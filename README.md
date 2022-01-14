@@ -13,7 +13,7 @@ Complete objectives while searching the worlds for characters, espers, and items
 ## Usage
 
 ```sh
-$ python3 wc.py ffiii.smc
+$ python3 wc.py -i ffiii.smc
 ```
 
 ```sh
