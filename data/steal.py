@@ -6,8 +6,9 @@ class Steal:
         self.rom = rom
         self.args = args
 
-    def enable_higher_steal_rate(self):
-        # Increase the Constant added to Attacker's Level from 50 (0x32) to 85 (0x55)
+    def enable_better_steal(self):
+        # Increase the Constant added to Attacker's Level from 50 (0x32) to 90 (0x5A)
+        # Effectively increases chance of stealing for same-level targets from 50% to 90%
         # Reference on Steal function (starts at C2 399E):
         #  StealValue = Attacker's level + Constant - Target's level
         #  If Thief Glove equipped: StealValue *= 2
@@ -16,9 +17,8 @@ class Steal:
         #  If StealValue < Random Value (0-99), then you fail to steal
         #  Else Steal is successful
         space = Reserve(0x239BB, 0x239BB, "steal value constant")
-        space.write(0x55) # default: 0x32
+        space.write(0x5A) # default: 0x32
 
-    def enable_more_rare_steals(self):
         # Increase the Rare Steal Constant from 32 (0x20) to 96 (0x60)
         # Effectively increases probably of stealing a rare item from 1/8 to 3/8
         # Occurs after the StealValue calculation above
@@ -32,11 +32,8 @@ class Steal:
         space.write(0x60) # default: 0x20
 
     def mod(self):
-        if self.args.higher_steal_rate:
-            self.enable_higher_steal_rate()
-
-        if self.args.more_rare_steals:
-            self.enable_more_rare_steals()
+        if self.args.better_steal:
+            self.enable_better_steal()
 
     def write(self):
         if self.args.spoiler_log:
