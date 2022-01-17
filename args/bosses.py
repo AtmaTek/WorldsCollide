@@ -11,6 +11,8 @@ def parse(parser):
                         help = "Boss battles randomized")
     bosses.add_argument("-bmbd", "--mix-bosses-dragons", action = "store_true",
                         help = "Shuffle/randomize bosses and dragons together")
+    bosses.add_argument("-bmbs", "--mix-bosses-statues", action = "store_true",
+                        help = "Shuffle/randomize bosses and statues together")
     bosses.add_argument("-srp3", "--shuffle-random-phunbaba3", action = "store_true",
                         help = "Apply Shuffle/Random to Phunbaba 3 (otherwise he will only appear in Mobliz WOR)")
     bosses.add_argument("-bnds", "--boss-normalize-distort-stats", action = "store_true",
@@ -33,6 +35,8 @@ def flags(args):
 
     if args.mix_bosses_dragons:
         flags += " -bmbd"
+    if args.mix_bosses_statues:
+        flags += " -bmbs"
     if args.shuffle_random_phunbaba3:
         flags += " -srp3"
     if args.boss_normalize_distort_stats:
@@ -54,6 +58,7 @@ def options(args):
     return [
         ("Boss Battles", boss_battles),
         ("Mix Bosses & Dragons", args.mix_bosses_dragons),
+        ("Mix Bosses & Statues", args.mix_bosses_statues),
         ("Shuffle/Random Phunbaba 3", args.shuffle_random_phunbaba3),
         ("Normalize & Distort Stats", args.boss_normalize_distort_stats),
         ("Boss Experience", args.boss_experience),
