@@ -18,6 +18,7 @@ class EnemyPacks():
     PHUNBABA3 = 386
     DOOM_GAZE = 349
 
+    # statues removed from shuffle pool with -bmbs flag
     DOOM=354
     GODDESS=355
     POLTERGEIST=356
