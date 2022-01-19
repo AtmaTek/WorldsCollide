@@ -1,4 +1,5 @@
 from constants.commands import *
+import random
 import args
 
 class Commands:
@@ -24,7 +25,25 @@ class Commands:
             except ValueError:
                 pass
 
-        import random
+        # if suplex a train condition exists, guarantee blitz
+        import objectives
+        blitz_id = name_id["Blitz"]
+        if objectives.suplex_train_condition_exists and blitz_id not in args.character_commands:
+            # try to replace a random "Random" or "Random Unique" command with Blitz (even if blitz in excluded commands)
+            possible_indices = []
+            for index, command in enumerate(args.character_commands):
+                if command == RANDOM_COMMAND or command == RANDOM_UNIQUE_COMMAND:
+                    possible_indices.append(index)
+
+            if not possible_indices:
+                # suplex a train explicitly picked and all commands explicitly picked (but none are blitz)
+                # force a random command to be blitz instead
+                possible_indices = list(range(len(args.character_commands)))
+
+            random_index = random.choice(possible_indices)
+            args.character_commands[random_index] = blitz_id
+            command_set.discard(blitz_id)
+
         for index, command in enumerate(args.character_commands):
             if command not in allowed_commands and (index != 0 or command != name_id["Morph"]) and (index != 12 or command != name_id["Leap"]):
                 raise ValueError(f"Invalid character command {command}")
@@ -57,7 +76,6 @@ class Commands:
             commands.append(self.characters[index].commands[1])
         commands.append(self.characters[Characters.GAU].commands[0]) # rage
 
-        import random
         random.shuffle(commands)
 
         for index in range(len(COMMAND_OPTIONS) - 1):
