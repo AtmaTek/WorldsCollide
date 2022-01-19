@@ -11,7 +11,7 @@ def parse(parser):
                         help = "Boss battles randomized")
     bosses.add_argument("-bmbd", "--mix-bosses-dragons", action = "store_true",
                         help = "Shuffle/randomize bosses and dragons together")
-    bosses.add_argument("-bmbs", "--mix-bosses-statues", action = "store_true",
+    bosses.add_argument("-bmbs", "--mix-bosses-statues", action = "store_true", default = True,
                         help = "Shuffle/randomize bosses and statues together")
     bosses.add_argument("-srp3", "--shuffle-random-phunbaba3", action = "store_true",
                         help = "Apply Shuffle/Random to Phunbaba 3 (otherwise he will only appear in Mobliz WOR)")
