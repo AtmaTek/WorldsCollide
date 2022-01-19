@@ -13,13 +13,15 @@ class MapProperty:
         self.data_start = self.DATA_START + self.id * self.DATA_SIZE
 
     def read(self):
-        data = self.rom.get_bytes(self.data_start, self.DATA_SIZE)
+        self.data = self.rom.get_bytes(self.data_start, self.DATA_SIZE)
 
-        self.name_index = data[0]
-        self.enable_random_encounters = (data[5] & 0x80) >> 7
+        self.name_index = self.data[0]
+        self.enable_random_encounters = (self.data[5] & 0x80) >> 7
+        self.song = self.data[28]
 
     def write(self):
-        pass
+        self.data[28] = self.song
+        self.rom.set_bytes(self.data_start, self.data)
 
     def print(self):
         print(f"{self.id}: {self.enable_random_encounters}")
