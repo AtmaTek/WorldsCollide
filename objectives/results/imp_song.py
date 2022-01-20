@@ -1,14 +1,14 @@
 from objectives.results._objective_result import *
 from objectives.results._apply_characters_party import ApplyToParty
+import instruction.field.entity as field_entity
 
 class Field(field_result.Result):
     def src(self):
-        from data.characters import Characters
         src = [
-            field.AddStatusEffects(Characters.PARTY0, field.Status.IMP),
-            field.AddStatusEffects(Characters.PARTY1, field.Status.IMP),
-            field.AddStatusEffects(Characters.PARTY2, field.Status.IMP),
-            field.AddStatusEffects(Characters.PARTY3, field.Status.IMP),
+            field.AddStatusEffects(field_entity.PARTY0, field.Status.IMP),
+            field.AddStatusEffects(field_entity.PARTY1, field.Status.IMP),
+            field.AddStatusEffects(field_entity.PARTY2, field.Status.IMP),
+            field.AddStatusEffects(field_entity.PARTY3, field.Status.IMP),
         ]
         return src
 
