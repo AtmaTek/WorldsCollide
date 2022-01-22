@@ -387,7 +387,7 @@ class Veldt(Event):
 
             battle_event.OpenMultiLineDialogWindow(),
             battle_event.DisplayMultiLineDialog(gau_char_arrives_dialog_id), # Gau: Uwaoo~!!
-            battle_event.FinishCheck(),
+            battle_event.IncrementChecksComplete(),
             battle_event.CloseMultiLineDialogWindow(),
             battle_event.End(),
         )

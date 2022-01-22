@@ -147,6 +147,8 @@ def menu(args):
     for index, entry in enumerate(entries):
         key, value = entry
         try:
+            value = value.replace("Original (Random Rates)", "Random Rates")
+            value = value.replace("Shuffle (Random Rates)", "Shuffle R Rates")
             value = value.replace("Random Value", "")
             value = value.replace("Random Percent", "")
             value = value.replace("Balanced Random", "Balanced")
