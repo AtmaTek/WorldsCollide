@@ -29,27 +29,30 @@ class CheckDragonBoss(asm.JSL):
 
             "DRAGON_CHECK_LOOP_START",
             asm.CMP(f0.dragon_formations, asm.LNG_X),
-            asm.BEQ("INCREMENT_DRAGON_COUNT"),      # branch if formation in dragon formations
+            asm.BEQ("CHECK_DRAGON_DEFEATED_BIT"),   # branch if formation in dragon formations
             asm.INX(),
             asm.INX(),
             asm.CPX(f0.dragon_formations_size, asm.IMM16),
             asm.BLT("DRAGON_CHECK_LOOP_START"),     # branch if not checked all dragon formations
             asm.BRA("CHECK_BOSS_FORMATIONS"),
 
-            "INCREMENT_DRAGON_COUNT",
-            asm.INC(dragons_defeated_address, asm.ABS),
+            "CHECK_DRAGON_DEFEATED_BIT",
             asm.TXA(),                              # a = formation index * 2
             asm.LSR(),                              # a = formation index
             asm.CLC(),
             asm.ADC(battle_bit.bit(battle_bit.DRAGON_DEFEATED_START), asm.IMM16),
             asm.LDX(0x0008, asm.IMM16),
             asm.JSR(f0.divide, asm.ABS),            # a = byte, x = bit
-            asm.PHY(),
-            asm.TAY(),                              # y = dragon battle byte
+            asm.PHA(),
             asm.JSR(f0.set_bit_x, asm.ABS),         # set bit #x in a
-            asm.ORA(dragon_bits_start, asm.ABS_Y),
-            asm.STA(dragon_bits_start, asm.ABS_Y),  # set dragon defeated battle bit
-            asm.PLY(),
+            asm.PLX(),                              # x = byte (pushed from a)
+            asm.BIT(dragon_bits_start, asm.ABS_X),  # is dragon defeated bit set?
+            asm.BNE("RETURN"),
+
+            "SET_DRAGON_DEFEATED",
+            asm.ORA(dragon_bits_start, asm.ABS_X),
+            asm.STA(dragon_bits_start, asm.ABS_X),  # set dragon defeated bit
+            asm.INC(dragons_defeated_address, asm.ABS), # increment dragons defeated count
             asm.BRA("RETURN"),
 
             "CHECK_BOSS_FORMATIONS",
@@ -57,27 +60,30 @@ class CheckDragonBoss(asm.JSL):
 
             "BOSS_CHECK_LOOP_START",
             asm.CMP(f0.boss_formations, asm.LNG_X),
-            asm.BEQ("INCREMENT_BOSS_COUNT"),        # branch if formation in boss formations
+            asm.BEQ("CHECK_BOSS_DEFEATED_BIT"),     # branch if formation in boss formations
             asm.INX(),
             asm.INX(),
             asm.CPX(f0.boss_formations_size, asm.IMM16),
             asm.BLT("BOSS_CHECK_LOOP_START"),       # branch if not checked all boss formations
             asm.BRA("RETURN"),
 
-            "INCREMENT_BOSS_COUNT",
-            asm.INC(bosses_defeated_address, asm.ABS),
+            "CHECK_BOSS_DEFEATED_BIT",
             asm.TXA(),                              # a = formation index * 2
             asm.LSR(),                              # a = formation index
             asm.CLC(),
             asm.ADC(battle_bit.bit(battle_bit.BOSS_DEFEATED_START), asm.IMM16),
             asm.LDX(0x0008, asm.IMM16),
             asm.JSR(f0.divide, asm.ABS),            # a = byte, x = bit
-            asm.PHY(),
-            asm.TAY(),                              # y = boss battle byte
+            asm.PHA(),
             asm.JSR(f0.set_bit_x, asm.ABS),         # set bit #x in a
-            asm.ORA(boss_bits_start, asm.ABS_Y),
-            asm.STA(boss_bits_start, asm.ABS_Y),    # set boss defeated battle bit
-            asm.PLY(),
+            asm.PLX(),                              # x = byte (pushed from a)
+            asm.BIT(boss_bits_start, asm.ABS_X),    # is boss defeated bit set?
+            asm.BNE("RETURN"),
+
+            "SET_BOSS_DEFEATED",
+            asm.ORA(boss_bits_start, asm.ABS_X),
+            asm.STA(boss_bits_start, asm.ABS_X),    # set boss defeated bit
+            asm.INC(bosses_defeated_address, asm.ABS),  # increment bosses defeated count
 
             "RETURN",
             asm.PLP(),
