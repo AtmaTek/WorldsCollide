@@ -334,6 +334,7 @@ class MagitekFactory(Event):
         space = Reserve(0xb3ff1, 0xb40e0, "magitek factory scene before crane fight", field.NOP())
         space.write(
             field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.IncrementEventWord(event_word.CHECKS_COMPLETE), # objectives finished after battle
             field.Branch(space.end_address + 1), # skip nops
         )
 
