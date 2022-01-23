@@ -66,10 +66,6 @@ class PhoenixCave(Event):
         character_requirements_cancel_landing = space.start_address
 
         space = Reserve(0xa0405, 0xa0428, "phoenix cave landing checks", field.NOP())
-        if self.args.character_gating:
-            space.write(
-                field.BranchIfEventBitClear(event_bit.character_recruited(self.character_gate()), no_locke_cancel_landing),
-            )
         space.write(
             field.BranchIfEventWordLess(event_word.CHARACTERS_AVAILABLE, self.characters_required(), character_requirements_cancel_landing),
             field.Branch(enter_phoenix_cave),
@@ -88,48 +84,66 @@ class PhoenixCave(Event):
         space = Reserve(0xc2b99, 0xc2b9d, "phoenix cave show magicite", field.NOP())
         space = Reserve(0xc2ba1, 0xc2ba4, "phoenix cave hide magicite", field.NOP())
 
+    def reward_mod(self, reward_instructions):
+        src = []
+        if self.args.character_gating:
+            src += [
+                field.ReturnIfEventBitClear(event_bit.character_recruited(self.character_gate())),
+            ]
+        src += [
+            Read(0xc2b3a, 0xc2b41), # create/show locke/npc
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, "phoenix cave reward room npc check")
+        npc_check = space.start_address
+
+        space = Reserve(0xc2b3a, 0xc2b41, "phoenix cave reward room start event tile", field.NOP())
+        space.write(
+            field.Branch(npc_check),
+        )
+
+        src = [
+            Read(0xc2b49, 0xc2b53), # event bits, magicite npc
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, "phoenix cave begin reward")
+        begin_reward = space.start_address
+
+        space = Reserve(0xc2b49, 0xc2b53, "phoenix cave call begin reward", field.NOP())
+        if self.args.character_gating:
+            space.write(
+                field.ReturnIfEventBitClear(event_bit.character_recruited(self.character_gate())),
+            )
+        space.write(
+            field.Call(begin_reward),
+        )
+
+        space = Reserve(0xc2bcb, 0xc2bef, "phoenix cave kohlingen rachel scenes", field.NOP())
+        space.write(
+            reward_instructions,
+            field.Call(field.RETURN_ALL_PARTIES_TO_FALCON),
+            field.FinishCheck(),
+            field.Return(),
+        )
+
     def character_mod(self, character):
         self.locke_npc.sprite = character
         self.locke_npc.palette = self.characters.get_palette(character)
 
         self.locke_holding_esper_mod()
 
-        space = Reserve(0xc2bcb, 0xc2bef, "phoenix cave kohlingen rachel scenes", field.NOP())
-        space.write(
+        self.reward_mod([
             field.RecruitCharacter(character),
-            field.Call(field.RETURN_ALL_PARTIES_TO_FALCON),
-            field.FinishCheck(),
-            field.Return(),
-        )
-
-        # TODO this should happen in the entrance event if event already done or if character reward
-        #      if come back in cave later the chest will be closed again but cannot be opened
-        open_chest_function = space.next_address
-        space.copy_from(0xc2b78, 0xc2b7d) # change chest sprite to open
-        space.copy_from(0xc2b3a, 0xc2b41) # create/show locke npc
-        space.write(
-            field.Return(),
-        )
-
-        space = Reserve(0xc2b3a, 0xc2b41, "create/show locke npc if phoenix cave not complete")
-        space.write(
-            field.Call(open_chest_function),
-            field.Return(),
-        )
-
+        ])
         space = Reserve(0xc2b76, 0xc2b7e, "phoenix cave open phoenix chest", field.NOP())
 
     def esper_item_mod(self, esper_item_instructions):
         self.locke_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.locke_npc.palette = self.characters.get_palette(self.locke_npc.sprite)
 
-        space = Reserve(0xc2bcb, 0xc2bef, "phoenix cave kohlingen rachel scenes", field.NOP())
-        space.write(
+        self.reward_mod([
             esper_item_instructions,
-            field.Call(field.RETURN_ALL_PARTIES_TO_FALCON),
-            field.FinishCheck(),
-            field.Return(),
-        )
+        ])
 
     def esper_mod(self, esper):
         self.esper_item_mod([
