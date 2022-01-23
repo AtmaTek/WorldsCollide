@@ -86,50 +86,20 @@ class DisplayMultiLineDialog(_Instruction):
     def __init__(self, dialog_id):
         super().__init__(0x01, dialog_id)
 
-class FinishCheck(_Instruction):
+class IncrementChecksComplete(_Instruction):
     def __init__(self):
-        import objectives
-        import data.dialogs as dialogs
-
         import data.event_word as event_word
         checks_complete_address = event_word.address(event_word.CHECKS_COMPLETE)
 
         src = [
             asm.INC(checks_complete_address, asm.ABS),
-        ]
-        for objective in objectives:
-            src += [
-                asm.XY8(),
-                objective.check_complete.battle(),
-                asm.XY16(),
-                asm.CMP(0x00, asm.IMM8),
-                asm.BEQ("AFTER_DIALOG" + str(objective.id)),    # if not complete, go to next objective
-
-                asm.LDA(dialogs.get_multi_line_battle_objective(objective.id), asm.IMM8),
-                asm.A16(),
-                asm.ASL(),  # a = dialog id * 2 (2 bytes per pointer)
-                asm.TAX(),  # x = dialog id * 2
-                asm.A8(),
-                asm.JSL(START_ADDRESS_SNES + c1.display_multi_line_dialog), # display objective complete dialog
-
-                "AFTER_DIALOG" + str(objective.id),
-            ]
-        src += [
-            "RETURN",
-            asm.RTL(),
-        ]
-        space = Write(Bank.F0, src, "battle event finish check")
-        finish_check = space.start_address
-
-        src = [
-            asm.JSL(START_ADDRESS_SNES + finish_check),
             asm.RTS(),
         ]
-        space = Write(Bank.C1, src, "battle event finish check command")
+        space = Write(Bank.C1, src, "battle event increment checks complete command")
         address = space.start_address
 
         opcode = 0x15
         _set_opcode_address(opcode, address)
 
-        FinishCheck.__init__ = lambda self : super().__init__(opcode)
+        IncrementChecksComplete.__init__ = lambda self : super().__init__(opcode)
         self.__init__()

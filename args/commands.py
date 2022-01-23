@@ -1,4 +1,4 @@
-from constants.commands import COMMAND_OPTIONS, RANDOM_COMMAND, RANDOM_UNIQUE_COMMAND, NONE_COMMAND, RANDOM_EXCLUDE_COMMANDS, id_name
+from constants.commands import COMMAND_OPTIONS, RANDOM_COMMAND, RANDOM_UNIQUE_COMMAND, NONE_COMMAND, RANDOM_EXCLUDE_COMMANDS, id_name, name_id
 
 def name():
     return "Commands"
@@ -15,6 +15,7 @@ def parse(parser):
 
 def process(args):
     if not args.commands:
+        args.blitz_command_possible = True
         return
 
     digits = 2 # number of digits each command id substring is
@@ -42,6 +43,10 @@ def process(args):
         args.random_exclude_commands.append(args.random_exclude_command4)
     if args.random_exclude_command5 != NONE_COMMAND:
         args.random_exclude_commands.append(args.random_exclude_command5)
+
+    random_exists = "Random" in args.command_strings or "Random Unique" in args.command_strings
+    blitz_excluded = name_id["Blitz"] in args.random_exclude_commands
+    args.blitz_command_possible = ("Blitz" in args.command_strings) or (random_exists and not blitz_excluded)
 
 def flags(args):
     flags = ""
