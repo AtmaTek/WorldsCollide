@@ -1,3 +1,5 @@
+from memory.space import *
+
 def main():
     import args
     import log
@@ -22,6 +24,8 @@ def main():
 
     from bug_fixes import BugFixes
     bug_fixes = BugFixes()
+
+    print(Space.heaps)
 
     data.write()
     memory.write()
