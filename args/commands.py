@@ -71,7 +71,7 @@ def flags(args):
     if args.random_exclude_command5 != NONE_COMMAND:
         flags += f" -rec5 {args.random_exclude_command5}"
     if args.random_exclude_command6 != NONE_COMMAND:
-        flags += f" -rec6 {args.random_exclude_command5}"
+        flags += f" -rec6 {args.random_exclude_command6}"
 
     return flags
 
