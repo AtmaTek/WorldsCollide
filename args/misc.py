@@ -13,6 +13,8 @@ def parse(parser):
                       help = "Randomize clock's correct time and NPC clues in Zozo")
     misc.add_argument("-scan", "--scan-all", action = "store_true",
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
+    misc.add_argument("-ff", "--fewer-flashes", action = "store_true",
+                      help = "Reduce the amount of background screen flashing")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
@@ -65,6 +67,8 @@ def flags(args):
         flags += " -rc"
     if args.scan_all:
         flags += " -scan"
+    if args.fewer_flashes:
+        flags += " -ff"
 
     if args.event_timers_random:
         flags += " -etr"
@@ -129,6 +133,7 @@ def options(args):
         ("Random RNG", args.random_rng),
         ("Random Clock", args.random_clock),
         ("Scan All", args.scan_all),
+        ("Fewer Flashes", args.fewer_flashes),
         ("Event Timers", event_timers),
         ("Y NPC", y_npc),
     ]
