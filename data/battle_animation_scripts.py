@@ -6,23 +6,23 @@
 # By changing address + 1 to E0 (for absolute) or F0 (for relative), it causes no change to the background color (that is, no flash)
 BATTLE_ANIMATION_FLASHES = [
     # [ Animation Script $01A2: Goner (bg1) ]
-    0x100088,
-    0x10008C,
-    0x100092,
-    0x100098,
-    0x1000A1,
-    0x1000A3,
-    0x1000D3,
-    0x1000DF,
-    0x100172,
+    #0x100088,
+    #0x10008C,
+    #0x100092,
+    #0x100098,
+    #0x1000A1,
+    #0x1000A3,
+    #0x1000D3,
+    #0x1000DF,
+    #0x100172,
     # [ Animation Script $0284: Misc. Monster Animation $0D: Final KEFKA Death (bg1) ]
-    0x10023A,
-    0x100240,
-    0x100248,
-    0x10024E,
-    0x10025B,
-    0x10025F,
-    0x100265,
+    #0x10023A,
+    #0x100240,
+    #0x100248,
+    #0x10024E,
+    #0x10025B,
+    #0x10025F,
+    #0x100265,
     # [ Animation Script $011F: Atom Edge, True Edge (bg1) ]
     0x1003D0,
     0x1003DD,
@@ -30,27 +30,27 @@ BATTLE_ANIMATION_FLASHES = [
     0x10044B,
     0x100457,
     # [ Animation Script $027B: Monster Exit $0C: Boss Death (bg1) ]
-    0x100476,
-    0x10047C,
-    0x100484,
-    0x100497,
+    #0x100476,
+    #0x10047C,
+    #0x100484,
+    #0x100497,
     # [ Animation Script $023A: Event Animation $0E: Transform into Magicite (bg3) ]
     0x100F30,
     0x100F3F,
     0x100F4E,
     # [ Animation Script $01C2: Meteo (bg3) ]
-    0x1011DC,
-    0x1011E0,
-    0x1011EA,
+    #0x1011DC,
+    #0x1011E0,
+    #0x1011EA,
     # [ Animation Script $00AF: Purifier (bg3) ]
     0x101340,
     0x101348,
     0x101380,
     0x10138A,
     # [ Animation Script $0180: CleanSweep (bg1) ]
-    0x1016E8,
-    0x1016F6,
-    0x101717,
+    #0x1016E8,
+    #0x1016F6,
+    #0x101717,
     # [ Animation Script $00FA: Wall (bg1) ]
     0x10177B,
     0x10177F,
@@ -125,13 +125,13 @@ BATTLE_ANIMATION_FLASHES = [
     0x101EFD,
     0x101F07,
     # [ Animation Script $01F5: Water Edge (sprite) ]
-    0x10235A,
-    0x10235E,
-    0x102376,
+    #0x10235A,
+    #0x10235E,
+    #0x102376,
     # [ Animation Script $01F4: Fire Skean (bg1) ]
-    0x1023C7,
-    0x1023CB,
-    0x1023DB,
+    #0x1023C7,
+    #0x1023CB,
+    #0x1023DB,
     # [ Animation Script $01CC: TigerBreak (bg1) ]
     0x10240D,
     0x102411,
@@ -213,11 +213,11 @@ BATTLE_ANIMATION_FLASHES = [
     0x1030CA,
     0x1030CE,
     # [ Animation Script $01A5: Flare Star (bg1) ]
-    0x1030F5,
-    0x103106,
-    0x10310D,
-    0x103123,
-    0x10312E,
+    #0x1030F5,
+    #0x103106,
+    #0x10310D,
+    #0x103123,
+    #0x10312E,
     # [ Animation Script $01A0: Quasar (bg1) ]
     0x1031D2,
     0x1031D6,
@@ -347,7 +347,7 @@ BATTLE_ANIMATION_FLASHES = [
     0x1056F5,
     # [ Animation Script $00D7: Flare (sprite) ]
     0x1057AD,
-    0x1057B1,
+    0x1057B1,                      
     0x1057DD,
     # [ Animation Script $00EA: Bolt 3, Giga Volt (sprite) ]
     0x10588E,
@@ -366,7 +366,7 @@ BATTLE_ANIMATION_FLASHES = [
     # [ Animation Script $00D2: X-Zone (bg3) ]
     0x105A5D,
     0x105A6A,
-    0x105A79,
+    0x105A79,              
     # [ Animation Script $00CF: Meteor (bg1) ]
     0x105AF7,
     0x105AFB,
@@ -397,9 +397,9 @@ BATTLE_ANIMATION_FLASHES = [
     0x106C95,
     0x106C9E,
     # [ Animation Script $006B: Fire Dance (bg1) ]
-    0x106D83,
-    0x106D89,
-    0x106DB5,
+    #0x106D83,
+    #0x106D89,
+    #0x106DB5,
     # [ Animation Script $01D7: Empowerer (bg1) ]
     0x106FA2,
     0x106FA8,
