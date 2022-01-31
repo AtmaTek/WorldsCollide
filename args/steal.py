@@ -4,7 +4,7 @@ def name():
 def parse(parser):
     steal = parser.add_argument_group("Steal")
 
-    steal.add_argument("-bs", "--better-steal", action = "store_true",
+    steal.add_argument("-bst", "--better-steal", action = "store_true",
                          help = "Steal Rate is improved and rare steals are more likely")
 
 def process(args):
@@ -14,7 +14,7 @@ def flags(args):
     flags = ""
 
     if args.better_steal:
-        flags += " -bs"
+        flags += " -bst"
 
     return flags
 
