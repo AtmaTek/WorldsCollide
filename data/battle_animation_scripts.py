@@ -4,23 +4,24 @@
 #  AF - Set background palette color subtraction (absolute)
 #  B6 - Subtract color from background palette (relative)
 # By changing address + 1 to E0 (for absolute) or F0 (for relative), it causes no change to the background color (that is, no flash)
+# If it's commented out, then that background palette change will stay vanilla.
 BATTLE_ANIMATION_FLASHES = [
     # [ Animation Script $01A2: Goner (bg1) ]
-    #0x100088,
-    #0x10008C,
-    #0x100092,
-    #0x100098,
-    #0x1000A1,
+    #0x100088, 
+    #0x10008C, 
+    #0x100092, 
+    #0x100098, 
+    #0x1000A1, 
     #0x1000A3,
     #0x1000D3,
     #0x1000DF,
     #0x100172,
     # [ Animation Script $0284: Misc. Monster Animation $0D: Final KEFKA Death (bg1) ]
-    #0x10023A,
-    #0x100240,
-    #0x100248,
-    #0x10024E,
-    #0x10025B,
+    0x10023A, #initial flash
+    0x100240,
+    0x100248,
+    0x10024E,
+    #0x10025B, #start final fade to black
     #0x10025F,
     #0x100265,
     # [ Animation Script $011F: Atom Edge, True Edge (bg1) ]
@@ -30,10 +31,10 @@ BATTLE_ANIMATION_FLASHES = [
     0x10044B,
     0x100457,
     # [ Animation Script $027B: Monster Exit $0C: Boss Death (bg1) ]
-    #0x100476,
-    #0x10047C,
-    #0x100484,
-    #0x100497,
+    0x100476, #flash 1
+    0x10047C, #fade
+    0x100484, #flash 2
+    0x100497,
     # [ Animation Script $023A: Event Animation $0E: Transform into Magicite (bg3) ]
     0x100F30,
     0x100F3F,
@@ -232,9 +233,9 @@ BATTLE_ANIMATION_FLASHES = [
     0x1034D9,
     0x1034E0,
     # [ Animation Script $0190: L.4 Flare (extra) ]
-    0x103585,
-    0x10358C,
-    0x10359A,
+    #0x103585,
+    #0x10358C,
+    #0x10359A,
     # [ Animation Script $0185: L.5 Doom (sprite) ]
     0x1035E6,
     0x1035F6,
@@ -346,9 +347,9 @@ BATTLE_ANIMATION_FLASHES = [
     0x1056ED,
     0x1056F5,
     # [ Animation Script $00D7: Flare (sprite) ]
-    0x1057AD,
-    0x1057B1,                      
-    0x1057DD,
+    #0x1057AD,
+    #0x1057B1,
+    #0x1057DD,
     # [ Animation Script $00EA: Bolt 3, Giga Volt (sprite) ]
     0x10588E,
     0x105893,
