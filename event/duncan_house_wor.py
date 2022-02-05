@@ -58,13 +58,6 @@ class DuncanHouseWOR(Event):
             space.write(field_entity.PARTY0)
 
     def bum_rush_flash_mod(self):
-        space = Reserve(0xc0d12, 0xc0d13, "duncan house wor bum rush flash 01", field.NOP())
-        space = Reserve(0xc0d5f, 0xc0d60, "duncan house wor bum rush flash 02", field.NOP())
-        space = Reserve(0xc0d7f, 0xc0d80, "duncan house wor bum rush flash 03", field.NOP())
-        space = Reserve(0xc0d9f, 0xc0da0, "duncan house wor bum rush flash 04", field.NOP())
-        space = Reserve(0xc0df0, 0xc0df1, "duncan house wor bum rush flash 05", field.NOP())
-        space = Reserve(0xc0e09, 0xc0e0a, "duncan house wor bum rush flash 06", field.NOP())
-        space = Reserve(0xc0e22, 0xc0e23, "duncan house wor bum rush flash 07", field.NOP())
-        space = Reserve(0xc0e3b, 0xc0e3c, "duncan house wor bum rush flash 08", field.NOP())
-        space = Reserve(0xc0e65, 0xc0e66, "duncan house wor bum rush flash 09", field.NOP())
-        space = Reserve(0xc0e74, 0xc0e75, "duncan house wor bum rush flash 10", field.NOP())
+        flash_addresses = [0xc0d12, 0xc0d5f, 0xc0d7f, 0xc0d9f, 0xc0df0, 0xc0e09, 0xc0e22, 0xc0e3b, 0xc0e65, 0xc0e74]
+        for address in flash_addresses:
+            space = Reserve(address, address + 1, "duncan house wor bum rush flash", field.NOP())

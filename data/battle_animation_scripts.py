@@ -4,440 +4,272 @@
 #  AF - Set background palette color subtraction (absolute)
 #  B6 - Subtract color from background palette (relative)
 # By changing address + 1 to E0 (for absolute) or F0 (for relative), it causes no change to the background color (that is, no flash)
-# If it's commented out, then that background palette change will stay vanilla.
-BATTLE_ANIMATION_FLASHES = [
-    # [ Animation Script $01A2: Goner (bg1) ]
-    #0x100088, 
-    #0x10008C, 
-    #0x100092, 
-    #0x100098, 
-    #0x1000A1, 
-    #0x1000A3,
-    #0x1000D3,
-    #0x1000DF,
-    #0x100172,
-    # [ Animation Script $0284: Misc. Monster Animation $0D: Final KEFKA Death (bg1) ]
-    0x10023A, #initial flash
-    0x100240,
-    0x100248,
-    0x10024E,
-    #0x10025B, #start final fade to black
-    #0x10025F,
-    #0x100265,
-    # [ Animation Script $011F: Atom Edge, True Edge (bg1) ]
-    0x1003D0,
-    0x1003DD,
-    0x1003E6,
-    0x10044B,
-    0x100457,
-    # [ Animation Script $027B: Monster Exit $0C: Boss Death (bg1) ]
-    0x100476, #flash 1
-    0x10047C, #fade
-    0x100484, #flash 2
-    0x100497,
-    # [ Animation Script $023A: Event Animation $0E: Transform into Magicite (bg3) ]
-    0x100F30,
-    0x100F3F,
-    0x100F4E,
-    # [ Animation Script $01C2: Meteo (bg3) ]
-    #0x1011DC,
-    #0x1011E0,
-    #0x1011EA,
-    # [ Animation Script $00AF: Purifier (bg3) ]
-    0x101340,
-    0x101348,
-    0x101380,
-    0x10138A,
-    # [ Animation Script $0180: CleanSweep (bg1) ]
-    #0x1016E8,
-    #0x1016F6,
-    #0x101717,
-    # [ Animation Script $00FA: Wall (bg1) ]
-    0x10177B,
-    0x10177F,
-    0x101788,
-    0x101791,
-    0x10179A,
-    0x1017A3,
-    0x1017AC,
-    0x1017B5,
-    # [ Animation Script $00E5: Pearl (bg1) ]
-    0x10190E,
-    0x101913,
-    0x10191E,
-    # [ Animation Script $00E6: Pearl (bg3) ]
-    0x10193E,
-    # [ Animation Script $00E0: Ice 3 (sprite) ]
-    0x101978,
-    0x10197B,
-    0x10197E,
-    0x101981,
-    0x101984,
-    0x101987,
-    0x10198A,
-    0x10198D,
-    0x101990,
-    # [ Animation Script $00C4: Fire 3 (sprite) ]
-    0x1019FA,
-    0x101A1C,
-    # [ Animation Script $00ED: Sleep (bg1) ]
-    0x101A23,
-    0x101A29,
-    0x101A33,
-    # [ Animation Script $0220: 7-Flush (bg1) ]
-    0x101B43,
-    0x101B47,
-    0x101B4D,
-    0x101B53,
-    0x101B59,
-    0x101B5F,
-    0x101B65,
-    0x101B6B,
-    # [ Animation Script $021E: H-Bomb (bg1) ]
-    0x101BC5,
-    0x101BC9,
-    0x101C13,
-    # [ Animation Script $0218: Revenger (sprite) ]
-    0x101C62,
-    0x101C66,
-    0x101C6C,
-    0x101C72,
-    0x101C78,
-    0x101C7E,
-    0x101C84,
-    0x101C86,
-    0x101C8C,
-    # [ Animation Script $0210: Phantasm (bg3) ]
-    0x101DFD,
-    0x101E03,
-    0x101E07,
-    0x101E0D,
-    0x101E15,
-    0x101E1F,
-    0x101E27,
-    0x101E2F,
-    0x101E3B,
-    # [ Animation Script $0215: Zinger (bg1) ]
-    0x101E54,
-    0x101E5A,
-    0x101E6B,
-    # [ Animation Script $0208: N. Cross (bg3) ]
-    0x101EF9,
-    0x101EFD,
-    0x101F07,
-    # [ Animation Script $01F5: Water Edge (sprite) ]
-    #0x10235A,
-    #0x10235E,
-    #0x102376,
-    # [ Animation Script $01F4: Fire Skean (bg1) ]
-    #0x1023C7,
-    #0x1023CB,
-    #0x1023DB,
-    # [ Animation Script $01CC: TigerBreak (bg1) ]
-    0x10240D,
-    0x102411,
-    0x102416,
-    # [ Animation Script $01F3: Fader (bg1) ]
-    0x102480,
-    0x102484,
-    0x1024C2,
-    # [ Animation Script $01F0: Tri-Dazer (bg1) ]
-    0x1024D1,
-    0x1024D5,
-    0x1024E3,
-    # [ Animation Script $01EE: Metamorph (bg1) ]
-    0x102595,
-    0x102599,
-    0x1025AF,
-    # [ Animation Script $01E9: Cat Rain (bg1) ]
-    0x102677,
-    0x10267B,
-    # [ Animation Script $01E6: Charm (sprite) ]
-    0x1026EE,
-    0x1026FB,
-    # [ Animation Script $01DE: Mirager (sprite) ]
-    0x102791,
-    0x102795,
-    # [ Animation Script $01DC: SabreSoul (bg1) ]
-    0x1027D3,
-    0x1027DA,
-    # [ Animation Script $01CD: Back Blade (bg3) ]
-    0x1028D3,
-    0x1028DF,
-    # [ Animation Script $01CA: RoyalShock (bg1) ]
-    0x102967,
-    0x10296B,
-    0x102973,
-    # [ Animation Script $01C1:  ]
-    0x102AAD,
-    0x102AB1,
-    # [ Animation Script $01B8: Absolute 0 (bg1) ]
-    0x102BF4,
-    0x102BF8,
-    0x102C10,
-    # [ Animation Script $01B7: Overcast (bg1) ]
-    0x102C3A,
-    0x102C55,
-    0x102C8D,
-    0x102C91,
-    # [ Animation Script $01B5: Disaster (bg1) ]
-    0x102CEE,
-    0x102CF2,
-    0x102D19,
-    # [ Animation Script $01B1: Force Field (bg3) ]
-    0x102D3A,
-    0x102D48,
-    0x102D64,
-    # [ Animation Script $01AF: Event Animation $00: Terra/Tritoch Lightning (bg1) ]
-    0x102E05,
-    0x102E09,
-    0x102E24,
-    # [ Animation Script $01AD: S. Cross (bg1) ]
-    0x102EDA,
-    0x102EDE,
-    0x102FA8,
-    0x102FB1,
-    0x102FBE,
-    0x102FD9,
-    # [ Animation Script $01AB: Mind Blast (bg3) ]
-    0x102FED,
-    0x102FF1,
-    0x102FF7,
-    0x102FF9,
-    0x102FFF,
-    0x103001,
-    0x103007,
-    0x10300D,
-    0x103015,
-    0x10301F,
-    # [ Animation Script $01A8:  ]
-    0x1030CA,
-    0x1030CE,
-    # [ Animation Script $01A5: Flare Star (bg1) ]
-    #0x1030F5,
-    #0x103106,
-    #0x10310D,
-    #0x103123,
-    #0x10312E,
-    # [ Animation Script $01A0: Quasar (bg1) ]
-    0x1031D2,
-    0x1031D6,
-    0x1031FA,
-    # [ Animation Script $019A: R.Polarity (bg1) ]
-    0x10328B,
-    0x103292,
-    # [ Animation Script $0192: Rippler (sprite) ]
-    0x1033C6,
-    0x1033CA,
-    # [ Animation Script $018B: Step Mine (sprite) ]
-    0x1034D9,
-    0x1034E0,
-    # [ Animation Script $0190: L.4 Flare (extra) ]
-    #0x103585,
-    #0x10358C,
-    #0x10359A,
-    # [ Animation Script $0185: L.5 Doom (sprite) ]
-    0x1035E6,
-    0x1035F6,
-    # [ Animation Script $0178: Megazerk (bg1) ]
-    0x103757,
-    0x103761,
-    0x10378F,
-    0x103795,
-    0x10379B,
-    0x1037A1,
-    0x1037A7,
-    0x1037AD,
-    0x1037B3,
-    0x1037B9,
-    0x1037C0,
-    # [ Animation Script $0176: Schiller (sprite) ]
-    0x103819,
-    0x10381D,
-    # [ Animation Script $016E: WallChange (sprite) ]
-    0x10399E,
-    0x1039A3,
-    0x1039A9,
-    0x1039AF,
-    0x1039B5,
-    0x1039BB,
-    0x1039C1,
-    0x1039C7,
-    0x1039CD,
-    0x1039D4,
-    # [ Animation Script $0169:  ]
-    0x103AEA,
-    0x103AED,
-    0x103AF0,
-    0x103AF3,
-    0x103AF6,
-    0x103AF9,
-    0x103AFC,
-    0x103AFF,
-    0x103B02,
-    # [ Animation Script $0161: Exploder (bg3) ]
-    0x103BC3,
-    0x103BC9,
-    0x103BCC,
-    0x103BDD,
-    # [ Animation Script $0137: Plasma (sprite) ]
-    0x104426,
-    0x10442A,
-    0x10443A,
-    # [ Animation Script $0125: Sun Bath (extra) ]
-    0x10494C,
-    0x104950,
-    0x10495A,
-    # [ Animation Script $0122: Moon Song (sprite) ]
-    0x1049B1,
-    0x1049B9,
-    0x1049D5,
-    # [ Animation Script $011A: Chaos Wing (bg1) ]
-    0x104ACE,
-    0x104AD5,
-    0x104AFA,
-    # [ Animation Script $0119: Sun Flare (bg1) ]
-    0x104C60,
-    0x104C6B,
-    0x104C77,
-    0x104C7C,
-    # [ Animation Script $010C: Heal Horn (bg1) ]
-    0x104DAF,
-    0x104DCA,
-    0x104DDE,
-    # [ Animation Script $010A: Life Guard (bg1) ]
-    0x104E27,
-    0x104E4A,
-    0x104E64,
-    # [ Animation Script $0102: Hope Song (bg3) {Siren}]
-    0x10504B,
-    0x10507B,
-    0x1050FB,
-    # [ Animation Script $0100: Gem Dust (sprite) {Shiva}]
-    0x105223,
-    0x10523C,
-    0x10524A,
-    0x10524F,
-    # [ Animation Script $00FD: Bolt Fist (sprite) {Ramuh}]
-    0x1052CE,
-    0x1052EC,
-    0x105302,
-    # [ Animation Script $00F6: Sea Song (bg1) ]
-    0x105312,
-    0x10531E,
-    0x105353,
-    # [ Animation Script $00F5: Earth Aura (sprite) ]
-    0x105432,
-    0x105438,
-    0x105444,
-    # [ Animation Script $0252: Demon Eye (sprite) {Shoat}]
-    0x105455,
-    0x105477,
-    0x105481,
-    # [ Animation Script $00EF: Inferno (bg1) {Ifrit}]
-    0x1055F0,
-    0x1055FC,
-    0x105601,
-    0x105606,
-    0x10560B,
-    0x10565C,
-    # [ Animation Script $00E7: Ultima (bg1) ]
-    0x1056CB,
-    0x1056CF,
-    0x1056ED,
-    0x1056F5,
-    # [ Animation Script $00D7: Flare (sprite) ]
-    #0x1057AD,
-    #0x1057B1,
-    #0x1057DD,
-    # [ Animation Script $00EA: Bolt 3, Giga Volt (sprite) ]
-    0x10588E,
-    0x105893,
-    0x105896,
-    0x105899,
-    0x10589C,
-    0x1058A1,
-    0x1058A6,
-    0x1058AB,
-    0x1058B0,
-    # [ Animation Script $00D9: Merton (bg3) ]
-    0x1059EF,
-    0x105A08,
-    0x105A1C,
-    # [ Animation Script $00D2: X-Zone (bg3) ]
-    0x105A5D,
-    0x105A6A,
-    0x105A79,              
-    # [ Animation Script $00CF: Meteor (bg1) ]
-    0x105AF7,
-    0x105AFB,
-    0x105B17,
-    # [ Animation Script $00BF: Dispel (bg1) ]
-    0x105DC2,
-    0x105DC9,
-    0x105DD2,
-    0x105DDB,
-    0x105DE4,
-    0x105DED,
-    # [ Animation Script $00AA: Muddle, L.3 Muddle, Confusion (sprite) ]
-    0x1060EA,
-    0x1060EE,
-    # [ Animation Script $0081: Shock (bg1) ]
-    0x1068BE,
-    0x1068D0,
-    # [ Animation Script $0070: Spiraler (bg1) ]
-    0x106B8A,
-    0x106B8F,
-    0x106BF4,
-    # [ Animation Script $006F: Bum Rush (sprite) ]
-    0x106C3E,
-    0x106C47,
-    0x106C53,
-    0x106C7E,
-    0x106C87,
-    0x106C95,
-    0x106C9E,
-    # [ Animation Script $006B: Fire Dance (bg1) ]
-    #0x106D83,
-    #0x106D89,
-    #0x106DB5,
-    # [ Animation Script $01D7: Empowerer (bg1) ]
-    0x106FA2,
-    0x106FA8,
-    0x106FB9,
-    0x106FC0,
-    0x106FC8,
-    # [ Animation Script $01D6: Stunner (sprite) ]
-    0x1071BA,
-    0x1071C1,
-    0x1071CA,
-    0x1071D5,
-    0x1071DE,
-    0x1071E9,
-    0x1071F2,
-    0x1071FD,
-    0x107206,
-    0x107211,
-    0x10721A,
-    0x10725A,
-    # [ Animation Script $01D3: Quadra Slam, Quadra Slice (sprite) ]
-    0x1073DC,
-    0x1073EE,
-    0x1073F3,
-    0x107402,
-    0x107424,
-    0x107429,
-    0x107436,
-    0x107458,
-    0x10745D,
-    0x107490,
-    0x1074B2,
-    0x1074B7,
-    # [ Animation Script $01D1: Slash (sprite) ]
-    0x1074F4,
-    0x1074FD,
-    0x107507,
-    # [ Animation Script $0052: Flash (sprite) ]
-    0x107850,
-    0x10785C
-]
+BATTLE_ANIMATION_FLASHES = {
+    "Final KEFKA Death": [
+        0x10023A, # B0 FF - set background color addition to 31 (white)
+        0x100240, # B5 F4 - decrease background color addition by 4 (white)
+        0x100248, # B0 FF - set background color addition to 31 (white)
+        0x10024E, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "Boss Death": [
+        0x100476, # B0 FF - set background color addition to 31 (white)
+        0x10047C, # B5 F4 - decrease background color addition by 4 (white)
+        0x100484, # B0 FF - set background color addition to 31 (white)
+        0x100497, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "Transform into Magicite": [
+        0x100F30, # B0 FF - set background color addition to 31 (white)
+        0x100F3F, # B5 F2 - decrease background color addition by 2 (white)
+        0x100F4E, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Purifier": [
+        0x101340, # AF E0 - set background color subtraction to 0 (black)
+        0x101348, # B6 62 - increase background color subtraction by 2 (red)
+        0x101380, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x10138A, # B6 F1 - decrease background color subtraction by 1 (black)
+        ],
+    "Wall": [
+        0x10177B, # AF E0 - set background color subtraction to 0 (black)
+        0x10177F, # B6 61 - increase background color subtraction by 1 (red)
+        0x101788, # B6 51 - decrease background color subtraction by 1 (magenta)
+        0x101791, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x10179A, # B6 31 - decrease background color subtraction by 1 (yellow)
+        0x1017A3, # B6 41 - increase background color subtraction by 1 (magenta)
+        0x1017AC, # B6 91 - decrease background color subtraction by 1 (cyan)
+        0x1017B5, # B6 51 - decrease background color subtraction by 1 (magenta)
+        ],
+    "Pearl": [
+        0x10190E, # B0 E0 - set background color addition to 0 (white)
+        0x101913, # B5 E2 - increase background color addition by 2 (white)
+        0x10191E, # B5 F1 - decrease background color addition by 1 (white)
+        0x10193E, # B6 C2 - increase background color subtraction by 2 (blue)
+        ],
+    "Ice 3": [
+        0x101978, # B0 FF - set background color addition to 31 (white)
+        0x10197B, # B5 F4 - decrease background color addition by 4 (white)
+        0x10197E, # B5 F4 - decrease background color addition by 4 (white)
+        0x101981, # B5 F4 - decrease background color addition by 4 (white)
+        0x101984, # B5 F4 - decrease background color addition by 4 (white)
+        0x101987, # B5 F4 - decrease background color addition by 4 (white)
+        0x10198A, # B5 F4 - decrease background color addition by 4 (white)
+        0x10198D, # B5 F4 - decrease background color addition by 4 (white)
+        0x101990, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "Fire 3": [
+        0x1019FA, # B0 9F - set background color addition to 31 (red)
+        0x101A1C, # B5 94 - decrease background color addition by 4 (red)
+        ],
+    "Sleep": [
+        0x101A23, # AF E0 - set background color subtraction to 0 (black)
+        0x101A29, # B6 E1 - increase background color subtraction by 1 (black)
+        0x101A33, # B6 F1 - decrease background color subtraction by 1 (black)
+        ],
+    "7-Flush": [
+        0x101B43, # AF E0 - set background color subtraction to 0 (black)
+        0x101B47, # B6 61 - increase background color subtraction by 1 (red)
+        0x101B4D, # B6 51 - decrease background color subtraction by 1 (magenta)
+        0x101B53, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x101B59, # B6 31 - decrease background color subtraction by 1 (yellow)
+        0x101B5F, # B6 41 - increase background color subtraction by 1 (magenta)
+        0x101B65, # B6 91 - decrease background color subtraction by 1 (cyan)
+        0x101B6B, # B6 51 - decrease background color subtraction by 1 (magenta)
+        ],
+    "H-Bomb": [
+        0x101BC5, # B0 E0 - set background color addition to 0 (white)
+        0x101BC9, # B5 E1 - increase background color addition by 1 (white)
+        0x101C13, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Revenger": [
+        0x101C62, # AF E0 - set background color subtraction to 0 (black)
+        0x101C66, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x101C6C, # B6 41 - increase background color subtraction by 1 (magenta)
+        0x101C72, # B6 91 - decrease background color subtraction by 1 (cyan)
+        0x101C78, # B6 21 - increase background color subtraction by 1 (yellow)
+        0x101C7E, # B6 51 - decrease background color subtraction by 1 (magenta)
+        0x101C84, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x101C86, # B6 31 - decrease background color subtraction by 1 (yellow)
+        0x101C8C, # B6 91 - decrease background color subtraction by 1 (cyan)
+        ],
+    "Phantasm": [
+        0x101DFD, # AF E0 - set background color subtraction to 0 (black)
+        0x101E03, # B6 E1 - increase background color subtraction by 1 (black)
+        0x101E07, # B0 FF - set background color addition to 31 (white)
+        0x101E0D, # B5 F4 - decrease background color addition by 4 (white)
+        0x101E15, # B6 E2 - increase background color subtraction by 2 (black)
+        0x101E1F, # B0 FF - set background color addition to 31 (white)
+        0x101E27, # B5 F4 - decrease background color addition by 4 (white)
+        0x101E2F, # B6 E2 - increase background color subtraction by 2 (black)
+        0x101E3B, # B6 F1 - decrease background color subtraction by 1 (black)
+        ],
+    "TigerBreak": [
+        0x10240D, # B0 FF - set background color addition to 31 (white)
+        0x102411, # B5 F2 - decrease background color addition by 2 (white)
+        0x102416, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Cat Rain": [
+        0x102677, # B0 FF - set background color addition to 31 (white)
+        0x10267B, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Charm": [
+        0x1026EE, # B0 FF - set background color addition to 31 (white)
+        0x1026FB, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Mirager": [
+        0x102791, # B0 FF - set background color addition to 31 (white)
+        0x102795, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "SabreSoul": [
+        0x1027D3, # B0 FF - set background color addition to 31 (white)
+        0x1027DA, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Back Blade": [
+        0x1028D3, # AF FF - set background color subtraction to 31 (black)
+        0x1028DF, # B6 F4 - decrease background color subtraction by 4 (black)
+        ],
+    "RoyalShock": [
+        0x102967, # B0 FF - set background color addition to 31 (white)
+        0x10296B, # B5 F2 - decrease background color addition by 2 (white)
+        0x102973, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Mind Blast": [
+        0x102FED, # B0 E0 - set background color addition to 0 (white)
+        0x102FF1, # B5 81 - increase background color addition by 1 (red)
+        0x102FF7, # B5 91 - decrease background color addition by 1 (red)
+        0x102FF9, # B5 21 - increase background color addition by 1 (blue)
+        0x102FFF, # B5 31 - decrease background color addition by 1 (blue)
+        0x103001, # B5 C1 - increase background color addition by 1 (yellow)
+        0x103007, # B5 91 - decrease background color addition by 1 (red)
+        0x10300D, # B5 51 - decrease background color addition by 1 (green)
+        0x103015, # B5 E2 - increase background color addition by 2 (white)
+        0x10301F, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "R.Polarity": [
+        0x10328B, # B0 FF - set background color addition to 31 (white)
+        0x103292, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Rippler": [
+        0x1033C6, # B0 FF - set background color addition to 31 (white)
+        0x1033CA, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Step Mine": [
+        0x1034D9, # B0 FF - set background color addition to 31 (white)
+        0x1034E0, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "L.5 Doom": [
+        0x1035E6, # B0 FF - set background color addition to 31 (white)
+        0x1035F6, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "Megazerk": [
+        0x103757, # B0 80 - set background color addition to 0 (red)
+        0x103761, # B5 82 - increase background color addition by 2 (red)
+        0x10378F, # B5 92 - decrease background color addition by 2 (red)
+        0x103795, # B5 92 - decrease background color addition by 2 (red)
+        0x10379B, # B5 92 - decrease background color addition by 2 (red)
+        0x1037A1, # B5 92 - decrease background color addition by 2 (red)
+        0x1037A7, # B5 92 - decrease background color addition by 2 (red)
+        0x1037AD, # B5 92 - decrease background color addition by 2 (red)
+        0x1037B3, # B5 92 - decrease background color addition by 2 (red)
+        0x1037B9, # B5 92 - decrease background color addition by 2 (red)
+        0x1037C0, # B5 92 - decrease background color addition by 2 (red)
+        ],
+    "Schiller": [
+        0x103819, # B0 FF - set background color addition to 31 (white)
+        0x10381D, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "WallChange": [
+        0x10399E, # B0 FF - set background color addition to 31 (white)
+        0x1039A3, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039A9, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039AF, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039B5, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039BB, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039C1, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039C7, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039CD, # B5 F2 - decrease background color addition by 2 (white)
+        0x1039D4, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Ultima": [
+        0x1056CB, # AF 60 - set background color subtraction to 0 (red)
+        0x1056CF, # B6 C2 - increase background color subtraction by 2 (blue)
+        0x1056ED, # B0 FF - set background color addition to 31 (white)
+        0x1056F5, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Bolt 3": [ # Also Giga Volt
+        0x10588E, # B0 FF - set background color addition to 31 (white)
+        0x105893, # B5 F4 - decrease background color addition by 4 (white)
+        0x105896, # B5 F4 - decrease background color addition by 4 (white)
+        0x105899, # B5 F4 - decrease background color addition by 4 (white)
+        0x10589C, # B5 F4 - decrease background color addition by 4 (white)
+        0x1058A1, # B5 F4 - decrease background color addition by 4 (white)
+        0x1058A6, # B5 F4 - decrease background color addition by 4 (white)
+        0x1058AB, # B5 F4 - decrease background color addition by 4 (white)
+        0x1058B0, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "X-Zone": [
+        0x105A5D, # B0 FF - set background color addition to 31 (white)
+        0x105A6A, # B5 F2 - decrease background color addition by 2 (white)
+        0x105A79, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Dispel": [
+        0x105DC2, # B0 FF - set background color addition to 31 (white)
+        0x105DC9, # B5 F1 - decrease background color addition by 1 (white)
+        0x105DD2, # B5 F1 - decrease background color addition by 1 (white)
+        0x105DDB, # B5 F1 - decrease background color addition by 1 (white)
+        0x105DE4, # B5 F1 - decrease background color addition by 1 (white)
+        0x105DED, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Muddle": [ # Also L.3 Muddle, Confusion
+        0x1060EA, # B0 FF - set background color addition to 31 (white)
+        0x1060EE, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Shock": [
+        0x1068BE, # B0 FF - set background color addition to 31 (white)
+        0x1068D0, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Bum Rush": [
+        0x106C3E, # B0 E0 - set background color addition to 0 (white)
+        0x106C47, # B0 E0 - set background color addition to 0 (white)
+        0x106C53, # B0 E0 - set background color addition to 0 (white)
+        0x106C7E, # B0 FF - set background color addition to 31 (white)
+        0x106C87, # B0 E0 - set background color addition to 0 (white)
+        0x106C95, # B0 FF - set background color addition to 31 (white)
+        0x106C9E, # B0 E0 - set background color addition to 0 (white)
+        ],
+    "Stunner": [
+        0x1071BA, # B0 20 - set background color addition to 0 (blue)
+        0x1071C1, # B5 24 - increase background color addition by 4 (blue)
+        0x1071CA, # B5 24 - increase background color addition by 4 (blue)
+        0x1071D5, # B5 24 - increase background color addition by 4 (blue)
+        0x1071DE, # B5 24 - increase background color addition by 4 (blue)
+        0x1071E9, # B5 24 - increase background color addition by 4 (blue)
+        0x1071F2, # B5 24 - increase background color addition by 4 (blue)
+        0x1071FD, # B5 24 - increase background color addition by 4 (blue)
+        0x107206, # B5 24 - increase background color addition by 4 (blue)
+        0x107211, # B5 24 - increase background color addition by 4 (blue)
+        0x10721A, # B5 24 - increase background color addition by 4 (blue)
+        0x10725A, # B5 32 - decrease background color addition by 2 (blue)
+        ],
+    "Quadra Slam": [ # Also Quadra Slice
+        0x1073DC, # B0 FF - set background color addition to 31 (white)
+        0x1073EE, # B5 F2 - decrease background color addition by 2 (white)
+        0x1073F3, # B5 F2 - decrease background color addition by 2 (white)
+        0x107402, # B0 5F - set background color addition to 31 (green)
+        0x107424, # B5 54 - decrease background color addition by 4 (green)
+        0x107429, # B5 54 - decrease background color addition by 4 (green)
+        0x107436, # B0 3F - set background color addition to 31 (blue)
+        0x107458, # B5 34 - decrease background color addition by 4 (blue)
+        0x10745D, # B5 34 - decrease background color addition by 4 (blue)
+        0x107490, # B0 9F - set background color addition to 31 (red)
+        0x1074B2, # B5 94 - decrease background color addition by 4 (red)
+        0x1074B7, # B5 94 - decrease background color addition by 4 (red)
+        ],
+    "Slash": [
+        0x1074F4, # B0 FF - set background color addition to 31 (white)
+        0x1074FD, # B5 F2 - decrease background color addition by 2 (white)
+        0x107507, # B5 F2 - decrease background color addition by 2 (white)
+        ],
+    "Flash": [
+        0x107850, # B0 FF - set background color addition to 31 (white)
+        0x10785C, # B5 F1 - decrease background color addition by 1 (white)
+        ]
+}
