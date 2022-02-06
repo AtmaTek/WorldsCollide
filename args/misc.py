@@ -43,10 +43,10 @@ def parse(parser):
                        help = "Remove NPC")
     parser.y_npc_group = y_npc
 
-    screen_flashes = misc.add_mutually_exclusive_group()
-    screen_flashes.add_argument("-frw", "--flashes-remove-worst", action = "store_true",
+    remove_flashes = misc.add_mutually_exclusive_group()
+    remove_flashes.add_argument("-frw", "--flashes-remove-worst", action = "store_true",
                               help = "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc.")
-    screen_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",
+    remove_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",
                               help = "Removes most flashes from animations. Includes Kefka Death.")
 
 def process(args):
@@ -134,11 +134,11 @@ def options(args):
     elif args.y_npc_remove:
         y_npc = "Remove"
 
-    screen_flashes = "Original"
+    remove_flashes = "Original"
     if args.flashes_remove_worst:
-        screen_flashes = "Worst"
+        remove_flashes = "Worst"
     elif args.flashes_remove_most:
-        screen_flashes = "Most"
+        remove_flashes = "Most"
 
     return [
         ("Auto Sprint", args.auto_sprint),
@@ -148,7 +148,7 @@ def options(args):
         ("Scan All", args.scan_all),
         ("Event Timers", event_timers),
         ("Y NPC", y_npc),
-        ("Screen Flashes", screen_flashes)
+        ("Remove Flashes", remove_flashes)
     ]
 
 def menu(args):
