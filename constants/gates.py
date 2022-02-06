@@ -31,7 +31,6 @@ character_checks = {
         "Narshe Weapon Shop",
         "Narshe Weapon Shop Mines",
         "Phoenix Cave",
-        "Phoenix Cave Dragon",
         "South Figaro Cave",
     ],
     "Mog" : [
@@ -88,6 +87,7 @@ character_checks = {
         "Narshe Battle",
         "Narshe Dragon",
         "Opera House Dragon",
+        "Phoenix Cave Dragon",
         "Tritoch Cliff",
         "Tzen Thief",
     ],
