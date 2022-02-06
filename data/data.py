@@ -10,6 +10,7 @@ import data.blitzes as blitzes
 import data.lores as lores
 import data.rages as rages
 import data.dances as dances
+import data.steal as steal
 import data.espers as espers
 import data.shops as shops
 import data.coliseum as coliseum
@@ -51,6 +52,9 @@ class Data:
         self.dances = dances.Dances(rom, args, self.characters)
         self.dances.mod()
 
+        self.steal = steal.Steal(rom, args)
+        self.steal.mod()
+
         self.espers = espers.Espers(rom, args, self.spells, self.characters)
         self.espers.mod(self.dialogs)
 
@@ -73,6 +77,7 @@ class Data:
         self.lores.write()
         self.rages.write()
         self.dances.write()
+        self.steal.write()
         self.espers.write()
         self.shops.write()
         self.coliseum.write()
