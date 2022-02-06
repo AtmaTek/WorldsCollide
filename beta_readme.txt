@@ -1,0 +1,19 @@
+Beta Branch for 1.1.0
+
+Adds the following flags:
+1) -bmbs for Kielbasigo's "Shuffle/randomize bosses and statues together"
+2) -rec6 for a 6th excluded command
+3) -bst for "Steal Rate is improved and rare steals are more likely"
+4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
+   or 
+   -frm for "Removes most flashes from animations. Includes Kefka Death."
+
+Other changes:
+- Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
+- Fixes Zozo random clock hints
+
+Associated PRs:
+https://github.com/AtmaTek/WorldsCollide/pull/10
+https://github.com/AtmaTek/WorldsCollide/pull/13
+https://github.com/AtmaTek/WorldsCollide/pull/8
+https://github.com/AtmaTek/WorldsCollide/pull/3
