@@ -1,15 +1,33 @@
-# List of addresses within the Battle Animation Scripts for the following commands:
+# List of addresses within the Battle Animation Scripts for the following commands which cause screen flashes:
 #  B0 - Set background palette color addition (absolute)
 #  B5 - Add color to background palette (relative)
 #  AF - Set background palette color subtraction (absolute)
 #  B6 - Subtract color from background palette (relative)
 # By changing address + 1 to E0 (for absolute) or F0 (for relative), it causes no change to the background color (that is, no flash)
 BATTLE_ANIMATION_FLASHES = {
+    "Goner": [
+        0x100088, # AF E0 - set background color subtraction to 0 (black)
+        0x10008C, # B6 61 - increase background color subtraction by 1 (red)
+        0x100092, # B6 31 - decrease background color subtraction by 1 (yellow)
+        0x100098, # B6 81 - increase background color subtraction by 1 (cyan)
+        0x1000A1, # B6 91 - decrease background color subtraction by 1 (cyan)
+        0x1000A3, # B6 21 - increase background color subtraction by 1 (yellow)
+        0x1000D3, # B6 8F - increase background color subtraction by 15 (cyan)
+        0x1000DF, # B0 FF - set background color addition to 31 (white)
+        0x100172, # B5 F2 - decrease background color addition by 2 (white)
+        ],
     "Final KEFKA Death": [
         0x10023A, # B0 FF - set background color addition to 31 (white)
         0x100240, # B5 F4 - decrease background color addition by 4 (white)
         0x100248, # B0 FF - set background color addition to 31 (white)
         0x10024E, # B5 F4 - decrease background color addition by 4 (white)
+        ],
+    "Atom Edge": [ # Also True Edge
+        0x1003D0, # AF E0 - set background color subtraction to 0 (black)
+        0x1003DD, # B6 E1 - increase background color subtraction by 1 (black)
+        0x1003E6, # B6 E1 - increase background color subtraction by 1 (black)
+        0x10044B, # B6 F1 - decrease background color subtraction by 1 (black)
+        0x100457, # B6 F1 - decrease background color subtraction by 1 (black)
         ],
     "Boss Death": [
         0x100476, # B0 FF - set background color addition to 31 (white)
@@ -106,6 +124,11 @@ BATTLE_ANIMATION_FLASHES = {
         0x102411, # B5 F2 - decrease background color addition by 2 (white)
         0x102416, # B5 F2 - decrease background color addition by 2 (white)
         ],
+    "Metamorph": [
+        0x102595, # AF E0 - set background color subtraction to 0 (black)
+        0x102599, # B6 61 - increase background color subtraction by 1 (red)
+        0x1025AF, # B6 71 - decrease background color subtraction by 1 (red)
+        ],
     "Cat Rain": [
         0x102677, # B0 FF - set background color addition to 31 (white)
         0x10267B, # B5 F1 - decrease background color addition by 1 (white)
@@ -131,6 +154,35 @@ BATTLE_ANIMATION_FLASHES = {
         0x10296B, # B5 F2 - decrease background color addition by 2 (white)
         0x102973, # B5 F2 - decrease background color addition by 2 (white)
         ],
+    "Overcast": [
+        0x102C3A, # AF E0 - set background color subtraction to 0 (black)
+        0x102C55, # B6 E1 - increase background color subtraction by 1 (black)
+        0x102C8D, # B6 F1 - decrease background color subtraction by 1 (black)
+        0x102C91, # B6 F1 - decrease background color subtraction by 1 (black)
+        ],
+    "Disaster": [
+        0x102CEE, # AF E0 - set background color subtraction to 0 (black)
+        0x102CF2, # B6 E1 - increase background color subtraction by 1 (black)
+        0x102D19, # B6 F1 - decrease background color subtraction by 1 (black)
+        ],
+    "ForceField": [
+        0x102D3A, # B0 E0 - set background color addition to 0 (white)
+        0x102D48, # B5 E1 - increase background color addition by 1 (white)
+        0x102D64, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Terra/Tritoch Lightning": [
+        0x102E05, # B0 E0 - set background color addition to 0 (white)
+        0x102E09, # B5 81 - increase background color addition by 1 (red)
+        0x102E24, # B5 61 - increase background color addition by 1 (cyan)
+        ],
+    "S. Cross": [
+        0x102EDA, # AF E0 - set background color subtraction to 0 (black)
+        0x102EDE, # B6 E2 - increase background color subtraction by 2 (black)
+        0x102FA8, # B6 F2 - decrease background color subtraction by 2 (black)
+        0x102FB1, # B0 E0 - set background color addition to 0 (white)
+        0x102FBE, # B5 E2 - increase background color addition by 2 (white)
+        0x102FD9, # B5 F2 - decrease background color addition by 2 (white)
+        ],
     "Mind Blast": [
         0x102FED, # B0 E0 - set background color addition to 0 (white)
         0x102FF1, # B5 81 - increase background color addition by 1 (red)
@@ -142,6 +194,18 @@ BATTLE_ANIMATION_FLASHES = {
         0x10300D, # B5 51 - decrease background color addition by 1 (green)
         0x103015, # B5 E2 - increase background color addition by 2 (white)
         0x10301F, # B5 F1 - decrease background color addition by 1 (white)
+        ],
+    "Flare Star": [
+        0x1030F5, # B0 E0 - set background color addition to 0 (white)
+        0x103106, # B5 81 - increase background color addition by 1 (red)
+        0x10310D, # B5 E2 - increase background color addition by 2 (white)
+        0x103123, # B5 71 - decrease background color addition by 1 (cyan)
+        0x10312E, # B5 91 - decrease background color addition by 1 (red)
+        ],
+    "Quasar": [
+        0x1031D2, # AF E0 - set background color subtraction to 0 (black)
+        0x1031D6, # B6 E1 - increase background color subtraction by 1 (black)
+        0x1031FA, # B6 F1 - decrease background color subtraction by 1 (black)
         ],
     "R.Polarity": [
         0x10328B, # B0 FF - set background color addition to 31 (white)
@@ -273,3 +337,4 @@ BATTLE_ANIMATION_FLASHES = {
         0x10785C, # B5 F1 - decrease background color addition by 1 (white)
         ]
 }
+

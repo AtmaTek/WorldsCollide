@@ -13,7 +13,7 @@ class DuncanHouseWOR(Event):
     def mod(self):
         self.bum_rush_dialog_mod()
         self.bum_rush_learn_mod()
-        if self.args.fewer_flashes:
+        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
             self.bum_rush_flash_mod()
 
     def bum_rush_dialog_mod(self):
