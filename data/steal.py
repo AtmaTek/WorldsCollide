@@ -6,7 +6,7 @@ class Steal:
         self.rom = rom
         self.args = args
 
-    def enable_better_steal(self):
+    def enable_steal_chances_higher(self):
         # Increase the Constant added to Attacker's Level from 50 (0x32) to 90 (0x5A)
         # Effectively increases chance of stealing for same-level targets from 50% to 90%
         # Reference on Steal function (starts at C2 399E):
@@ -32,8 +32,8 @@ class Steal:
         space.write(0x60) # default: 0x20
 
     def mod(self):
-        if self.args.better_steal:
-            self.enable_better_steal()
+        if self.args.steal_chances_higher:
+            self.enable_steal_chances_higher()
 
     def write(self):
         if self.args.spoiler_log:

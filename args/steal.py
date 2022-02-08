@@ -4,7 +4,8 @@ def name():
 def parse(parser):
     steal = parser.add_argument_group("Steal")
 
-    steal.add_argument("-bst", "--better-steal", action = "store_true",
+    steal_chances = steal.add_mutually_exclusive_group()
+    steal_chances.add_argument("-sch", "--steal-chances-higher", action = "store_true",
                          help = "Steal Rate is improved and rare steals are more likely")
 
 def process(args):
@@ -13,14 +14,18 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.better_steal:
-        flags += " -bst"
+    if args.steal_chances_higher:
+        flags += " -sch"
 
     return flags
 
 def options(args):
+    steal_chances = "Original"
+    if args.steal_chances_higher:
+        steal_chances = "Higher"
+
     return [
-        ("Better Steal", args.better_steal),
+        ("Chances", steal_chances),
     ]
 
 def menu(args):
