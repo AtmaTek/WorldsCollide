@@ -6,6 +6,40 @@ class Steal:
         self.rom = rom
         self.args = args
 
+    def enable_steal_chances_always(self):
+        #Always steal if the enemy has an item. 
+        # If the enemy has both rare and common, the rare item will be stolen 3/8 of the time.
+        space = Reserve(0x0239b7, 0x0239e4, "steal common vs rare logic", asm.NOP())
+        space.add_label("SPACE_END", space.end_address + 1)
+        space.write(
+            asm.PHY(),
+            asm.PHX(),
+            asm.LDX(0x3308, asm.ABS_Y), # x = rare item
+            asm.INY(),
+            asm.LDA(0x3308, asm.ABS_Y), # a = common item
+            asm.TAY(),                  # y = common item
+
+            asm.CPX(0xff, asm.IMM8),    # rare steal exists?
+            asm.BEQ("STEAL_COMMON"),    # if not, steal common item
+            asm.CPY(0xff, asm.IMM8),    # common steal exists?
+            asm.BEQ("STEAL_RARE"),      # if not, steal rare item
+            asm.JSR(0x4b5a, asm.ABS),   # a = random number between 0 and 255
+            asm.CMP(0x60, asm.IMM8),    # compare with 96
+            asm.BLT("STEAL_RARE"),      # if a < 96 then steal rare item
+
+            "STEAL_COMMON",
+            asm.TYA(),                  # a = common item
+            asm.BRA("STEAL_ITEM"),      # steal common item
+
+            "STEAL_RARE",
+            asm.TXA(),                  # a = rare item
+
+            "STEAL_ITEM",
+            asm.PLX(),
+            asm.PLY(),
+            asm.BRA("SPACE_END"),       # skip nops
+        )
+
     def enable_steal_chances_higher(self):
         # Increase the Constant added to Attacker's Level from 50 (0x32) to 90 (0x5A)
         # Effectively increases chance of stealing for same-level targets from 50% to 90%
@@ -34,6 +68,8 @@ class Steal:
     def mod(self):
         if self.args.steal_chances_higher:
             self.enable_steal_chances_higher()
+        elif self.args.steal_chances_always:
+            self.enable_steal_chances_always()
 
     def write(self):
         if self.args.spoiler_log:
