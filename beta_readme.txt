@@ -4,6 +4,8 @@ Adds the following flags:
 1) -bmbs for Kielbasigo's "Shuffle/randomize bosses and statues together"
 2) -rec6 for a 6th excluded command
 3) -sch for "Steal Rate is improved and rare steals are more likely"
+   or 
+   -sca for "Steal will always succeed if enemy has an item"
 4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
