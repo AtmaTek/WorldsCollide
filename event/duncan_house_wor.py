@@ -13,6 +13,8 @@ class DuncanHouseWOR(Event):
     def mod(self):
         self.bum_rush_dialog_mod()
         self.bum_rush_learn_mod()
+        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
+            self.bum_rush_flash_mod()
 
     def bum_rush_dialog_mod(self):
         space = Reserve(0xc0c25, 0xc0c27, "duncan house wor duncan!!", field.NOP())
@@ -54,3 +56,8 @@ class DuncanHouseWOR(Event):
         for address in sabin_action_queues:
             space = Reserve(address, address, "duncan house learn bum rush sabin")
             space.write(field_entity.PARTY0)
+
+    def bum_rush_flash_mod(self):
+        flash_addresses = [0xc0d12, 0xc0d5f, 0xc0d7f, 0xc0d9f, 0xc0df0, 0xc0e09, 0xc0e22, 0xc0e3b, 0xc0e65, 0xc0e74]
+        for address in flash_addresses:
+            space = Reserve(address, address + 1, "duncan house wor bum rush flash", field.NOP())
