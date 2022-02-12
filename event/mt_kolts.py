@@ -18,7 +18,6 @@ class MtKolts(Event):
         if self.args.character_gating:
             self.add_gating_condition()
 
-        self.shadow_vargas_mod()
         self.vargas_battle_mod()
         self.entrance_exit_mod()
 
@@ -48,12 +47,14 @@ class MtKolts(Event):
             field.Branch(vargas_appears),
         )
 
-    def shadow_vargas_mod(self):
-        # shadowy vargas uses sabin's sprite with an all black palette
+    def shadow_vargas_mod(self, sprite):
+        # change shadowy vargas to use the given sprite rather than uses sabin's sprite
         # character npc palettes are updated to match the character in npc data, change vargas back to black palette
         vargas_shadow_npc1 = self.maps.get_npc(0x060, self.vargas_npc_id)
+        vargas_shadow_npc1.sprite = sprite
         vargas_shadow_npc1.palette = 0x06
         vargas_shadow_npc2 = self.maps.get_npc(0x061, self.vargas_npc_id)
+        vargas_shadow_npc2.sprite = sprite
         vargas_shadow_npc2.palette = 0x06
 
     def vargas_battle_mod(self):
@@ -140,6 +141,9 @@ class MtKolts(Event):
         self.maps.add_event(0x64, new_event)
 
     def character_mod(self, character):
+        # Change shadow to peak the character
+        self.shadow_vargas_mod(character)
+
         boss_pack_id = self.get_boss("Vargas")
 
         space = Reserve(0xa82a3, 0xa831f, "mt kolts invoke vargas battle", field.NOP())
@@ -255,6 +259,9 @@ class MtKolts(Event):
         space = Reserve(0xa83a0, 0xa83a2, "mt kolts Bodybuilder?!", field.NOP())
 
     def esper_item_mod(self, esper_item_instructions):
+        # Change shadow to peak that it's a esper/item
+        self.shadow_vargas_mod(self.characters.get_random_esper_item_sprite())
+
         boss_pack_id = self.get_boss("Vargas")
 
         # scene with vargas and sabin
