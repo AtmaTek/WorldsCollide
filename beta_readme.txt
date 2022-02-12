@@ -20,7 +20,10 @@ Other changes:
 - Fixed animation bugs with Reflecting Health
 
 Associated PRs:
-https://github.com/AtmaTek/WorldsCollide/pull/10
-https://github.com/AtmaTek/WorldsCollide/pull/13
-https://github.com/AtmaTek/WorldsCollide/pull/8
-https://github.com/AtmaTek/WorldsCollide/pull/3
+<https://github.com/AtmaTek/WorldsCollide/pull/10>
+<https://github.com/AtmaTek/WorldsCollide/pull/13>
+<https://github.com/AtmaTek/WorldsCollide/pull/8>
+<https://github.com/AtmaTek/WorldsCollide/pull/3>
+<https://github.com/AtmaTek/WorldsCollide/pull/16>
+<https://github.com/AtmaTek/WorldsCollide/pull/15>
+<https://github.com/AtmaTek/WorldsCollide/pull/17>
