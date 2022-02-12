@@ -15,6 +15,7 @@ Other changes:
 - Fixes Zozo random clock hints
 - Guarantee Enough Unique Dragons to complete objective conditions with random bosses
 - Fix win an auction objective condition not completed if auction items not randomized
+- Mt Kolts is peakable -- the shadowy figure will now represent the reward
 
 Associated PRs:
 https://github.com/AtmaTek/WorldsCollide/pull/10
