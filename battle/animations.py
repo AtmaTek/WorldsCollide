@@ -43,6 +43,7 @@ class Animations:
         # Banon's Health command casts Cure 2 on the party with a unique animation.
         # Because the animation is unique, it has the step-forward component built into it.  
         # And because Cure 2 can be reflected, if the command hits a mirrored target it will bounce and make Banon step forward again.  
+        # Note: this only occurs if the whole party doesn't have reflect, only a subset.
         # Used over and over, Banon can be made to walk completely off-screen.
         # 
         # Fix:
