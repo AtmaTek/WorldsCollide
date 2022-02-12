@@ -16,6 +16,7 @@ Other changes:
 - Guarantee Enough Unique Dragons to complete objective conditions with random bosses
 - Fix win an auction objective condition not completed if auction items not randomized
 - Mt Kolts is peakable -- the shadowy figure will now represent the reward
+- Ebot's Rock spotlight is larger and coral is tripled
 
 Associated PRs:
 https://github.com/AtmaTek/WorldsCollide/pull/10
