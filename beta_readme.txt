@@ -17,6 +17,7 @@ Other changes:
 - Fix win an auction objective condition not completed if auction items not randomized
 - Mt Kolts is peakable -- the shadowy figure will now represent the reward
 - Ebot's Rock spotlight is larger and coral is tripled
+- Fixed animation bugs with Reflecting Health
 
 Associated PRs:
 https://github.com/AtmaTek/WorldsCollide/pull/10
