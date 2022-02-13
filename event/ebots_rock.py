@@ -25,10 +25,7 @@ class EbotsRock(Event):
         self.hidon_mod()
         self.hidon_battle_mod()
 
-        if self.args.faster_ebots_rock:
-            self.spotlight_mod()
-            self.coral_mod()
-            self.warp_to_chest_mod()
+        self.warp_to_chest_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -201,36 +198,18 @@ class EbotsRock(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
-    def spotlight_mod(self):
-        #extend the spotlight effect within ebot's cave
-        spotlight_value_addresses = [0xb6ef5, 0xb6f0a, 0xb74b3, 0xb74fe]
-        for address in spotlight_value_addresses:
-            space = Reserve(address, address, "ebot's rock spotlight")
-            space.write(0x1f) # default: 0x14; 0x20 = whole screen visible
-
-    def coral_mod(self):
-        # Change the amount of coral in ebot's "chests"
-        new_coral_values = [3, 6, 9, 15] # vanilla: 1, 2, 3, 5
-        coral_value_addresses = [0xb7433, 0xb743b, 0xb7443, 0xb7427] # the actual values
-        coral_value_dialogs = [2882, 2883, 2884, 2885] # the dialog displayed
-        for idx, address in enumerate(coral_value_addresses):
-            space = Reserve(address, address, "ebot's rock coral")
-            space.write(new_coral_values[idx])
-        for idx, dialog in enumerate(coral_value_dialogs):
-            new_dialog = 'Received {} pieces of “Coral.”<end>'
-            self.dialogs.set_text(dialog, new_dialog.format(new_coral_values[idx]))
-
     def warp_to_chest_mod(self):
         # If the player has sufficient Coral, make all teleports go to Chest
         CORAL_EVENT_WORD = 0x07
         NORMAL_LOGIC_ADDR = 0xb6f0e # Normal Ebot's Cave branch logic location in ROM
         GO_TO_CHEST_ADDR = 0xb6fb5 # The address in ROM of the event instruction to go to Chest
-        MIN_CORAL_NEEDED = 21 # Amount of coral needed
+        NUM_CORAL_ADDR = 0xb7109 # The address of the number of coral that the chest checks
+        num_coral = Read(NUM_CORAL_ADDR, NUM_CORAL_ADDR+1)[0]
 
         src = [
-            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
-            field.BranchIfEventWordLess(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR),
-            field.BranchIfEventWordGreater(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, GO_TO_CHEST_ADDR)
+            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, num_coral, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
+            field.BranchIfEventWordLess(CORAL_EVENT_WORD, num_coral, NORMAL_LOGIC_ADDR),  #coral count  < 21, branch to regular logic
+            field.BranchIfEventWordGreater(CORAL_EVENT_WORD, num_coral, GO_TO_CHEST_ADDR) #coral count  > 21, branch to chest
         ]
         space = Write(Bank.CB, src, "Coral check to branch")
         check_coral = space.start_address
