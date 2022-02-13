@@ -9,6 +9,7 @@ Adds the following flags:
 4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
+5) -ebot for "Ebot's Rock is made faster with more Coral and less darkness." 
 
 Other changes:
 - Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
@@ -16,7 +17,6 @@ Other changes:
 - Guarantee Enough Unique Dragons to complete objective conditions with random bosses
 - Fix win an auction objective condition not completed if auction items not randomized
 - Mt Kolts is peakable -- the shadowy figure will now represent the reward
-- Ebot's Rock spotlight is larger and coral is tripled
 - Fixed animation bugs with Reflecting Health
 
 Associated PRs:
