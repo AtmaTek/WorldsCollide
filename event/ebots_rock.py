@@ -24,8 +24,10 @@ class EbotsRock(Event):
         self.chest_mod()
         self.hidon_mod()
         self.hidon_battle_mod()
-        self.spotlight_mod()
-        self.coral_mod()
+
+        if self.args.faster_ebots_rock:
+            self.spotlight_mod()
+            self.coral_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
