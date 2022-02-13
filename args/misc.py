@@ -13,8 +13,6 @@ def parse(parser):
                       help = "Randomize clock's correct time and NPC clues in Zozo")
     misc.add_argument("-scan", "--scan-all", action = "store_true",
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
-    misc.add_argument("-ebot", "--faster-ebots-rock", action = "store_true",
-                      help = "Ebot's Rock is made faster with more Coral, less darkness, and teleport to chest once you have enough Coral")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
@@ -73,8 +71,6 @@ def flags(args):
         flags += " -rc"
     if args.scan_all:
         flags += " -scan"
-    if args.faster_ebots_rock:
-        flags += " -ebot"
 
     if args.event_timers_random:
         flags += " -etr"
@@ -150,7 +146,6 @@ def options(args):
         ("Random RNG", args.random_rng),
         ("Random Clock", args.random_clock),
         ("Scan All", args.scan_all),
-        ("Faster Ebots", args.faster_ebots_rock),
         ("Event Timers", event_timers),
         ("Y NPC", y_npc),
         ("Remove Flashes", remove_flashes)
