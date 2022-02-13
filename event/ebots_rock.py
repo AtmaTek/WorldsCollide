@@ -28,6 +28,7 @@ class EbotsRock(Event):
         if self.args.faster_ebots_rock:
             self.spotlight_mod()
             self.coral_mod()
+            self.warp_to_chest_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -218,3 +219,21 @@ class EbotsRock(Event):
         for idx, dialog in enumerate(coral_value_dialogs):
             new_dialog = 'Received {} pieces of “Coral.”<end>'
             self.dialogs.set_text(dialog, new_dialog.format(new_coral_values[idx]))
+
+    def warp_to_chest_mod(self):
+        # If the player has sufficient Coral, make all teleports go to Chest
+        CORAL_EVENT_WORD = 0x07
+        NORMAL_LOGIC_ADDR = 0xb6f0e # Normal Ebot's Cave branch logic location in ROM
+        GO_TO_CHEST_ADDR = 0xb6fb5 # The address in ROM of the event instruction to go to Chest
+        MIN_CORAL_NEEDED = 22 # Amount of coral needed
+
+        src = [
+            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
+            field.BranchIfEventWordLess(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR),
+            field.BranchIfEventWordGreater(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, GO_TO_CHEST_ADDR)
+        ]
+        space = Write(Bank.CB, src, "Coral check to branch")
+        check_coral = space.start_address
+
+        space = Reserve(0xb6f01, 0xb6f04, "Call Ebot's Cave branch logic")
+        space.write(field.Call(check_coral))
