@@ -1,6 +1,6 @@
 Beta Branch for 1.1.0
 
-Adds the following flags:
+Adds the following flags for new features:
 1) -bmbs for Kielbasigo's "Shuffle/randomize bosses and statues together"
 2) -rec6 for a 6th excluded command
 3) -sch for "Steal Rate is improved and rare steals are more likely"
@@ -9,15 +9,15 @@ Adds the following flags:
 4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
-5) -ebot for "Ebot's Rock is made faster with more Coral, less darkness, and teleport to chest once you have enough Coral" 
 
 Other changes:
-- Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
-- Fixes Zozo random clock hints
-- Guarantee Enough Unique Dragons to complete objective conditions with random bosses
-- Fix win an auction objective condition not completed if auction items not randomized
-- Mt Kolts is peakable -- the shadowy figure will now represent the reward
-- Fixed animation bugs with Reflecting Health
+- Feature: Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
+- Bugfix: Fixes Zozo random clock hints
+- Bugfix: Guarantee Enough Unique Dragons to complete objective conditions with random bosses
+- Bugfix: Fix win an auction objective condition not completed if auction items not randomized
+- QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
+- Bugfix: Fixed animation bugs with Reflecting Health
+- QoL: Once you have 22 coral, every teleporter will take you to chest
 
 Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/10>
