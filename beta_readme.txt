@@ -9,7 +9,7 @@ Adds the following flags:
 4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
-5) -ebot for "Ebot's Rock is made faster with more Coral and less darkness." 
+5) -ebot for "Ebot's Rock is made faster with more Coral, less darkness, and teleport to chest once you have enough Coral" 
 
 Other changes:
 - Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
