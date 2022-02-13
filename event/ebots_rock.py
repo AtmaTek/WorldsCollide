@@ -225,11 +225,12 @@ class EbotsRock(Event):
         CORAL_EVENT_WORD = 0x07
         NORMAL_LOGIC_ADDR = 0xb6f0e # Normal Ebot's Cave branch logic location in ROM
         GO_TO_CHEST_ADDR = 0xb6fb5 # The address in ROM of the event instruction to go to Chest
+        MIN_CORAL_NEEDED = 22 # Amount of coral needed
 
         src = [
-            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, 0x15, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
-            field.BranchIfEventWordLess(CORAL_EVENT_WORD, 0x15, NORMAL_LOGIC_ADDR),
-            field.BranchIfEventWordGreater(CORAL_EVENT_WORD, 0x15, GO_TO_CHEST_ADDR)
+            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
+            field.BranchIfEventWordLess(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, NORMAL_LOGIC_ADDR),
+            field.BranchIfEventWordGreater(CORAL_EVENT_WORD, MIN_CORAL_NEEDED, GO_TO_CHEST_ADDR)
         ]
         space = Write(Bank.CB, src, "Coral check to branch")
         check_coral = space.start_address

@@ -14,7 +14,7 @@ def parse(parser):
     misc.add_argument("-scan", "--scan-all", action = "store_true",
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
     misc.add_argument("-ebot", "--faster-ebots-rock", action = "store_true",
-                      help = "Ebot's Rock is made faster with more Coral and less darkness.")
+                      help = "Ebot's Rock is made faster with more Coral, less darkness, and teleport to chest once you have enough Coral")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
