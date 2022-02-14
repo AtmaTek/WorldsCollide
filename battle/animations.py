@@ -1,10 +1,12 @@
-from memory.space import Read, Write
+from memory.space import Bank, Reserve, Read, Write
 import data.battle_animation_scripts as battle_animation_scripts
+import instruction.asm as asm
 import args
 
 class Animations:
     def __init__(self):
-        
+        self.health_animation_reflect_mod()
+
         if args.flashes_remove_most:
             flash_address_arrays = battle_animation_scripts.BATTLE_ANIMATION_FLASHES.values()
             self.remove_battle_flashes_mod(flash_address_arrays)
@@ -35,3 +37,26 @@ class Animations:
                 else:
                     # This is an error, reflecting a difference between the disassembly used to generate BATTLE_ANIMATION_FLASHES and the ROM
                     raise ValueError(f"Battle Animation Script Command at 0x{flash_address:x} (0x{animation_cmd[0]:x}) did not match an expected value.")
+    
+    def health_animation_reflect_mod(self):
+        # Ref: https://www.ff6hacking.com/forums/thread-4145.html
+        # Banon's Health command casts Cure 2 on the party with a unique animation.
+        # Because the animation is unique, it has the step-forward component built into it.  
+        # And because Cure 2 can be reflected, if the command hits a mirrored target it will bounce and make Banon step forward again.  
+        # Note: this only occurs if the whole party doesn't have reflect, only a subset.
+        # Used over and over, Banon can be made to walk completely off-screen.
+        # 
+        # Fix:
+        # We tell the HEALTH animation to ignore block graphics, which prevents the reflect animation from playing.  
+        # When encountering a reflection, the regular green Cure 2 animation will follow on the reflect recipient.
+        src = [
+            asm.INC(0x62C0, asm.ABS), #Makes the animation ignore blocking graphics
+            asm.JSR(0xBC35, asm.ABS), #Call the subroutine that got displaced to inject the block override
+            asm.RTS()
+        ]
+        space = Write(Bank.C1, src, "Health animation fix")
+        jsrAddr = space.start_address
+
+        # Replace the existing jump with one to our new service routine
+        space = Reserve(0x1BB67, 0x1BB69, "Health animation JSR")
+        space.write(asm.JSR(jsrAddr, asm.ABS))
