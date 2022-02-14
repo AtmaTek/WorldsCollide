@@ -18,6 +18,7 @@ Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
 - Bugfix: Fixed animation bugs with Reflecting Health
 - QoL: Once you have 22 coral, every teleporter will take you to chest
+- Bugfix: Stats added by objectives will max out at 128, to match Esper reward max and avoid bugs.
 
 Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/10>
@@ -27,3 +28,4 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/16>
 <https://github.com/AtmaTek/WorldsCollide/pull/15>
 <https://github.com/AtmaTek/WorldsCollide/pull/17>
+<https://github.com/AtmaTek/WorldsCollide/pull/19>
