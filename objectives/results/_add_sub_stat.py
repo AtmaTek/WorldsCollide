@@ -8,6 +8,7 @@ def AddStat(stat_address):
     MAX_STAT = 0x80
     return [
         asm.LDA(stat_address, asm.ABS_Y),
+        asm.CLC(),
         asm.ADC(field.LongCall.ARG_ADDRESS, asm.DIR),
         asm.CMP(MAX_STAT, asm.IMM8),
         asm.BLT("STORE"),             # If < 128, skip to STORE
