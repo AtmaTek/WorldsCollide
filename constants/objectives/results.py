@@ -33,7 +33,6 @@ category_types = {
         ResultType("Auto Shell", "Auto Shell", None),
         ResultType("Auto Sleep", "Auto Sleep", None),
         ResultType("Auto Slow", "Auto Slow", None),
-        ResultType("Auto Stop", "Auto Stop", None),
     ],
     "Battle" : [
         ResultType("Battle", "Random", None),
@@ -59,8 +58,9 @@ category_types = {
         ResultType("Dragoon", "Dragoon", None),
         ResultType("Dried Meat", "Dried Meat", None),
         ResultType("Exp. Egg", "Exp. Egg", None),
-        ResultType("Imp Set", "Imp Set", None),
+        ResultType("High Tier Item", "High Tier Item", None),
         ResultType("Illumina", "Illumina", None),
+        ResultType("Imp Set", "Imp Set", None),
         ResultType("Rename Cards", "Rename Cards", None),
         ResultType("Ribbon", "Ribbon", None),
         ResultType("Tools", "Tools", None),
