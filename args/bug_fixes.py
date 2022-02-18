@@ -18,7 +18,7 @@ def parse(parser):
     bug_fixes.add_argument("-fedc", "--fix-enemy-damage-counter", action = "store_true",
                            help = "Enemy damage counters only trigger if HP is reduced")
     bug_fixes.add_argument("-fc", "--fix-capture", action = "store_true",
-                           help = "Fix Capture such that Weapon Special Effects are applied")
+                           help = "Fix Capture such that Weapon Special Effects are applied and Multi-Steals work")
 
 def process(args):
     pass
