@@ -23,18 +23,15 @@ class Capture:
 
         # Make the "Steal <item>" text go through the array
         src = [
-            asm.LDA(0x2f35, asm.ABS),   #displaced instruction
-            asm.PHA(),                  #save A
             asm.REP(0x20),              #Set A to 16 bits
             asm.LDA(0x76, asm.DIR_16),  #Load first two bytes of current animation entry 
             asm.CMP(0x0302, asm.IMM16), #Check for animation opcode 2 (upper text box) and text message 3 (Steal <item>)
             asm.SEP(0x20),              #Set A back to 8 bits 
             asm.BEQ("GET_STEAL_ITEM"),  #If the above condition was true, branch
-            asm.PLA(),                  #Else, Restore A
+            asm.LDA(0x2f35, asm.ABS),   #Else, perform the displaced command (Note: it's unclear if this will ever get called)
             asm.RTS(),                  #      and return
             "GET_STEAL_ITEM",           
             asm.SEP(0x10),              #Set X to 8 bits
-            asm.PLA(),                  # Restore A if we took this branch
             asm.LDX(STOLEN_ITEM_ARRAY_INDEX, asm.ABS),   # Load the index to the stolen item array
             asm.LDA(STOLEN_ITEM_ARRAY_START, asm.ABS_X), # Put the item from index into A
             asm.REP(0x10),              # Set X back to 16 bits
