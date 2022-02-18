@@ -8,7 +8,7 @@ import objectives
 class _AutoStatus:
     def __init__(self):
         auto_b_status_effects = ["Condemned", "Image", "Mute", "Berserk", "Muddle", "Seizure", "Sleep"]
-        auto_c_status_effects = ["Float", "Regen", "Slow", "Haste", "Stop", "Shell", "Safe", "Reflect"]
+        auto_c_status_effects = ["Float", "Regen", "Slow", "Haste", "Shell", "Safe", "Reflect"]
 
         auto_addresses = []
         for status in auto_b_status_effects:

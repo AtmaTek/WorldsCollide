@@ -10,6 +10,8 @@ def parse(parser):
                                  help = "Chest contents shuffled and given percent randomized")
     chests_contents.add_argument("-ccrt", "--chest-contents-random-tiered", action = "store_true",
                                  help = "Chest contents randomized by tier")
+    chests_contents.add_argument("-ccrs", "--chest-contents-random-scaled", action = "store_true",
+                                 help = "Chest contents randomized by tier. Probability of higher tiers begins low and increases as more chests are opened")
     chests_contents.add_argument("-cce", "--chest-contents-empty", action = "store_true",
                                  help = "Chest contents empty")
 
@@ -28,6 +30,8 @@ def flags(args):
         flags += f" -ccsr {args.chest_contents_shuffle_random_percent}"
     elif args.chest_contents_random_tiered:
         flags += " -ccrt"
+    elif args.chest_contents_random_scaled:
+        flags += " -ccrs"
     elif args.chest_contents_empty:
         flags += " -cce"
 
@@ -44,6 +48,8 @@ def options(args):
         contents_value = "Shuffle + Random"
     elif args.chest_contents_random_tiered:
         contents_value = "Random Tiered"
+    elif args.chest_contents_random_scaled:
+        contents_value = "Random Scaled"
     elif args.chest_contents_empty:
         contents_value = "Empty"
 

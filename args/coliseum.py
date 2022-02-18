@@ -2,7 +2,7 @@ def name():
     return "Coliseum"
 
 def parse(parser):
-    from data.items import Items
+    from constants.items import ITEM_COUNT
 
     coliseum = parser.add_argument_group("Coliseum")
 
@@ -19,7 +19,7 @@ def parse(parser):
                                    help = "Coliseum rewards randomized")
 
     coliseum.add_argument("-crvr", "--coliseum-rewards-visible-random", default = None, type = int,
-                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(Items.ITEM_COUNT),
+                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(ITEM_COUNT),
                           help = "Random number of rewards within given range visible before beginning the match. Remaining rewards will display as question marks")
     coliseum.add_argument("-crm", "--coliseum-rewards-menu", action = "store_true",
                           help = "Display rewards in item selection menu. Hidden rewards will display as question marks")
