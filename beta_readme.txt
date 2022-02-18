@@ -9,6 +9,7 @@ Adds the following flags for new features:
 4) -frw for "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc."
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
+5) -fc to Fix Capture Bugs (multi-steal not giving more than 1 item and weapon specials not proccing)
 
 Other changes:
 - Feature: Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
@@ -29,3 +30,4 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/15>
 <https://github.com/AtmaTek/WorldsCollide/pull/17>
 <https://github.com/AtmaTek/WorldsCollide/pull/19>
+<https://github.com/AtmaTek/WorldsCollide/pull/18>
