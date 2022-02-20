@@ -48,6 +48,9 @@ class MtKolts(Event):
         )
 
     def shadow_vargas_mod(self, sprite):
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+
         # change shadowy vargas to use the given sprite rather than uses sabin's sprite
         # character npc palettes are updated to match the character in npc data, change vargas back to black palette
         vargas_shadow_npc1 = self.maps.get_npc(0x060, self.vargas_npc_id)
@@ -141,7 +144,7 @@ class MtKolts(Event):
         self.maps.add_event(0x64, new_event)
 
     def character_mod(self, character):
-        # Change shadow to peak the character
+        # Change shadow to peek the character
         self.shadow_vargas_mod(character)
 
         boss_pack_id = self.get_boss("Vargas")
@@ -259,7 +262,7 @@ class MtKolts(Event):
         space = Reserve(0xa83a0, 0xa83a2, "mt kolts Bodybuilder?!", field.NOP())
 
     def esper_item_mod(self, esper_item_instructions):
-        # Change shadow to peak that it's a esper/item
+        # Change shadow to peek that it's a esper/item
         self.shadow_vargas_mod(self.characters.get_random_esper_item_sprite())
 
         boss_pack_id = self.get_boss("Vargas")

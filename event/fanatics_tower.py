@@ -137,8 +137,12 @@ class FanaticsTower(Event):
         )
 
     def character_mod(self, character):
-        self.strago_npc.sprite = character
-        self.strago_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+
+        self.strago_npc.sprite = sprite
+        self.strago_npc.palette = self.characters.get_palette(sprite)
 
         space = Reserve(0xc540d, 0xc542a, "fanatics tower add character", field.NOP())
         space.write(
@@ -146,7 +150,10 @@ class FanaticsTower(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        self.strago_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.strago_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.strago_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.strago_npc.palette = self.characters.get_palette(self.strago_npc.sprite)
 
         space = Reserve(0xc5409, 0xc542a, "fanatics tower esper/item reward", field.NOP())

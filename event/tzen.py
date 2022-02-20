@@ -17,6 +17,9 @@ class Tzen(Event):
         self.wob_price = randint(1, field.RemoveGP.MAX)
         self.wor_price = randint(1, field.RemoveGP.MAX)
 
+        no_peek_name = self.characters.get_no_peeking_name()
+        self.no_peek_wob_dialog = f"For {self.wob_price} GP {no_peek_name} is yours.<line><choice> Yes<line><choice> No<end>"
+
         if self.reward.type == RewardType.ESPER:
             self.esper_mod(self.reward.id)
         elif self.reward.type == RewardType.ITEM:
@@ -62,14 +65,20 @@ class Tzen(Event):
         )
 
     def esper_mod(self, esper):
-        wob_dialog = f"For {self.wob_price} GP this glowing stone\'s yours.<line><choice> Yes<line><choice> No<end>"
+        if self.args.no_peeking:
+            wob_dialog = self.no_peek_wob_dialog
+        else:
+            wob_dialog = f"For {self.wob_price} GP this glowing stone\'s yours.<line><choice> Yes<line><choice> No<end>"
         self.esper_item_mod(wob_dialog, [
             field.AddEsper(esper),
             field.Dialog(self.espers.get_receive_esper_dialog(esper)),
         ])
 
     def item_mod(self, item):
-        wob_dialog = f"For {self.wob_price} GP this is yours.<line><choice> Yes<line><choice> No<end>"
+        if self.args.no_peeking:
+            wob_dialog = self.no_peek_wob_dialog
+        else:
+            wob_dialog = f"For {self.wob_price} GP this is yours.<line><choice> Yes<line><choice> No<end>"
         self.esper_item_mod(wob_dialog, [
             field.AddItem(item),
             field.Dialog(self.items.get_receive_dialog(item)),

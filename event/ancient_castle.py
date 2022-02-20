@@ -20,6 +20,9 @@ class AncientCastle(Event):
         )
 
     def mod(self):
+        self.statue_npc_id = 0x11
+        self.statue_npc = self.maps.get_npc(0x198, self.statue_npc_id)
+
         self.dialog_mod()
 
         if self.reward.type == RewardType.CHARACTER:
@@ -37,9 +40,9 @@ class AncientCastle(Event):
         space = Reserve(0xc1f73, 0xc1f75, "ancient castle a tear comes from the stone", field.NOP())
 
     def character_mod(self, character):
-        statue_npc_id = 0x11
-        statue_npc = self.maps.get_npc(0x198, statue_npc_id)
-        statue_npc.sprite = character
+        self.statue_npc.sprite = character
+        if self.args.no_peeking:
+            self.statue_npc.sprite = self.characters.get_no_peeking_sprite()
 
         space = Reserve(0xc1f72, 0xc1f72, "ancient castle pause after tear", field.NOP())
 
@@ -47,8 +50,8 @@ class AncientCastle(Event):
         #       for command 0x61 some colors are # 00 = black, 01 = red, 02 = green, 03 = yellow, 04 = blue, 05 = purple,
         #                                        # 06 = teal, 07 = gray, 08 = teal, 09 = blue/purple, 0a = darker yellow
         src = [
-            field.SetPalette(statue_npc_id, self.characters.get_palette(character)),
-            field.EntityAct(statue_npc_id, True,
+            field.SetPalette(self.statue_npc_id, self.characters.get_palette(self.statue_npc.sprite)),
+            field.EntityAct(self.statue_npc_id, True,
                 field_entity.AnimateKneeling(),
                 field_entity.Pause(20),
                 field_entity.AnimateStandingHeadDown(),
@@ -71,8 +74,8 @@ class AncientCastle(Event):
             field.WaitForFade(),
 
             field.ClearEventBit(npc_bit.MARIA_STATUE_ANCIENT_CASTLE),
-            field.HideEntity(statue_npc_id),
-            field.DeleteEntity(statue_npc_id),
+            field.HideEntity(self.statue_npc_id),
+            field.DeleteEntity(self.statue_npc_id),
 
             field.RecruitAndSelectParty(character),
 
@@ -90,6 +93,9 @@ class AncientCastle(Event):
         )
 
     def esper_mod(self, esper):
+        if self.args.no_peeking:
+            self.statue_npc.sprite = self.characters.get_no_peeking_sprite()
+
         space = Reserve(0xc1f7e, 0xc1f84, "ancient castle display receive raiden dialog and take odin", field.NOP())
         space.write(
             field.Dialog(self.espers.get_receive_esper_dialog(esper)),
@@ -97,6 +103,9 @@ class AncientCastle(Event):
         )
 
     def item_mod(self, item):
+        if self.args.no_peeking:
+            self.statue_npc.sprite = self.characters.get_no_peeking_sprite()
+
         space = Reserve(0xc1f76, 0xc1f84, "ancient castle display receive raiden dialog and take odin", field.NOP())
         space.write(
             field.Dialog(self.items.get_receive_dialog(item)),

@@ -68,11 +68,14 @@ class UmaroCave(Event):
         )
 
     def character_mod(self, character):
-        self.umaro_cave_npc.sprite = character
-        self.umaro_cave_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+        self.umaro_cave_npc.sprite = sprite
+        self.umaro_cave_npc.palette = self.characters.get_palette(sprite)
 
-        self.umaro_wob_npc.sprite = character
-        self.umaro_wob_npc.palette = self.characters.get_palette(character)
+        self.umaro_wob_npc.sprite = sprite
+        self.umaro_wob_npc.palette = self.characters.get_palette(sprite)
         # TODO hide umaro in wob? (his npc bit is shared...)
         #      change the entrance event to somewhere with more space where can check for umaro recruited?
 
@@ -105,11 +108,16 @@ class UmaroCave(Event):
         )
 
     def esper_item_mod(self, add_instructions, dialog_instructions):
-        # remove umaro from wob
-        space = Reserve(0xc3871, 0xc388d, "narshe wob umaro appearance", field.NOP())
-        space.write(
-            field.HideEntity(self.umaro_wob_npc_id),
-        )
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+            self.umaro_wob_npc.sprite = sprite
+            self.umaro_wob_npc.palette = self.characters.get_palette(sprite)
+        else:
+            # remove umaro from wob
+            space = Reserve(0xc3871, 0xc388d, "narshe wob umaro appearance", field.NOP())
+            space.write(
+                field.HideEntity(self.umaro_wob_npc_id),
+            )
 
         space = Reserve(0xcd731, 0xcd733, "narshe wor receive esper dialog bone carving", field.NOP())
         space.write(
