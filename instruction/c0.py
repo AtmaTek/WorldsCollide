@@ -1,4 +1,4 @@
-from memory.space import Bank, Reserve, Allocate, Free, Write, Read
+from memory.space import Bank, Reserve, Allocate, Free, Write, Read, START_ADDRESS_SNES
 import instruction.asm as asm
 import args
 
@@ -32,12 +32,23 @@ def _extract_original(original_start, original_end):
 
     return new_address
 
+# 0xbafc = 0x01, 0xbafd = 0x02, 0xbafe = 0x04, 0xbaff = 0x08, ..., 0xbb03 = 0x80
+power_of_two_table = 0xbafc + START_ADDRESS_SNES
+
 def _multiply_mod():
     # 16 bit a = low a * high a
     data = Read(0x24781, 0x24791) # multiply function
     space = Write(Bank.C0, data, "c0 multiply a = low a * high a")
     return space.start_address
 multiply = _multiply_mod()
+
+def _divide_mod():
+    # 16-bit a = 16-bit a / 8-bit x
+    #  8-bit x = 16-bit a % 8-bit x
+    data = Read(0x24792, 0x247b6) # divide function
+    space = Write(Bank.C0, data, "c0 divide 16-bit a / 8-bit x")
+    return space.start_address
+divide = _divide_mod()
 
 def _rng_mod():
     # a = random number (0 to 255)
@@ -176,7 +187,7 @@ def _esper_found_mod():
 
         asm.JSR(0xbaed, asm.ABS),       # x = a mod 8 (bit), y = a // 8 (byte)
         asm.LDA(0x1a69, asm.ABS_Y),     # a = esper found byte
-        asm.AND(0xc0bafc, asm.LNG_X),   # & esper found bit
+        asm.AND(power_of_two_table, asm.LNG_X), # & esper found bit
         asm.BNE("FOUND"),
 
         asm.LDA(0x00, asm.IMM8),        # return 0 in a register
@@ -211,11 +222,11 @@ def _recruit_character_mod():
         asm.JSR(0xbaed, asm.ABS),                   # x = a mod 8 (bit), y = a // 8 (byte)
 
         asm.LDA(0x1edc, asm.ABS_Y),                 # a = character recruited byte
-        asm.ORA(0xc0bafc, asm.LNG_X),               # set character recruited bit
+        asm.ORA(power_of_two_table, asm.LNG_X),     # set character recruited bit
         asm.STA(0x1edc, asm.ABS_Y),                 # store result
 
         asm.LDA(0x1ede, asm.ABS_Y),                 # a = character available byte
-        asm.ORA(0xc0bafc, asm.LNG_X),               # set character available bit
+        asm.ORA(power_of_two_table, asm.LNG_X),     # set character available bit
         asm.STA(0x1ede, asm.ABS_Y),                 # store result
 
         asm.INC(characters_available_address, asm.ABS),
@@ -237,7 +248,7 @@ def _character_recruited_mod():
 
         asm.JSR(0xbaed, asm.ABS),       # x = a mod 8 (bit), y = a // 8 (byte)
         asm.LDA(0x1edc, asm.ABS_Y),     # a = character recruited byte
-        asm.AND(0xc0bafc, asm.LNG_X),   # & character recruited bit
+        asm.AND(power_of_two_table, asm.LNG_X), # & character recruited bit
         asm.BNE("RECRUITED"),
 
         asm.LDA(0x00, asm.IMM8),        # return 0 in a register
@@ -264,7 +275,7 @@ def _character_available_mod():
 
         asm.JSR(0xbaed, asm.ABS),       # x = a mod 8 (bit), y = a // 8 (byte)
         asm.LDA(0x1ede, asm.ABS_Y),     # a = character recruited byte
-        asm.AND(0xc0bafc, asm.LNG_X),   # & character recruited bit
+        asm.AND(power_of_two_table, asm.LNG_X), # & character recruited bit
         asm.BNE("AVAILABLE"),
 
         asm.LDA(0x00, asm.IMM8),        # return 0 in a register
