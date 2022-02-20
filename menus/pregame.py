@@ -63,6 +63,22 @@ class PreGameMenu:
         space = Write(Bank.C3, src, "pregame initialize")
         self.initialize = space.start_address
 
+    def invoke_objectives_menu_mod(self):
+        src = [
+            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a (workaround for bizhawk snes9x core bug)
+            asm.JMP(self.common.invoke_objectives, asm.ABS),
+        ]
+        space = Write(Bank.C3, src, "pregame invoke objectives")
+        self.invoke_objectives = space.start_address
+
+    def invoke_flags_menu_mod(self):
+        src = [
+            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a (workaround for bizhawk snes9x core bug)
+            asm.JMP(self.common.invoke_flags, asm.ABS),
+        ]
+        space = Write(Bank.C3, src, "pregame invoke flags")
+        self.invoke_flags = space.start_address
+
     def sustain_mod(self):
         src = [
             asm.JSR(0x2a21, asm.ABS),       # reset game play time
@@ -94,8 +110,8 @@ class PreGameMenu:
 
         src = [
             (new_game & 0xffff).to_bytes(2, "little"),
-            (self.common.invoke_objectives & 0xffff).to_bytes(2, "little"),
-            (self.common.invoke_flags & 0xffff).to_bytes(2, "little"),
+            (self.invoke_objectives & 0xffff).to_bytes(2, "little"),
+            (self.invoke_flags & 0xffff).to_bytes(2, "little"),
             (config & 0xffff).to_bytes(2, "little"),
         ]
         space = Write(Bank.C3, src, "pregame option click table")
@@ -217,6 +233,8 @@ class PreGameMenu:
         self.draw_options_mod()
 
         self.initialize_mod()
+        self.invoke_objectives_menu_mod()
+        self.invoke_flags_menu_mod()
         self.sustain_mod()
 
         self.initialize_config_menu_mod()
