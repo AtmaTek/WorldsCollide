@@ -10,6 +10,8 @@ class Animations:
         if args.flashes_remove_most:
             flash_address_arrays = battle_animation_scripts.BATTLE_ANIMATION_FLASHES.values()
             self.remove_battle_flashes_mod(flash_address_arrays)
+            self.remove_critical_flash()
+
         if args.flashes_remove_worst:
             flash_address_arrays = []
             animation_names = ["Boss Death", "Ice 3", "Fire 3", "Bolt 3", "Schiller", "R.Polarity", "X-Zone",
@@ -18,6 +20,9 @@ class Animations:
             for name in animation_names:
                 flash_address_arrays.append(battle_animation_scripts.BATTLE_ANIMATION_FLASHES[name])
             self.remove_battle_flashes_mod(flash_address_arrays)
+
+    def remove_critical_flash(self):
+        space = Reserve(0x23410, 0x23413, "Critical hit screen flash", asm.NOP())
 
     def remove_battle_flashes_mod(self, flash_address_arrays):
         ABSOLUTE_CHANGES = [0xb0, 0xaf]
