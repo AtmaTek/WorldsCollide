@@ -1,5 +1,7 @@
 from data.chest import Chest
+import data.chests_asm as chests_asm
 from data.structures import DataArrays
+import random
 
 class Chests():
     PTRS_START = 0x2d82f4
@@ -45,6 +47,15 @@ class Chests():
                                                              chest.id != lone_wolf_chest_id and \
                                                              chest.id != gem_box_chest_id]
 
+        from data.chest_item_tiers import tiers, tier_s_distribution
+        self.item_tiers = tiers
+
+        # remove excluded items from tier s
+        # remaining item weights raised proportionally to their original weight
+        #   e.g. if original weights were [0.10, 0.50, 0.40] and 0.50 removed, the remaining ones become [0.20, 0.80]
+        excluded_items = self.items.get_excluded()
+        self.item_tier_s_distribution = [(item_weight[0], item_weight[1]) for item_weight in tier_s_distribution
+                                         if item_weight[0] not in excluded_items]
 
     def chest_count(self, map_id):
         return len(self.map_chests[map_id])
@@ -61,7 +72,6 @@ class Chests():
         import copy
         chests_shuffle = [copy.deepcopy(chest) for chest in self.chests if chest.type in types]
 
-        import random
         random.shuffle(chests_shuffle)
 
         shuffle_index = 0
@@ -73,10 +83,27 @@ class Chests():
                 chest.type = shuffled_chest.type
                 chest.contents = shuffled_chest.contents
 
+    def shuffle_random(self):
+        randomizable_types = [Chest.EMPTY, Chest.ITEM, Chest.GOLD]
+
+        # first shuffle the chests to mix up empty/item/gold positions
+        self.shuffle(randomizable_types)
+        if self.args.chest_contents_shuffle_random_percent == 0:
+            return
+
+        possible_chests = [chest for chest in self.chests if chest.type in randomizable_types]
+        random_percent = self.args.chest_contents_shuffle_random_percent / 100.0
+        num_random_chests = int(len(possible_chests) * random_percent)
+        random_chests = random.sample(possible_chests, num_random_chests)
+        for chest in random_chests:
+            if chest.type == Chest.GOLD:
+                chest.randomize_gold()
+            elif chest.type == Chest.ITEM:
+                chest.contents = self.items.get_random()
+
     def random_tiered(self):
-        def get_item():
-            import random
-            from data.chest_item_tiers import tiers, weights, tier_s_distribution
+        def get_item(tiers, tier_s_distribution):
+            from data.chest_item_tiers import weights
             from utils.weighted_random import weighted_random
 
             random_tier = weighted_random(weights)
@@ -91,7 +118,6 @@ class Chests():
         # first shuffle the chests to mix up empty/item/gold positions
         self.shuffle([Chest.EMPTY, Chest.ITEM, Chest.GOLD])
 
-        import random
         for chest in self.chests:
             if chest.type == Chest.GOLD:
                 chest.contents = int(random.triangular(1, Chest.MAX_GOLD_VALUE + 1, 1))
@@ -99,26 +125,70 @@ class Chests():
                     # triangular max is inclusive, very small chance need to round max down
                     chest.contents = Chest.MAX_GOLD_VALUE
             elif chest.type == Chest.ITEM:
-                chest.contents = get_item()
+                chest.contents = get_item(self.item_tiers, self.item_tier_s_distribution)
 
-    def shuffle_random(self):
-        randomizable_types = [Chest.EMPTY, Chest.ITEM, Chest.GOLD]
+    def random_scaled(self):
+        import math
+        from utils.weighted_random import weighted_random
 
-        # first shuffle the chests to mix up empty/item/gold positions
-        self.shuffle(randomizable_types)
-        if self.args.chest_contents_shuffle_random_percent == 0:
-            return
+        # shuffle the chests to mix up empty/item/gold positions
+        self.shuffle([Chest.EMPTY, Chest.ITEM, Chest.GOLD])
 
-        import random
-        possible_chests = [chest for chest in self.chests if chest.type in randomizable_types]
-        random_percent = self.args.chest_contents_shuffle_random_percent / 100.0
-        num_random_chests = int(len(possible_chests) * random_percent)
-        random_chests = random.sample(possible_chests, num_random_chests)
-        for chest in random_chests:
-            if chest.type == Chest.GOLD:
-                chest.randomize_gold()
-            elif chest.type == Chest.ITEM:
-                chest.contents = self.items.get_random()
+        item_chests = [chest for chest in self.chests if chest.type == Chest.ITEM]
+        gold_chests = [chest for chest in self.chests if chest.type == Chest.GOLD]
+
+        # tier weights, start_weights are the odds for chest 0, end_weights are for chest (len(item_chests) - 1)
+        start_weights = [
+            25, 15, 3, 1, 0,
+            10, 40, 5, 1, 0,
+        ]
+        end_weights = [
+            10, 12, 6, 3, 1,
+            0, 0, 40, 25, 3,
+        ]
+
+        # most chests are often not opened, a quadratic transition allows values close to end_weights to be used
+        # for late game chests and achieves the main desired effect of lowering the odds of high tier items early
+        # start with horizontal parabola: x = a * (y - k)^2 + h
+        # at chest_index = 0, weight = start_weight
+        #   vertex = (h, k) = (0, start_weight), axis = k = start_weight, x = a * (y - start_weight)^2
+        # at chest_index = x = len(item_chests) - 1, weight = y = end_weight
+        #   a = rate = (len(item_chests) - 1) / (end_weight - start_weight)^2
+        # weight = +-sqrt(chest_index / rate) + start_weight
+        rates = [0] * len(start_weights)
+        for index in range(len(start_weights)):
+            rates[index] = (len(item_chests) - 1) / ((end_weights[index] - start_weights[index]) ** 2)
+
+        item_bits = []
+        self.item_contents = []
+        for chest_index, chest in enumerate(item_chests):
+            weights = [None] * len(rates)
+            for tier_index in range(len(weights)):
+                weights[tier_index] = math.sqrt(chest_index / rates[tier_index])
+                if start_weights[tier_index] > end_weights[tier_index]:
+                    weights[tier_index] = -weights[tier_index]
+                weights[tier_index] += start_weights[tier_index]
+
+            random_tier_index = weighted_random(weights)
+            if random_tier_index < len(self.item_tiers) - 1: # not s tier, use equal distribution
+                random_element_index = random.randrange(len(self.item_tiers[random_tier_index]))
+                self.item_contents.append(self.item_tiers[random_tier_index][random_element_index])
+            else:
+                weights = [entry[1] for entry in self.item_tier_s_distribution]
+                random_s_index = weighted_random(weights)
+                self.item_contents.append(self.item_tier_s_distribution[random_s_index][0])
+            item_bits.append(chest.bit.to_bytes(2, "little"))
+
+        chests_asm.scale_items(item_bits, self.item_contents)
+
+        gold_bits = []
+        self.gold_contents = []
+        for chest_index, chest in enumerate(gold_chests):
+            max_value = int((Chest.MAX_GOLD_VALUE / len(gold_chests)) * (chest_index + 1))
+            self.gold_contents.append(random.randint(1, max_value))
+            gold_bits.append(chest.bit.to_bytes(2, "little"))
+
+        chests_asm.scale_gold(gold_bits, self.gold_contents)
 
     def clear_contents(self):
         for chest in self.chests:
@@ -193,15 +263,18 @@ class Chests():
 
         if self.args.chest_contents_shuffle_random:
             self.shuffle_random()
+            self.remove_excluded_items()
         elif self.args.chest_contents_random_tiered:
             self.random_tiered()
+        elif self.args.chest_contents_random_scaled:
+            self.random_scaled()
         elif self.args.chest_contents_empty:
             self.clear_contents()
+        else:
+            self.remove_excluded_items()
 
         if self.args.chest_monsters_shuffle:
             self.shuffle([Chest.MONSTER])
-
-        self.remove_excluded_items()
 
         self.copy_thamasa_chests()
 
@@ -222,31 +295,46 @@ class Chests():
         from log import SECTION_WIDTH, section, format_option
         from data.area_chests import area_chests
         from data.item_names import id_name
+        from data.item import Item
         from textwrap import wrap
 
         lcolumn = []
-        for area_name, chest_ids in area_chests.items():
-            lcolumn.append(area_name)
+        if self.args.chest_contents_random_scaled:
+            lcolumn.append("Items:")
+            items_per_line = 5
 
-            contents = []
-            for chest_id in chest_ids:
-                chest = self.all_chests[chest_id]
-                if chest.type == Chest.ITEM:
-                    contents.append(id_name[chest.contents])
-                elif chest.type == Chest.GOLD:
-                    contents.append(f"{chest.contents * 100} GP")
-                elif chest.type == Chest.MONSTER:
-                    # TODO how to get enemy name?
-                    contents.append("MIAB")
-                elif chest.type == Chest.EMPTY:
-                    contents.append("Empty")
-
-            lines = wrap(", ".join(contents), width = SECTION_WIDTH, \
-                         initial_indent = "    ", subsequent_indent = "    ")
-            for line in lines:
+            lines = [self.item_contents[index : index + items_per_line] for index in range(0, len(self.item_contents), items_per_line)]
+            for line_index, line_items in enumerate(lines):
+                line = f"{line_index * items_per_line:>3}: "
+                for item_index, item_id in enumerate(line_items):
+                    line += f"{id_name[item_id]:<{Item.NAME_LENGTH}}"
                 lcolumn.append(line)
+
             lcolumn.append("")
-        lcolumn.pop()
+            lcolumn.append("GP: " + ", ".join([f"{gold * 100}" for gold in self.gold_contents]))
+        else:
+            for area_name, chest_ids in area_chests.items():
+                lcolumn.append(area_name)
+
+                contents = []
+                for chest_id in chest_ids:
+                    chest = self.all_chests[chest_id]
+                    if chest.type == Chest.ITEM:
+                        contents.append(id_name[chest.contents])
+                    elif chest.type == Chest.GOLD:
+                        contents.append(f"{chest.contents * 100} GP")
+                    elif chest.type == Chest.MONSTER:
+                        # TODO how to get enemy name?
+                        contents.append("MIAB")
+                    elif chest.type == Chest.EMPTY:
+                        contents.append("Empty")
+
+                lines = wrap(", ".join(contents), width = SECTION_WIDTH, \
+                             initial_indent = "    ", subsequent_indent = "    ")
+                for line in lines:
+                    lcolumn.append(line)
+                lcolumn.append("")
+            lcolumn.pop()
 
         section("Chests", lcolumn, [])
 

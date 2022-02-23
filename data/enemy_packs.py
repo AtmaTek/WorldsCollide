@@ -108,17 +108,29 @@ class EnemyPacks():
 
         boss_condition_name = "Boss"
         dragon_condition_name = "Dragon"
+        dragons_condition_name = "Dragons"
         assert boss_condition_name in possible_condition_names
         assert dragon_condition_name in possible_condition_names
+        assert dragons_condition_name in possible_condition_names
 
         required_boss_formations = set()
         required_dragon_formations = set()
+        min_dragon_formations = 0
         for objective in objectives:
             for condition in objective.conditions:
                 if condition.NAME == boss_condition_name:
                     required_boss_formations.add(bosses.name_formation[condition.boss_name()])
                 elif condition.NAME == dragon_condition_name:
                     required_dragon_formations.add(bosses.name_formation[condition.dragon_name()])
+                elif condition.NAME == dragons_condition_name and condition.count > min_dragon_formations:
+                    min_dragon_formations = condition.count
+
+        dragon_formations_needed = min_dragon_formations - len(required_dragon_formations)
+        if dragon_formations_needed > 0:
+            all_dragon_formations = set(bosses.dragon_formation_name)
+            remaining_dragon_formations = list(all_dragon_formations - required_dragon_formations)
+            random_dragon_formations = random.sample(remaining_dragon_formations, dragon_formations_needed)
+            required_dragon_formations |= set(random_dragon_formations)
 
         required_boss_packs = set()
         for pack_id, pack_name in bosses.normal_pack_name.items():
