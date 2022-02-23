@@ -31,6 +31,7 @@ class Zozo(Event):
         self.ramuh_npc_id = 0x11
         self.ramuh_npc = self.maps.get_npc(0x0e2, self.ramuh_npc_id)
         self.ramuh_magicite_npc_id = 0x12
+        self.ramuh_magicite_npc = self.maps.get_npc(0x0e2, self.ramuh_magicite_npc_id)
 
         if self.args.character_gating:
             self.add_gating_condition()
@@ -77,7 +78,9 @@ class Zozo(Event):
 
     def character_mod(self, character):
         self.ramuh_npc.sprite = character
-        self.ramuh_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.ramuh_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.ramuh_npc.palette = self.characters.get_palette(self.ramuh_npc.sprite)
 
         src = [
             field.SetEventBit(event_bit.GOT_ZOZO_REWARD),
@@ -95,6 +98,16 @@ class Zozo(Event):
         self.ramuh_npc.set_event_address(recruit_character)
 
     def esper_mod(self, esper):
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+            palette = self.characters.get_palette(sprite)
+            self.ramuh_npc.sprite = sprite
+            self.ramuh_npc.palette = palette
+            self.ramuh_magicite_npc.sprite = sprite
+            self.ramuh_magicite_npc.palette = palette
+            self.ramuh_magicite_npc.direction = direction.DOWN
+            self.ramuh_magicite_npc.split_sprite = 0
+
         space = Reserve(0xaa7fd, 0xaa803, "receive ramuh esper dialog", field.NOP())
         space = Reserve(0xaa808, 0xaa808, "zozo pause before receiving esper", field.NOP())
 
@@ -119,10 +132,14 @@ class Zozo(Event):
         )
 
     def item_mod(self, item):
-        self.ramuh_npc.sprite = 106
-        self.ramuh_npc.palette = 6
-        self.ramuh_npc.split_sprite = 1
-        self.ramuh_npc.direction = direction.DOWN
+        if self.args.no_peeking:
+            self.ramuh_npc.sprite = self.characters.get_no_peeking_sprite()
+            self.ramuh_npc.palette = self.characters.get_palette(self.ramuh_npc.sprite)
+        else:
+            self.ramuh_npc.sprite = 106
+            self.ramuh_npc.palette = 6
+            self.ramuh_npc.split_sprite = 1
+            self.ramuh_npc.direction = direction.DOWN
 
         src = [
             field.AddItem(item),

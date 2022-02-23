@@ -85,7 +85,9 @@ class Kohlingen(Event):
 
     def character_mod(self, character):
         self.shadow_npc.sprite = character
-        self.shadow_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.shadow_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)
 
         space = Reserve(0xc6f84, 0xc6f8b, "kohlingen talk to shadow", field.NOP())
         space.add_label("RECEIVE_REWARD", 0xc704f)
@@ -101,7 +103,10 @@ class Kohlingen(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.shadow_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)
 
         space = Reserve(0xc6f84, 0xc6f8b, "kohlingen talk to shadow", field.NOP())

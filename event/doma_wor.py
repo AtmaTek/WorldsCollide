@@ -200,20 +200,24 @@ class DomaWOR(Event):
         )
 
     def cyan_character_mod(self, character):
-        self.cyan_phantom_train_npc.sprite = character
-        self.cyan_phantom_train_npc.palette = self.characters.get_palette(character)
-        self.cyan_mines_npc.sprite = character
-        self.cyan_mines_npc.palette = self.characters.get_palette(character)
-        self.cyan_outside_mines_npc.sprite = character
-        self.cyan_outside_mines_npc.palette = self.characters.get_palette(character)
-        self.cyan_fishing_npc.sprite = character
-        self.cyan_fishing_npc.palette = self.characters.get_palette(character)
-        self.cyan_training_npc.sprite = character
-        self.cyan_training_npc.palette = self.characters.get_palette(character)
-        self.cyan_bedroom_npc.sprite = character
-        self.cyan_bedroom_npc.palette = self.characters.get_palette(character)
-        self.cyan_throne_room_npc.sprite = character
-        self.cyan_throne_room_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+
+        self.cyan_phantom_train_npc.sprite = sprite
+        self.cyan_phantom_train_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_mines_npc.sprite = sprite
+        self.cyan_mines_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_outside_mines_npc.sprite = sprite
+        self.cyan_outside_mines_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_fishing_npc.sprite = sprite
+        self.cyan_fishing_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_training_npc.sprite = sprite
+        self.cyan_training_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_bedroom_npc.sprite = sprite
+        self.cyan_bedroom_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_throne_room_npc.sprite = sprite
+        self.cyan_throne_room_npc.palette = self.characters.get_palette(sprite)
 
         space = Reserve(0xb9818, 0xb982f, "doma wor split up party after wrexsoul battle", field.NOP())
         space.write(
@@ -228,7 +232,10 @@ class DomaWOR(Event):
         )
 
     def random_cyan_npc_mod(self):
-        sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+        else:
+            sprite = self.characters.get_random_esper_item_sprite()
         palette = self.characters.get_palette(sprite)
 
         self.cyan_phantom_train_npc.sprite = sprite
