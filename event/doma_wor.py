@@ -279,8 +279,6 @@ class DomaWOR(Event):
 
         space = Reserve(0xb9a6f, 0xb9a6f, "doma wor learn all swdtechs", field.NOP())
 
-
-
     def throne_esper_item_mod(self, reward_instructions):
         src = [
             reward_instructions,
