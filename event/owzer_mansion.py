@@ -16,6 +16,9 @@ class OwzerMansion(Event):
 
         self.dialog_mod()
 
+        if(self.args.flashes_remove_most):
+            self.flash_mod()
+
         if self.args.character_gating:
             self.add_gating_condition()
 
@@ -37,6 +40,9 @@ class OwzerMansion(Event):
         self.finish_check_mod()
 
         self.log_reward(self.reward)
+
+    def flash_mod(self):
+        space = Reserve(0xb4d10, 0xb4d11, "owzer mansion flash", field.NOP())
 
     def dialog_mod(self):
         space = Reserve(0xb4d0d, 0xb4d0f, "owzer mansion help that painting!!", field.NOP())
