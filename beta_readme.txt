@@ -10,6 +10,7 @@ Adds the following flags for new features:
    or 
    -frm for "Removes most flashes from animations. Includes Kefka Death."
 5) -fc to Fix Capture Bugs (multi-steal not giving more than 1 item and weapon specials not proccing)
+6) -np flag for Sprites in peekable checks are left a mystery until reward
 
 Other changes:
 - Feature: Magitek is now a -com option (it's 29) and will show up in Random/Random Unique
