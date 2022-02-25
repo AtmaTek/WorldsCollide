@@ -75,6 +75,15 @@ class Coliseum():
         for match_index in hidden_indices:
             self.matches[match_index].reward_hidden = 1
 
+    def controllable(self):
+        # Replacing these commands from vanilla with NO-OPS to make Coliseum battles controllable:
+        # C2/092F: AD 97 3A     LDA $3A97      (RAM $3A97 = character are on auto-pilot [colosseum])
+        # C2/0932: D0 91        BNE $08C5      (exit if in the Colosseum)
+        from memory.space import Reserve
+        import instruction.asm as asm
+
+        space = Reserve(0x02092f, 0x020933, "removing Coliseum check for commands", asm.NOP())
+
     def mod(self):
         if self.args.coliseum_opponents_shuffle:
             self.shuffle_opponents()
@@ -90,6 +99,9 @@ class Coliseum():
 
         if self.args.coliseum_rewards_visible_random:
             self.randomize_rewards_hidden()
+
+        if self.args.coliseum_controllable:
+            self.controllable()
 
     def log(self):
         from log import section
