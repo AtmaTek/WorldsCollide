@@ -72,7 +72,9 @@ class LoneWolf(Event):
 
     def character_mod(self, character):
         self.mog_npc.sprite = character
-        self.mog_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.mog_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.mog_npc.palette = self.characters.get_palette(self.mog_npc.sprite)
 
         space = Reserve(0xcd5e5, 0xcd5f3, "lone wolf create char and make available", field.NOP())
         space.write(
@@ -103,6 +105,12 @@ class LoneWolf(Event):
         )
 
     def esper_item_mod(self, add_esper_item, sound_dialog_esper_item):
+        if self.args.no_peeking:
+            self.mog_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.mog_npc.sprite = self.characters.get_random_esper_item_sprite()
+        self.mog_npc.palette = self.characters.get_palette(self.mog_npc.sprite)
+
         space = Reserve(0xcd5df, 0xcd5f3, "lone wolf assign character properties", field.NOP())
         space = Reserve(0xcd693, 0xcd695, "char chosen dialog before lone wolf falls", field.NOP())
 
@@ -119,9 +127,6 @@ class LoneWolf(Event):
         )
 
     def esper_mod(self, esper):
-        self.mog_npc.sprite = self.characters.get_random_esper_item_sprite()
-        self.mog_npc.palette = self.characters.get_palette(self.mog_npc.sprite)
-
         self.esper_item_mod([
             field.AddEsper(esper, sound_effect = False),
         ],
@@ -131,9 +136,6 @@ class LoneWolf(Event):
         ])
 
     def item_mod(self, item):
-        self.mog_npc.sprite = self.characters.get_random_esper_item_sprite()
-        self.mog_npc.palette = self.characters.get_palette(self.mog_npc.sprite)
-
         self.esper_item_mod([
             field.AddItem(item, sound_effect = False),
         ],

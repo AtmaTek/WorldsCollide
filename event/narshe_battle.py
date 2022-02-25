@@ -229,17 +229,23 @@ class NarsheBattle(Event):
         )
 
     def character_mod(self, character):
-        self.banon_before_battle_npc.sprite = character
-        self.banon_before_battle_npc.palette = self.characters.get_palette(character)
-        self.banon_during_battle_npc.sprite = character
-        self.banon_during_battle_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+        self.banon_before_battle_npc.sprite = sprite
+        self.banon_before_battle_npc.palette = self.characters.get_palette(sprite)
+        self.banon_during_battle_npc.sprite = sprite
+        self.banon_during_battle_npc.palette = self.characters.get_palette(sprite)
 
         self.end_event_mod([
             field.RecruitCharacter(character),
         ])
 
     def esper_item_mod(self, esper_item_instructions):
-        random_sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            random_sprite = self.characters.get_no_peeking_sprite()
+        else:
+            random_sprite = self.characters.get_random_esper_item_sprite()
         self.banon_before_battle_npc.sprite = random_sprite
         self.banon_before_battle_npc.palette = self.characters.get_palette(self.banon_before_battle_npc.sprite)
         self.banon_during_battle_npc.sprite = random_sprite

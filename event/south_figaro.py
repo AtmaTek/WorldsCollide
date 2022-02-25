@@ -64,7 +64,9 @@ class SouthFigaro(Event):
 
     def character_mod(self, character):
         self.celes_npc.sprite = character
-        self.celes_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.celes_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.celes_npc.palette = self.characters.get_palette(self.celes_npc.sprite)
 
         src = [
             field.RecruitAndSelectParty(character),
@@ -87,7 +89,10 @@ class SouthFigaro(Event):
         self.celes_npc.set_event_address(celes_npc_event)
 
     def esper_item_mod(self, esper_item_instructions):
-        self.celes_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.celes_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.celes_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.celes_npc.palette = self.characters.get_palette(self.celes_npc.sprite)
 
         src = [

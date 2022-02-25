@@ -73,6 +73,9 @@ class DarylTomb(Event):
         )
 
     def daryl_sleeps_here_mod(self, new_name):
+        if self.args.no_peeking:
+            new_name = self.characters.get_no_peeking_name()
+
         num_spaces = 15 - len(new_name) # try to center dialog
 
         daryl_sleeps_here_dialog_id = 2461 # previously 2464

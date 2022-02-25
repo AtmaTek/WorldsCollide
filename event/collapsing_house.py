@@ -157,7 +157,9 @@ class CollapsingHouse(Event):
         sabin_npc_id = 0x11
         sabin_npc = self.maps.get_npc(0x131, sabin_npc_id)
         sabin_npc.sprite = character
-        sabin_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            sabin_npc.sprite = self.characters.get_no_peeking_sprite()
+        sabin_npc.palette = self.characters.get_palette(sabin_npc.sprite)
 
         space = Reserve(0xc5a9d, 0xc5aba, "collapsing house add char", field.NOP())
         space.write(
@@ -168,7 +170,11 @@ class CollapsingHouse(Event):
         sabin_npc_id = 0x11
         sabin_npc = self.maps.get_npc(0x131, sabin_npc_id)
 
-        sabin_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            sabin_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            sabin_npc.sprite = self.characters.get_random_esper_item_sprite()
+
         sabin_npc.palette = self.characters.get_palette(sabin_npc.sprite)
 
         # ovewrite adding sabin with fading out screen and updating event bits

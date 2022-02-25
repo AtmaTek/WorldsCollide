@@ -192,3 +192,9 @@ class Characters():
 
     def get_palette(self, character):
         return self.character_palettes.get(character)
+
+    # Convenience methods for no peeking
+    def get_no_peeking_sprite(self):
+        return self.IMP
+    def get_no_peeking_name(self):
+        return "KAPPA"

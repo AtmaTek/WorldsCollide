@@ -111,7 +111,9 @@ class OwzerMansion(Event):
 
     def character_mod(self, character):
         self.relm_npc.sprite = character
-        self.relm_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de1, 0xb4de7, "owzer mansion get startlet esper", field.NOP())
 
@@ -121,7 +123,10 @@ class OwzerMansion(Event):
         )
 
     def esper_mod(self, esper):
-        self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de3, 0xb4de7, "owzer mansion get esper", field.NOP())
@@ -133,7 +138,10 @@ class OwzerMansion(Event):
         space = Reserve(0xb4dfd, 0xb4e1c, "owzer mansion add relm", field.NOP())
 
     def item_mod(self, item):
-        self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de3, 0xb4de7, "owzer mansion get item", field.NOP())

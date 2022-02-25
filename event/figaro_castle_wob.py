@@ -56,7 +56,9 @@ class FigaroCastleWOB(Event):
 
     def character_mod(self, character):
         self.edgar_npc.sprite = character
-        self.edgar_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.edgar_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.edgar_npc.palette = self.characters.get_palette(self.edgar_npc.sprite)
 
         src = [
             field.SetEventBit(event_bit.NAMED_EDGAR),
@@ -77,7 +79,10 @@ class FigaroCastleWOB(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        self.edgar_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.edgar_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.edgar_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.edgar_npc.palette = self.characters.get_palette(self.edgar_npc.sprite)
 
         src = [
