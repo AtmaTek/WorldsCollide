@@ -127,7 +127,7 @@ class AutoSprint:
             asm.LSR(),
             asm.RTS(),
         ]
-        subroutine_space = Allocate(Bank.C0, 18, "walking speed calculation", asm.NOP())
+        subroutine_space = Allocate(Bank.C0, 20, "walking speed calculation", asm.NOP())
         subroutine_space.write(subroutine_src)
 
         src = [
