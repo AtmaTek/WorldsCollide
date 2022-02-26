@@ -9,6 +9,8 @@ def parse(parser):
                             help = "Exp. Eggs will not appear in coliseum/auction/shops/chests/events")
     challenges.add_argument("-nil", "--no-illuminas", action = "store_true",
                             help = "Illuminas will not appear in coliseum/auction/shops/chests/events")
+    challenges.add_argument("-noshoes", "--no-sprint-shoes", action = "store_true",
+                            help = "Sprint Shoes will not appear in coliseum/auction/shops/chests")
     challenges.add_argument("-nu", "--no-ultima", action = "store_true",
                             help = "Ultima cannot be learned from espers/items/natural magic")
     challenges.add_argument("-nfps", "--no-free-paladin-shields", action = "store_true",
@@ -30,6 +32,9 @@ def flags(args):
         flags += " -nee"
     if args.no_illuminas:
         flags += " -nil"
+    if args.no_sprint_shoes:
+        flags += " -noshoes"
+
     if args.no_ultima:
         flags += " -nu"
     if args.no_free_paladin_shields:
