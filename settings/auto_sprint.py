@@ -14,57 +14,68 @@ class AutoSprint:
         SPRINT_SPEED = 3
         DASH_SPEED = 4
 
-        if args.auto_sprint:
-            self.mod_auto_sprint(WALK_SPEED, SPRINT_SPEED, DASH_SPEED)
+        if args.auto_sprint or args.sprint_shoes_b_dash:
+            src = self.get_auto_sprint_src(WALK_SPEED, SPRINT_SPEED, DASH_SPEED)
+            space = Allocate(Bank.C0, 28, "Sprint subroutine")
+            space.write(src)
+            src = [
+                asm.JSR(space.start_address, asm.ABS),
+            ]
+            space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
+            space.write(src)
+
             self.sliding_dash_fix()
 
-    def mod_auto_sprint(self, WALK_SPEED, SPRINT_SPEED, DASH_SPEED):
+    def get_auto_sprint_src(self, WALK_SPEED, SPRINT_SPEED, DASH_SPEED):
+        import args
         CONTROLLER1_BYTE2 = 0x4219
         SPRINT_SHOES_BYTE = 0x11df
         SPRINT_SHOES_MASK = 0x20
         B_BUTTON_MASK = 0x80
         FIELD_RAM_SPEED = 0x0875
 
-        walking_src = [
+        if args.auto_sprint:
+            src = [
+                asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
+                asm.AND(B_BUTTON_MASK, asm.IMM8),
+                asm.BNE("WALK"), # branch if b button down
 
-            asm.LDA(SPRINT_SPEED, asm.IMM8),            # load default and push to stack
-            asm.PHA(),
+                "SPRINT",
+                asm.LDA(SPRINT_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
 
-            "B_BUTTON",                                 # decrement speed by 1 if b button is held down
-            asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
-            asm.AND(B_BUTTON_MASK, asm.IMM8),
-            asm.BNE("B_BUTTON_DOWN"),
-            asm.BRA("SPRINT_SHOES"),
+                "WALK",
+                asm.LDA(WALK_SPEED, asm.IMM8),
+            ]
 
-            "B_BUTTON_DOWN",
-            asm.PLA(),                                  # pull off stack
-            asm.DEC(),                                  # decrement
-            asm.PHA(),                                  # push to stack
+        if args.sprint_shoes_b_dash:
+            src = [
+                asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
+                asm.AND(B_BUTTON_MASK, asm.IMM8),
+                asm.BNE("DASH1"), # b button just store default
+                "STORE_DEFAULT",
+                asm.LDA(SPRINT_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
 
-            "SPRINT_SHOES",                             # incremeby speed by 1 if sprint shoes are on
-            asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),
-            asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
-            asm.BEQ("STORE_SPEED"),
+                "DASH1",
+                asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),        # If sprint shoes equipped, store dash speed
+                asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
+                asm.BNE("DASH2"),
+                asm.LDA(WALK_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
 
-            asm.PLA(),                                  # pull off stack
-            asm.INC(),                                  # increment
-            asm.PHA(),                                  # push to stack
+                "DASH2",
+                asm.LDA(DASH_SPEED, asm.IMM8),
+            ]
 
-            "STORE_SPEED",
-            asm.PLA(),                                  # load speed off stack
-            asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),
-            asm.RTS(),
+        src += [
+            "STORE",
+            asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),        # store speed in ram
+            asm.RTS(),                                  # return
         ]
 
-        walking_space = Allocate(Bank.C0, 40, "walking speed calculation", asm.NOP())
-        walking_space.write(walking_src)
+        return src
 
-        src = [
-            asm.JSR(walking_space.start_address, asm.ABS),
-        ]
-
-        space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
-        space.write(src)
 
     #  DIRECTION VALUE
     #   $087F ------dd
@@ -83,10 +94,10 @@ class AutoSprint:
             asm.PHA(),
             asm.LDA(DIRECTION_VALUE, asm.ABS_Y),
             asm.DEC(),
-            asm.BEQ("FOO"),
+            asm.BEQ("UNKNOWN"),
             asm.DEC(),
             asm.BNE("RETURN"),
-            "FOO",
+            "UNKNOWN",
             asm.PLA(),
             asm.INC(),
             asm.PHA(),
@@ -95,7 +106,7 @@ class AutoSprint:
             asm.LSR(),
             asm.RTS(),
         ]
-        subroutine_space = Allocate(Bank.C0, 40, "walking speed calculation", asm.NOP())
+        subroutine_space = Allocate(Bank.C0, 100, "walking speed calculation", asm.NOP())
         subroutine_space.write(subroutine_src)
 
         src = [
@@ -107,41 +118,3 @@ class AutoSprint:
 
         space = Reserve(0x5892, 0x5894, "Sprite offset calculation 2")
         space.write(src)
-
-# from memory.space import Reserve
-# import instruction.asm as asm
-# import args
-
-# class AutoSprint:
-#     def __init__(self):
-#         if args.auto_sprint:
-#             self.mod()
-
-#     def mod(self):
-#         # set sprint by default, b button to walk, sprint shoes do nothing
-
-#         WALK_SPEED = 4 if args.auto_sprint else 2
-#         SPRINT_SPEED = 3
-
-#         CONTROLLER1_BYTE2 = 0x4219
-#         B_BUTTON_MASK = 0x80
-#         FIELD_RAM_SPEED = 0x0875
-
-#         src = [
-#             asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
-#             asm.AND(B_BUTTON_MASK, asm.IMM8),
-#             asm.BNE("WALK"), # branch if b button down
-
-#             "SPRINT",
-#             asm.LDA(SPRINT_SPEED, asm.IMM8),
-#             asm.BRA("STORE_SPEED"),
-
-#             "WALK",
-#             asm.LDA(WALK_SPEED, asm.IMM8),
-
-#             "STORE_SPEED",
-#             asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),
-#         ]
-
-#         space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
-#         space.write(src)
