@@ -52,7 +52,7 @@ class AutoSprint:
             src = [
                 asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
                 asm.AND(B_BUTTON_MASK, asm.IMM8),
-                asm.BNE("DASH1"), # b button just store default
+                asm.BNE("DASH1"),                           # b button just store default
                 "STORE_DEFAULT",
                 asm.LDA(SPRINT_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
@@ -86,18 +86,39 @@ class AutoSprint:
     #            11 = left
 
     # https://silentenigma.neocities.org/ff6/index.html
+    # Will leave bits of documentation about in the vent neocities does not stand the test of time
+
+    # With dash enabled, this causes a bug that the player will appear to be standing still when
+    # running down or right at move speed 5. This is because two sprite instances are thrown out of
+    # the animation cycle when running at that speed; while Up/Left correctly omits the standing
+    # sprite, Down/Right omits the stepping sprites, since the offsets lag by an iteration.
     def sliding_dash_fix(self):
         DIRECTION_VALUE = 0x087f
+
+        # C0/0000: 4A         	LSR            ; Shift offset bits right
+        # C0/0001: 4A         	LSR            ; Shift offset bits right
+        # C0/0002: 48         	PHA            ; Push offset value to stack
+        # C0/0003: B9 7F 08   	LDA $087F,y    ; Load direction value
+        # C0/0006: C9 01      	CMP #$01       ; Check if direction is Right
+        # C0/0008: F0 07      	BEQ $D69E      ; Branch if the direction is Right
+        # C0/000A: C9 02      	CMP #$02       ; Check if the direction is Down
+        # C0/000C: F0 03      	BEQ $D69E      ; Branch if the direction is Down
+        # C0/000E: 68         	PLA            ; Pull offset back off of stack
+        # C0/000F: 80 02      	BRA $D6A0      ; Branch to the third LSR
+        # C0/0011: 68         	PLA            ; Pull offset back off of stack
+        # C0/0012: 1A         	INC            ; Increase the offset value by 1
+        # C0/0013: 4A         	LSR            ; Shift offset bits right
+        # C0/0014: 60         	RTS            ; Return from subfunction
         subroutine_src = [
             asm.LSR(),
             asm.LSR(),
             asm.PHA(),
             asm.LDA(DIRECTION_VALUE, asm.ABS_Y),
             asm.DEC(),
-            asm.BEQ("UNKNOWN"),
+            asm.BEQ("FACING_RIGHT"),
             asm.DEC(),
             asm.BNE("RETURN"),
-            "UNKNOWN",
+            "FACING_RIGHT",
             asm.PLA(),
             asm.INC(),
             asm.PHA(),
@@ -106,7 +127,7 @@ class AutoSprint:
             asm.LSR(),
             asm.RTS(),
         ]
-        subroutine_space = Allocate(Bank.C0, 100, "walking speed calculation", asm.NOP())
+        subroutine_space = Allocate(Bank.C0, 18, "walking speed calculation", asm.NOP())
         subroutine_space.write(subroutine_src)
 
         src = [
