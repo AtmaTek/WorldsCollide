@@ -1,5 +1,5 @@
-from settings.auto_sprint import AutoSprint
 from settings.initial_spells import InitialSpells
+from settings.movement import Movement
 from settings.random_rng import RandomRNG
 from settings.permadeath import Permadeath
 from settings.y_npc import YNPC
@@ -11,8 +11,8 @@ import instruction.asm as asm
 __all__ = ["Settings"]
 class Settings:
     def __init__(self):
-        self.auto_sprint = AutoSprint()
         self.initial_spells = InitialSpells()
+        self.movement = Movement()
         self.random_rng = RandomRNG()
         self.permadeath = Permadeath()
         self.y_npc = YNPC()

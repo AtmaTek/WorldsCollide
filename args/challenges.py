@@ -10,6 +10,8 @@ def parse(parser):
     challenges.add_argument("-nil", "--no-illuminas", action = "store_true",
                             help = "Illuminas will not appear in coliseum/auction/shops/chests/events")
     ultima = challenges.add_mutually_exclusive_group()
+    challenges.add_argument("-noshoes", "--no-sprint-shoes", action = "store_true",
+                            help = "Sprint Shoes will not appear in coliseum/auction/shops/chests")
     ultima.add_argument("-nu", "--no-ultima", action = "store_true",
                             help = "Ultima cannot be learned from espers/items/natural magic")
     ultima.add_argument("-u254", "--ultima-254-mp", action = "store_true",
@@ -68,6 +70,9 @@ def flags(args):
         flags += " -nee"
     if args.no_illuminas:
         flags += " -nil"
+    if args.no_sprint_shoes:
+        flags += " -noshoes"
+
     if args.no_ultima:
         flags += " -nu"
     elif args.ultima_254_mp:
@@ -96,6 +101,7 @@ def options(args):
         ("No Exp Eggs", args.no_exp_eggs),
         ("No Illuminas", args.no_illuminas),
         ("Ultima", ultima),
+        ("No Sprint Shoes", args.no_sprint_shoes),
         ("No Free Paladin Shields", args.no_free_paladin_shields),
         ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),

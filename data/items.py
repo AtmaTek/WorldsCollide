@@ -297,6 +297,11 @@ class Items():
             exclude.append(name_id["Exp. Egg"])
         if self.args.no_illuminas:
             exclude.append(name_id["Illumina"])
+
+        from data.movement import AUTO_SPRINT, B_DASH
+        # Sprint Shoes are a literal dead item if any of these options
+        if self.args.no_sprint_shoes or self.args.movement in [AUTO_SPRINT, B_DASH]:
+            exclude.append(name_id["Sprint Shoes"])
         if self.args.no_free_paladin_shields:
             exclude.append(name_id["Paladin Shld"])
             exclude.append(name_id["Cursed Shld"])

@@ -9,6 +9,9 @@ def parse(parser):
 
     starting_gold_items.add_argument("-smc", "--start-moogle-charms", default = 0, type = int, choices = range(4), metavar = "COUNT",
                                      help = "Start game with %(metavar)s Moogle Charms. Overrides No Moogle Charms option")
+    starting_gold_items.add_argument("-sshoes", "--start-sprint-shoes", default = 0, type = int, choices = range(4), metavar = "COUNT",
+                                     help = "Start game with %(metavar)s Sprint Shoes. Overrides No Sprint Shoes option")
+
     starting_gold_items.add_argument("-sws", "--start-warp-stones", default = 0, type = int, choices = range(11), metavar = "COUNT",
                                      help = "Start game with %(metavar)s Warp Stones")
     starting_gold_items.add_argument("-sfd", "--start-fenix-downs", default = 0, type = int, choices = range(11), metavar = "COUNT",
@@ -28,6 +31,8 @@ def flags(args):
         flags += f" -gp {args.gold}"
     if args.start_moogle_charms != 0:
         flags += f" -smc {args.start_moogle_charms}"
+    if args.start_sprint_shoes != 0:
+        flags += f" -sshoes {args.start_sprint_shoes}"
     if args.start_warp_stones != 0:
         flags += f" -sws {args.start_warp_stones}"
     if args.start_fenix_downs != 0:
@@ -43,6 +48,7 @@ def options(args):
     return [
         ("Start Gold", args.gold),
         ("Start Moogle Charms", args.start_moogle_charms),
+        ("Start Sprint Shoes", args.start_sprint_shoes),
         ("Start Warp Stones", args.start_warp_stones),
         ("Start Fenix Downs", args.start_fenix_downs),
         ("Start Tools", args.start_tools),

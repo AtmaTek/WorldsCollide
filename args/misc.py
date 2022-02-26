@@ -1,10 +1,11 @@
+
+
 def name():
     return "Misc."
 
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
-    misc.add_argument("-as", "--auto-sprint", action = "store_true",
-                      help = "Player always sprints. Sprint Shoes have no effect")
+
     misc.add_argument("-ond", "--original-name-display", action = "store_true",
                       help = "Display original character names in party and party select menus")
     misc.add_argument("-rr", "--random-rng", action = "store_true",
@@ -15,6 +16,15 @@ def parse(parser):
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
     misc.add_argument("-warp", "--warp-all", action = "store_true",
                       help = "All characters start with Warp learned. Warp costs 0 MP. Useful for seeds that limit Warp Stone access")
+
+    from data.movement import ALL
+    movement = misc.add_mutually_exclusive_group()
+    movement.name = "Movement"
+    movement.add_argument("-move", "--movement", type = str.lower, choices = ALL,
+                      help = "Player movement options")
+    # Completely ignore this argument, and default to auto sprint when -move is not defined
+    misc.add_argument("-as", "--auto-sprint", action = "store_true",
+                      help = "DEPRECATED - Use `-move as` instead. Player always sprints. Sprint Shoes have no effect")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
@@ -57,8 +67,8 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.auto_sprint:
-        flags += " -as"
+    if args.movement:
+        flags += f" -move {args.movement}"
     if args.original_name_display:
         flags += " -ond"
     if args.random_rng:
@@ -127,8 +137,15 @@ def options(args):
     elif args.y_npc_remove:
         y_npc = "Remove"
 
+    from data.movement import key_name, AUTO_SPRINT
+    # Similar logic is present in the init fn of settings/movement.py
+    if args.movement:
+        movement = key_name[args.movement]
+    else:
+        movement = key_name[AUTO_SPRINT]
+
     return [
-        ("Auto Sprint", args.auto_sprint),
+        ("Movement", movement),
         ("Original Name Display", args.original_name_display),
         ("Random RNG", args.random_rng),
         ("Random Clock", args.random_clock),
