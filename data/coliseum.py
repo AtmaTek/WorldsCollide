@@ -79,10 +79,15 @@ class Coliseum():
         # Replacing these commands from vanilla with NO-OPS to make Coliseum battles controllable:
         # C2/092F: AD 97 3A     LDA $3A97      (RAM $3A97 = character are on auto-pilot [colosseum])
         # C2/0932: D0 91        BNE $08C5      (exit if in the Colosseum)
+
+        # and runnable...
+        # C2/5BEC: AD 97 3A     LDA $3A97
+        # C2/5BEF: D0 29        BNE $5C1A      (exit if in Colosseum)
         from memory.space import Reserve
         import instruction.asm as asm
 
         space = Reserve(0x02092f, 0x020933, "removing Coliseum check for commands", asm.NOP())
+        space = Reserve(0x025bec, 0x025bf0, "removing Coliseum no-run", asm.NOP())
 
     def mod(self):
         if self.args.coliseum_opponents_shuffle:
