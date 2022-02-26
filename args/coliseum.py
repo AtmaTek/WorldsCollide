@@ -29,6 +29,9 @@ def parse(parser):
     coliseum.add_argument("-cnil", "--coliseum-no-illuminas", action = "store_true",
                        help = "Illuminas will not appear in coliseum")
 
+    coliseum.add_argument("-cc", "--coliseum-controllable", action = "store_true",
+                       help = "Make characters controllable in coliseum (except Umaro)")
+
 def process(args):
     args._process_min_max("coliseum_rewards_visible_random")
 
@@ -55,6 +58,9 @@ def flags(args):
         flags += " -cnee"
     if args.coliseum_no_illuminas:
         flags += " -cnil"
+
+    if args.coliseum_controllable:
+        flags += " -cc"
 
     return flags
 
@@ -84,6 +90,7 @@ def options(args):
         ("Rewards Menu", args.coliseum_rewards_menu),
         ("No Exp. Eggs", args.coliseum_no_exp_eggs),
         ("No Illuminas", args.coliseum_no_illuminas),
+        ("Controllable", args.coliseum_controllable),
     ]
 
 def menu(args):
