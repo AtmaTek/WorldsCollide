@@ -65,7 +65,7 @@ class AutoSprint:
                 asm.BRA("STORE"),
 
                 "DASH2",
-                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.LDA(DASH_SPEED, asm.IMM8),              # load fastest speed (DASH)
             ]
 
         src += [
