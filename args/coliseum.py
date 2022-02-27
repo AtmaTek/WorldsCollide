@@ -65,15 +65,11 @@ def options(args):
     result = []
 
     opponents = "Original"
-    if args.coliseum_opponents_shuffle:
-        opponents = "Shuffle"
-    elif args.coliseum_opponents_random:
+    if args.coliseum_opponents_random:
         opponents = "Random"
 
     rewards = "Original"
-    if args.coliseum_rewards_shuffle:
-        rewards = "Shuffle"
-    elif args.coliseum_rewards_random:
+    if args.coliseum_rewards_random:
         rewards = "Random"
 
     rewards_visible = "Original"
