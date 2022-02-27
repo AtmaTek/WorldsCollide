@@ -1,8 +1,8 @@
-import random
+import args, random
 from data.item import Item
 
-from data.items_good import good_items
-from data.item_names import id_name, name_id
+from constants.items import good_items
+from constants.items import id_name, name_id
 
 import data.items_asm as items_asm
 
@@ -13,21 +13,21 @@ class Items():
     BREAKABLE_RODS = range(53, 59)
     ELEMENTAL_SHIELDS = range(96, 99)
 
+    GOOD = [name_id[name] for name in good_items]
+    if args.stronger_atma_weapon:
+        GOOD.append(name_id["Atma Weapon"])
+    if args.no_free_paladin_shields:
+        GOOD.remove(name_id["Paladin Shld"])
+    if args.no_exp_eggs:
+        GOOD.remove(name_id["Exp. Egg"])
+    if args.no_illuminas:
+        GOOD.remove(name_id["Illumina"])
+
     def __init__(self, rom, args, dialogs, characters):
         self.rom = rom
         self.args = args
         self.dialogs = dialogs
         self.characters = characters
-        self.good_items = good_items
-
-        if self.args.stronger_atma_weapon:
-            self.good_items.append(name_id["Atma Weapon"])
-        if self.args.no_free_paladin_shields:
-            self.good_items.remove(name_id["Paladin Shld"])
-        if self.args.no_exp_eggs:
-            self.good_items.remove(name_id["Exp. Egg"])
-        if self.args.no_illuminas:
-            self.good_items.remove(name_id["Illumina"])
 
         self.read()
 
@@ -230,7 +230,7 @@ class Items():
 
         # generate receive item dialogs for good items
         self.receive_dialogs = {}
-        for item_id in self.good_items:
+        for item_id in self.GOOD:
             self.add_receive_dialog(item_id)
 
     def write(self):
@@ -303,7 +303,7 @@ class Items():
         return random.choice(self.get_items(exclude, item_type))
 
     def get_good_random(self):
-        return random.choice(self.good_items)
+        return random.choice(self.GOOD)
 
     def get_receive_dialog(self, item):
         return self.receive_dialogs[item]

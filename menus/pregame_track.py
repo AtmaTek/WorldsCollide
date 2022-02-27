@@ -83,11 +83,11 @@ class PreGameTrack:
         version_string = "v" + version.__version__.split(' ')[0] # remove substrings such as ' (dev)'
         text_positions = [
             ("FFVI Worlds Collide", 0x78cd),
-            (f"{version_string}", 0x78f9),
+            (f"{version_string}", 0x7905 - len(version_string) * 2),
         ]
 
         labels = []
-        label_space = Allocate(Bank.C3, 31, "pregame track labels")
+        label_space = Allocate(Bank.C3, 32, "pregame track labels")
         for text_position in text_positions:
             labels.append(label_space.next_address)
             label_space.write(

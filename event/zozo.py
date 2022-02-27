@@ -232,6 +232,7 @@ class Zozo(Event):
             solution_value = solution_value // 5
         self.dialogs.set_text(1066, f"Hand's pointin' at the {number_string[solution_value]}.<end>")
         del options[digit_index]
+        del solution_values[digit_index]
 
         # second clue removes half (or half - 1) of the possibilities from one of the two remaining digits
         digit_index = random.randint(0, len(options) - 1)

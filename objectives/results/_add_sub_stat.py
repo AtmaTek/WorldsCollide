@@ -5,16 +5,14 @@ import instruction.field as field
 from objectives.results._apply_characters_party import ApplyToCharacter, ApplyToCharacters
 
 def AddStat(stat_address):
+    MAX_STAT = 0x80
     return [
         asm.LDA(stat_address, asm.ABS_Y),
         asm.CLC(),
         asm.ADC(field.LongCall.ARG_ADDRESS, asm.DIR),
-        asm.BCS("MAXIMUM"),
-        asm.BRA("STORE"),
-
-        "MAXIMUM",
-        asm.LDA(255, asm.IMM8),
-
+        asm.CMP(MAX_STAT, asm.IMM8),
+        asm.BLT("STORE"),             # If < 128, skip to STORE
+        asm.LDA(MAX_STAT, asm.IMM8),  # Else, cap at 128
         "STORE",
         asm.STA(stat_address, asm.ABS_Y),
     ]

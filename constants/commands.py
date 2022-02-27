@@ -41,7 +41,7 @@ RANDOM_UNIQUE_COMMAND = 98
 NONE_COMMAND = 97   # none command id is 3 digits in base 10 (255), use a custom 2 digit value for args
 
 COMMAND_OPTIONS = ["Morph", "Steal", "SwdTech", "Throw", "Tools", "Blitz", "Runic", "Lore", "Sketch", "Slot", "Dance", "Rage", "Leap"]
-EXCLUDE_COMMANDS = ["Item", "Magic", "Revert", "Leap", "Mimic", "Row", "Def", "Summon", "MagiTek", "Empty", "Empty?", "None"]
+EXCLUDE_COMMANDS = ["Item", "Magic", "Revert", "Leap", "Mimic", "Row", "Def", "Summon", "Empty", "Empty?", "None"]
 
 RANDOM_POSSIBLE_COMMANDS = [option for option in sorted(name_id.keys()) if option not in EXCLUDE_COMMANDS and option != "Fight"]
 RANDOM_EXCLUDE_COMMANDS = [NONE_COMMAND] + [name_id[option] for option in RANDOM_POSSIBLE_COMMANDS]

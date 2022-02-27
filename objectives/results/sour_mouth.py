@@ -1,15 +1,15 @@
 from objectives.results._objective_result import *
 from objectives.results._apply_characters_party import ApplyToParty
+import instruction.field.entity as field_entity
 
 class Field(field_result.Result):
     def src(self):
-        from data.characters import Characters
         status_effects = field.Status.DARKNESS | field.Status.POISON | field.Status.IMP
         return [
-            field.AddStatusEffects(Characters.PARTY0, status_effects),
-            field.AddStatusEffects(Characters.PARTY1, status_effects),
-            field.AddStatusEffects(Characters.PARTY2, status_effects),
-            field.AddStatusEffects(Characters.PARTY3, status_effects),
+            field.AddStatusEffects(field_entity.PARTY0, status_effects),
+            field.AddStatusEffects(field_entity.PARTY1, status_effects),
+            field.AddStatusEffects(field_entity.PARTY2, status_effects),
+            field.AddStatusEffects(field_entity.PARTY3, status_effects),
         ]
 
 class Battle(battle_result.Result):
