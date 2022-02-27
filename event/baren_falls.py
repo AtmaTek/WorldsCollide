@@ -172,7 +172,7 @@ class BarenFalls(Event):
         )
 
         # Eliminate the palette swaps without reducing any cpu cycles by just writing back the value from the previous LDA
-        space = Reserve(0x2b20b, 0x2b30d, "waterfall palette change")
+        space = Reserve(0x2b20b, 0x2b20d, "waterfall palette change")
         space.write(
             asm.STA(0xEC71, asm.ABS_X)
         )
