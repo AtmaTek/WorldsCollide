@@ -143,6 +143,12 @@ class FloatingContinent(Event):
         )
 
     def air_force_battle_mod(self):
+        if self.args.flashes_remove_most:
+            # Remove the scrolling background by modifying the background animation pointer table for offset 7 (falling through clouds).
+            # By setting the pointer to 0xB13D, it will keep the background from scrolling.
+            space = Reserve(0x2b0db, 0x2b0dc, "falling through clouds background animation")
+            space.write(0x3d, 0xb1)
+
         boss_pack_id = self.get_boss("Air Force")
         battle_background = 7 # sky, falling
 
