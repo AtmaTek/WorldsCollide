@@ -22,6 +22,9 @@ class BarenFalls(Event):
         self.after_battle_mod()
         self.already_complete_mod()
 
+        if self.args.flashes_remove_most:
+            self.background_scrolling_mod()
+
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
         elif self.reward.type == RewardType.ESPER:
@@ -160,3 +163,10 @@ class BarenFalls(Event):
             field.AddItem(item),
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
+
+    def background_scrolling_mod(self):
+        # Slow the scrolling background by modifying the ADC command.
+        space = Reserve(0x2b1f7, 0x2b1f9, "waterfall background movement")
+        space.write(
+            asm.ADC(0x0001, asm.IMM16) #default: 0x0006
+        )
