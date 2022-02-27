@@ -281,6 +281,8 @@ class Items():
             exclude.append(name_id["Exp. Egg"])
         if self.args.no_illuminas:
             exclude.append(name_id["Illumina"])
+        if self.args.no_sprint_shoes:
+            exclude.append(name_id["Sprint Shoes"])
         if self.args.no_free_paladin_shields:
             exclude.append(name_id["Paladin Shld"])
             exclude.append(name_id["Cursed Shld"])
