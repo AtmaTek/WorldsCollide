@@ -7,17 +7,11 @@ def parse(parser):
     coliseum = parser.add_argument_group("Coliseum")
 
     coliseum_opponents = coliseum.add_mutually_exclusive_group()
-    coliseum_opponents.add_argument("-cor", "--coliseum-opponents-random", default = None, type = int,
-                                    metavar = "PERCENT", choices = range(101),
-                                    help = "Coliseum opponents original with a given percent randomized")
     coliseum_opponents.add_argument("-cosr", "--coliseum-opponents-shuffle-random", default = None, type = int,
                                     metavar = "PERCENT", choices = range(101),
                                     help = "Coliseum opponents shuffled and then given percent randomized")
 
     coliseum_rewards = coliseum.add_mutually_exclusive_group()
-    coliseum_rewards.add_argument("-crr", "--coliseum-rewards-random", default = None, type = int,
-                                    metavar = "PERCENT", choices = range(101),
-                                    help = "Coliseum rewards original with a given percent randomized")
     coliseum_rewards.add_argument("-crsr", "--coliseum-rewards-shuffle-random", default = None, type = int,
                                     metavar = "PERCENT", choices = range(101),
                                     help = "Coliseum rewards shuffled and then a given percent randomized")
