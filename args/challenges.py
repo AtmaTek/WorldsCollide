@@ -51,6 +51,7 @@ def options(args):
         ("No Moogle Charms", args.no_moogle_charms),
         ("No Exp Eggs", args.no_exp_eggs),
         ("No Illuminas", args.no_illuminas),
+        ("No Sprint Shoes", args.no_sprint_shoes),
         ("No Ultima", args.no_ultima),
         ("No Free Paladin Shields", args.no_free_paladin_shields),
         ("No Free Characters/Espers", args.no_free_characters_espers),
