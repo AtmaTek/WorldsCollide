@@ -94,7 +94,6 @@ category_types["Status"].append(ResultType(57, "Sour Mouth", "Sour Mouth", None)
 
 # Add new result types here
 category_types["Item"].append(ResultType(58, "High Tier Item", "High Tier Item", None))
-category_types["Item"].append(ResultType(59, "Sprint Shoes", "Sprint Shoes", None))
 
 
 # Order the list of each category type alphabetically
