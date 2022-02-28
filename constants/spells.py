@@ -55,3 +55,17 @@ id_spell = {
     53  : "Life 3",
 }
 spell_id = {v: k for k, v in id_spell.items()}
+
+top_spells = [
+    "Cure 3",
+    "Life 3",
+    "Life 2",
+    "Fire 3",
+    "Bolt 3",
+    "Ice 3",
+    "Quick",
+    "Merton",
+    "Ultima",
+    "Flare",
+    "Pearl",
+]

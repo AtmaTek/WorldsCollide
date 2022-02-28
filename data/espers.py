@@ -159,6 +159,14 @@ class Espers():
             if esper.has_spell(life3_id):
                 esper.remove_spell(life3_id)
 
+    def remove_top_spells(self):
+        from constants.spells import top_spells
+        for top_spell in top_spells:
+            id = self.spells.get_id(top_spell)
+            for esper in self.espers:
+                if esper.has_spell(id):
+                    esper.remove_spell(id)
+
     def clear_spells(self):
         for esper in self.espers:
             esper.clear_spells()
@@ -280,6 +288,8 @@ class Espers():
 
         if self.args.no_ultima:
             self.remove_all_ultima()
+        if self.args.no_top_spells:
+            self.remove_top_spells()
 
         if self.args.esper_bonuses_shuffle:
             self.shuffle_bonuses()

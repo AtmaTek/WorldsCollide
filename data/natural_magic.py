@@ -1,5 +1,6 @@
 from data.natural_spell import NaturalSpell
 from data.structures import DataArray
+from constants.spells import top_spells, spell_id
 
 from memory.space import Bank, Reserve, Allocate
 import instruction.asm as asm
@@ -153,6 +154,8 @@ class NaturalMagic:
             exclude.append(self.spells.get_id("Life"))
             exclude.append(self.spells.get_id("Life 2"))
             exclude.append(self.spells.get_id("Life 3"))
+        if self.args.no_top_spells:
+            exclude.append(top_spells)
 
         random_spells = self.spells.get_random(count = len(self.terra_spells), exclude = exclude)
         for index, spell in enumerate(random_spells):
@@ -166,6 +169,8 @@ class NaturalMagic:
             exclude.append(self.spells.get_id("Life"))
             exclude.append(self.spells.get_id("Life 2"))
             exclude.append(self.spells.get_id("Life 3"))
+        if self.args.no_top_spells:
+            exclude.append(top_spells)
 
         random_spells = self.spells.get_random(count = len(self.celes_spells), exclude = exclude)
         for index, spell in enumerate(random_spells):
@@ -183,6 +188,22 @@ class NaturalMagic:
     def remove_natural_ultima(self):
         self.terra_spells[-1].spell = 0
         self.terra_spells[-1].level = 0
+
+    def remove_natural_top_spells(self):
+        for top_spell in top_spells:
+            top_spell_id = spell_id[top_spell]
+
+            #linear search through Terra's spells
+            for terra_spell in self.terra_spells:
+                if terra_spell.spell == top_spell_id:
+                    terra_spell.spell = 0
+                    terra_spell.level = 0
+
+            #linear search through Celes' spells
+            for celes_spell in self.celes_spells:
+                if celes_spell.spell == top_spell_id:
+                    celes_spell.spell = 0
+                    celes_spell.level = 0
 
     def randomize_levels1(self):
         import random
@@ -221,6 +242,9 @@ class NaturalMagic:
                 self.randomize_levels2()
             if self.args.random_natural_spells2:
                 self.randomize_spells2()
+
+        if self.args.no_top_spells:
+            self.remove_natural_top_spells()
 
     def log(self):
         from log import section, format_option
