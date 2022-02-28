@@ -2,11 +2,20 @@ from objectives.results._objective_result import *
 import args
 
 def _random_spell_table():
-    from constants.spells import spell_id
+    from constants.spells import spell_id, top_spells
 
     spell_table = list(range(len(spell_id)))
     if args.no_ultima:
         spell_table.remove(spell_id["Ultima"])
+    if args.permadeath:
+        spell_table.remove(spell_id["Life"])
+        spell_table.remove(spell_id["Life 2"])
+        spell_table.remove(spell_id["Life 3"])
+    if args.no_top_spells:
+        for top_spell in top_spells:
+            id = spell_id[top_spell]
+            if id in spell_table:
+                spell_table.remove(spell_id[top_spell])
     random.shuffle(spell_table)
 
     space = Write(Bank.F0, spell_table, "forget spells random spell table")

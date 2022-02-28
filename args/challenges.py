@@ -21,6 +21,8 @@ def parse(parser):
                             help = "Life spells cannot be learned. Fenix Downs unavailable (except from starting items). Buckets/inns/tents/events do not revive characters. Phoenix casts Life 3 on party instead of Life")
     challenges.add_argument("-np", "--no-peeking", action = "store_true",
                             help = "Sprites in peekable checks are left a mystery until reward.")
+    challenges.add_argument("-nts", "--no-top-spells", action = "store_true",
+                            help = "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare")
 
 def process(args):
     pass
@@ -47,6 +49,8 @@ def flags(args):
         flags += " -pd"
     if args.no_peeking:
         flags += " -np"
+    if args.no_top_spells:
+        flags += " -nts"
 
     return flags
 
@@ -59,7 +63,8 @@ def options(args):
         ("No Free Paladin Shields", args.no_free_paladin_shields),
         ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
-        ("No Peeking", args.no_peeking)
+        ("No Peeking", args.no_peeking),
+        ("No Top Spells", args.no_top_spells),
     ]
 
 def menu(args):
