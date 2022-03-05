@@ -45,12 +45,6 @@ def parse(parser):
                        help = "Remove NPC")
     parser.y_npc_group = y_npc
 
-    remove_flashes = misc.add_mutually_exclusive_group()
-    remove_flashes.add_argument("-frw", "--flashes-remove-worst", action = "store_true",
-                              help = "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc.")
-    remove_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",
-                              help = "Removes most flashes from animations. Includes Kefka Death.")
-
 def process(args):
     args.y_npc = False # are any y_npc flags enabled?
 
@@ -102,11 +96,6 @@ def flags(args):
     elif args.y_npc_remove:
         flags += " -yremove"
 
-    if args.flashes_remove_worst:
-        flags += " -frw"
-    if args.flashes_remove_most:
-        flags += " -frm"
-
     return flags
 
 def options(args):
@@ -138,12 +127,6 @@ def options(args):
     elif args.y_npc_remove:
         y_npc = "Remove"
 
-    remove_flashes = "Original"
-    if args.flashes_remove_worst:
-        remove_flashes = "Worst"
-    elif args.flashes_remove_most:
-        remove_flashes = "Most"
-
     return [
         ("Auto Sprint", args.auto_sprint),
         ("Sprint Shoes B-Dash", args.sprint_shoes_b_dash),
@@ -153,7 +136,6 @@ def options(args):
         ("Scan All", args.scan_all),
         ("Event Timers", event_timers),
         ("Y NPC", y_npc),
-        ("Remove Flashes", remove_flashes)
     ]
 
 def menu(args):

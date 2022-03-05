@@ -10,6 +10,13 @@ def parse(parser):
     graphics.add_argument("-cspr", "--character-sprites", type = str, help = "Character sprite indices")
     graphics.add_argument("-cspp", "--character-sprite-palettes", type = str, help = "Character sprite palette indices")
 
+    remove_flashes = graphics.add_mutually_exclusive_group()
+    remove_flashes.add_argument("-frw", "--flashes-remove-worst", action = "store_true",
+                              help = "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc.")
+    remove_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",
+                              help = "Removes most flashes from animations. Includes Kefka Death.")
+
+
 def process(args):
     import graphics.palettes.palettes as palettes
     import graphics.portraits.portraits as portraits
@@ -98,6 +105,11 @@ def flags(args):
     if args.character_sprite_palettes:
         flags += " -cspp " + args.character_sprite_palettes
 
+    if args.flashes_remove_worst:
+        flags += " -frw"
+    if args.flashes_remove_most:
+        flags += " -frm"
+
     return flags
 
 def _truncated_name(name):
@@ -148,12 +160,34 @@ def _character_customization_log(args):
 
     return log
 
+def _other_options_log(args):
+    from log import format_option
+    log = ["Other Graphics"]
+
+    remove_flashes = "Original"
+    if args.flashes_remove_worst:
+        remove_flashes = "Worst"
+    elif args.flashes_remove_most:
+        remove_flashes = "Most"
+
+    entries = [
+        ("Remove Flashes", remove_flashes),
+    ]
+
+    for entry in entries:
+        log.append(format_option(*entry))
+
+    return log
+
 def log(args):
     lcolumn = [""]
     lcolumn.extend(_sprite_palettes_log(args))
 
     lcolumn.append("")
     lcolumn.extend(_other_portraits_sprites_log(args))
+
+    lcolumn.append("")
+    lcolumn.extend(_other_options_log(args))
 
     rcolumn = [""]
     rcolumn.extend(_character_customization_log(args))
