@@ -2,7 +2,7 @@ import data.text as text
 from data.status_effects import StatusEffects
 
 class Enemy:
-    def __init__(self, id, data, name_data, item_data):
+    def __init__(self, id, data, name_data, item_data, special_name_data):
         self.id = id
         self.name = text.get_string(name_data, text.TEXT2).rstrip('\0')
 
@@ -69,6 +69,8 @@ class Enemy:
         self.steal_common       = item_data[1]
         self.drop_rare          = item_data[2]
         self.drop_common        = item_data[3]
+
+        self.special_name       = text.get_string(special_name_data, text.TEXT2).rstrip('\0')
 
         # copy stats for reference after modifications
         self.original_speed         = self.speed
@@ -180,6 +182,12 @@ class Enemy:
         item_data[3]    = self.drop_common
 
         return item_data
+
+    def special_name_data(self):
+        from data.enemies import Enemies
+        data = text.get_bytes(self.special_name, text.TEXT2)
+        data.extend([0xff] * (Enemies.SPECIAL_NAMES_SIZE - len(data)))
+        return data
 
     def print(self):
         print(f"{self.id} {self.name}")
