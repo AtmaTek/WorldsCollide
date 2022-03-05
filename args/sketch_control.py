@@ -21,7 +21,7 @@ def flags(args):
 def options(args):
 
     return [
-        ("Buff Sketch/Control", args.improve_sketch_control),
+        ("Improve", args.improve_sketch_control),
     ]
 
 def menu(args):
