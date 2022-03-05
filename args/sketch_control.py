@@ -4,8 +4,8 @@ def name():
 def parse(parser):
     sketch_control = parser.add_argument_group("Sketch/Control")
 
-    sketch_control.add_argument("-scca", "--sketch-control-chances-always", action = "store_true",
-                         help = "Sketch & Control will always succeed if target is valid")
+    sketch_control.add_argument("-isc", "--improve-sketch-control", action = "store_true",
+                         help = "Sketch & Control 100%% accurate, Sketch uses caster's stats, and both have more useful commands")
 
 def process(args):
     pass
@@ -13,15 +13,15 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.sketch_control_chances_always:
-        flags += " -scca"
+    if args.improve_sketch_control:
+        flags += " -isc"
 
     return flags
 
 def options(args):
 
     return [
-        ("Chances Always", args.sketch_control_chances_always),
+        ("Buff Sketch/Control", args.improve_sketch_control),
     ]
 
 def menu(args):
