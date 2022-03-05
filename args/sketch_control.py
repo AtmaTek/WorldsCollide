@@ -4,7 +4,7 @@ def name():
 def parse(parser):
     sketch_control = parser.add_argument_group("Sketch/Control")
 
-    sketch_control.add_argument("-scca", "--sketch-control-chances_always", action = "store_true",
+    sketch_control.add_argument("-scca", "--sketch-control-chances-always", action = "store_true",
                          help = "Sketch & Control will always succeed if target is valid")
 
 def process(args):
