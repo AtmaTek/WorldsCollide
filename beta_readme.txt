@@ -7,6 +7,7 @@ Adds the following flags for new features:
 4) -cc flag for Controllable Coliseum
 5) -shoedash flag for Kielbasigo's "Sprint Shoes providing Speed 5 run when B is held."
 6) -nts flag for "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare"
+7) -scca flag for "Sketch & Control will always succeed if target is valid"
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
