@@ -52,7 +52,7 @@ class Sketches():
             asm.JSR(use_sketcher_stats_addr, asm.ABS)
         )
 
-    def enable_better_sketch_commands(self):
+    def enable_sketch_improved_abilities(self):
         from data.spell_names import name_id
         from data.sketch_custom_commands import custom_commands
 
@@ -78,10 +78,11 @@ class Sketches():
                 sketch.common = custom_commands[sketch.id][1]
 
     def mod(self):
-        if self.args.improve_sketch_control:
+        if self.args.sketch_control_improved_stats:
             self.enable_sketch_chances_always()
             self.enable_sketch_casters_stats()
-            self.enable_better_sketch_commands()
+        if self.args.sketch_improved_abilities:
+            self.enable_sketch_improved_abilities()
 
     def write(self):
         if self.args.spoiler_log:

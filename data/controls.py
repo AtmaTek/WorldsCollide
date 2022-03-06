@@ -26,45 +26,9 @@ class Controls():
         # NOPing the JSR and BCS that can prevent Control from working
         space = Reserve(0x023ae8, 0x023aec, "control always", asm.NOP())
 
-    def enable_better_control_commands(self):
-        from data.spell_names import name_id
-        # Ensure that Rage & Special are available (if there are open Controls)
-        for control in self.controls:
-            # Search for blanks, rages, and specials
-            index_of_blank = self.ATTACKS_DATA_SIZE # default to end
-            control_has_rage = False
-            control_has_special = False
-            for attack_index, attack in enumerate(control.attack_data()):
-                # Look for the first blank entry
-                if index_of_blank == self.ATTACKS_DATA_SIZE and attack == name_id["??????????"]:
-                    index_of_blank = attack_index
-                # Look for a rage
-                if control.id < self.rages.RAGE_COUNT: # Enemy has a rage
-                    if attack == self.rages.rages[control.id].attack2 and not control_has_rage:
-                        control_has_rage = True
-                else:
-                    control_has_rage = True # no rages to have
-                # Look for a special
-                if attack == name_id["Special"] and not control_has_special:
-                    control_has_special = True
-            
-            # If we found that it doesn't have a rage and there's room, add the rage
-            if not control_has_rage and index_of_blank < self.ATTACKS_DATA_SIZE:
-                control.attack_data_array[index_of_blank] = self.rages.rages[control.id].attack2
-                # Avoid duplicate Specials if Rage == Special
-                if control.attack_data_array[index_of_blank] == name_id["Special"]:
-                    control_has_special = True
-                index_of_blank = index_of_blank + 1
-
-            # If we found that it doesn't have a Special and there's room, add the Special
-            if not control_has_special and index_of_blank < self.ATTACKS_DATA_SIZE:
-                control.attack_data_array[index_of_blank] = name_id["Special"]
-                index_of_blank = index_of_blank + 1
-
     def mod(self):
-        if self.args.improve_sketch_control:
+        if self.args.sketch_control_improved_stats:
             self.enable_control_chances_always()
-            self.enable_better_control_commands()
 
     def write(self):
         if self.args.spoiler_log:
