@@ -8,7 +8,7 @@ Adds the following flags for new features:
 5) -shoedash flag for Kielbasigo's "Sprint Shoes providing Speed 5 run when B is held."
 6) -nts flag for "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare"
 7) -scis flag for "Sketch & Control 100%% accurate and Sketch uses caster's stats"
-8) -sia flag for "Improves Sketch abilities by removing Battle. Adds Rage as a Sketch possibility for most monsters. Gives Sketch abilities to most bosses."
+8) -scia flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
