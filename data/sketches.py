@@ -81,7 +81,7 @@ class Sketches():
         if self.args.sketch_control_improved_stats:
             self.enable_sketch_chances_always()
             self.enable_sketch_casters_stats()
-        if self.args.sketch_improved_abilities:
+        if self.args.sketch_control_improved_abilities:
             self.enable_sketch_improved_abilities()
 
     def write(self):
