@@ -144,6 +144,7 @@ normal_enemy_name = {
     256 : "Whelk",
     257 : "Presenter",
     361 : "Naughty",
+    292 : "KatanaSoul",
     308 : "Head",
     259 : "Vargas",
     333 : "Ipooh",

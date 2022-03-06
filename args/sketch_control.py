@@ -4,8 +4,10 @@ def name():
 def parse(parser):
     sketch_control = parser.add_argument_group("Sketch/Control")
 
-    sketch_control.add_argument("-isc", "--improve-sketch-control", action = "store_true",
-                         help = "Sketch & Control 100%% accurate, Sketch uses caster's stats, and both have more useful commands")
+    sketch_control.add_argument("-scis", "--sketch-control-improved-stats", action = "store_true",
+                         help = "Sketch & Control 100%% accurate and Sketch uses caster's stats")
+    sketch_control.add_argument("-sia", "--sketch-improved-abilities", action = "store_true",
+                         help = "Improves Sketch abilities by removing Battle. Adds Rage as a Sketch possibility for most monsters. Gives Sketch abilities to most bosses.")
 
 def process(args):
     pass
@@ -13,15 +15,18 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.improve_sketch_control:
-        flags += " -isc"
+    if args.sketch_control_improved_stats:
+        flags += " -scis"
+    if args.sketch_improved_abilities:
+        flags += " -sia"
 
     return flags
 
 def options(args):
 
     return [
-        ("Improve", args.improve_sketch_control),
+        ("Improved Stats", args.sketch_control_improved_stats),
+        ("Buff Sketch Abilities", args.sketch_improved_abilities),
     ]
 
 def menu(args):
