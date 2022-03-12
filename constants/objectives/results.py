@@ -85,6 +85,8 @@ category_types = {
     ],
 }
 
+category_types["Item"].append(ResultType(60, "Sprint Shoes", "Sprint Shoes", None))
+
 categories = list(category_types.keys())
 
 id_type = {}

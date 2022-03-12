@@ -16,10 +16,10 @@ class AutoSprint:
 
         if args.auto_sprint or args.sprint_shoes_b_dash:
             src = self.get_auto_sprint_src(WALK_SPEED, SPRINT_SPEED, DASH_SPEED)
-            space = Allocate(Bank.C0, 28, "Sprint subroutine")
+            space = Allocate(Bank.F0, 49, "Sprint subroutine")
             space.write(src)
             src = [
-                asm.JSR(space.start_address, asm.ABS),
+                asm.JSL(space.start_address_snes),
             ]
             space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
             space.write(src)
@@ -28,6 +28,8 @@ class AutoSprint:
 
     def get_auto_sprint_src(self, WALK_SPEED, SPRINT_SPEED, DASH_SPEED):
         import args
+        CURRENT_MAP_BYTE = 0x82 # 2 bytes
+        OWZERS_MANSION_ID = 0x0D1 # the door room can create visual artifacts on the map while dashing
         CONTROLLER1_BYTE2 = 0x4219
         SPRINT_SHOES_BYTE = 0x11df
         SPRINT_SHOES_MASK = 0x20
@@ -50,28 +52,37 @@ class AutoSprint:
 
         if args.sprint_shoes_b_dash:
             src = [
+                "CHECK_OWZERS",
+                asm.REP(0x20),                         # set register A bit size to 16
+                asm.LDA(CURRENT_MAP_BYTE, asm.ABS),    # if current map owzers mansion, disable the b-button
+                asm.CMP(OWZERS_MANSION_ID, asm.IMM16),
+                asm.BEQ("STORE_DEFAULT"),
+                asm.SEP(0x20),
                 asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
                 asm.AND(B_BUTTON_MASK, asm.IMM8),
-                asm.BNE("DASH1"),                           # b button just store default
+                asm.BNE("DASH1"),                       # b button just store default
+
                 "STORE_DEFAULT",
+                asm.SEP(0x20),
                 asm.LDA(SPRINT_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
 
                 "DASH1",
-                asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),        # If sprint shoes equipped, store dash speed
+                asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store dash speed
                 asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
                 asm.BNE("DASH2"),
                 asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
 
                 "DASH2",
-                asm.LDA(DASH_SPEED, asm.IMM8),              # load fastest speed (DASH)
+                asm.LDA(DASH_SPEED, asm.IMM8),          # load fastest speed (DASH)
             ]
 
         src += [
             "STORE",
             asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),        # store speed in ram
-            asm.RTS(),                                  # return
+            asm.SEP(0x20),
+            asm.RTL(),                                  # return
         ]
 
         return src
