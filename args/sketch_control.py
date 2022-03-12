@@ -5,7 +5,7 @@ def parse(parser):
     sketch_control = parser.add_argument_group("Sketch/Control")
 
     sketch_control.add_argument("-scis", "--sketch-control-improved-stats", action = "store_true",
-                         help = "Sketch & Control 100%% accurate and Sketch uses caster's stats")
+                         help = "Sketch & Control 100%% accurate and use Sketcher/Controller's stats")
     sketch_control.add_argument("-scia", "--sketch-control-improved-abilities", action = "store_true",
                          help = "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses.")
 

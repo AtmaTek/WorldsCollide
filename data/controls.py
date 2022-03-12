@@ -1,6 +1,6 @@
 from data.control import Control
 from data.structures import DataArray
-from memory.space import Reserve, Allocate, Bank
+from memory.space import Reserve, Allocate, Bank, Write
 import instruction.asm as asm
 
 class Controls():
@@ -19,6 +19,14 @@ class Controls():
         self.new_attack_data_space = Allocate(Bank.F0, self.ATTACKS_DATA_TOTAL_BYTES, "new Controls table")
         self.new_attack_data_space.copy_from(self.ATTACKS_DATA_START, self.ATTACKS_DATA_END)
 
+        self.attack_data = DataArray(self.rom, self.new_attack_data_space.start_address, self.new_attack_data_space.end_address, self.ATTACKS_DATA_SIZE)
+
+        self.controls = []
+        for control_index in range(len(self.attack_data)):
+            control = Control(control_index, self.attack_data[control_index])
+            self.controls.append(control)
+
+    def split_control_table(self):
         # Update the vanilla lookup of the table for Control commands
         # Default: LDA $CF3D00,X
         space = Reserve(0x23758, 0x2375B, "get Control command table")
@@ -26,12 +34,57 @@ class Controls():
             asm.LDA(self.new_attack_data_space.start_address_snes, asm.LNG_X)
         )
 
-        self.attack_data = DataArray(self.rom, self.new_attack_data_space.start_address, self.new_attack_data_space.end_address, self.ATTACKS_DATA_SIZE)
+    def ignore_randomize_target(self):
+        # Ignoring Randomize Target bit when Control is used, to ensure that those commands respect the selected targetting
+        # This is a bug-fix for a vanilla bug, in which Controlled Dance abilities (ex: Sandstorm) swap targetting.
+        src = [ 
+            asm.LDA(0x3A7A, asm.ABS), # load the command
+            asm.CMP(0x0E, asm.IMM8),  # is it Control?
+            asm.BEQ("exit"),          # if so, skip over displaced code
+            # displaced code from C2/276A - C2/2771 to read the "Randomize target bit" and set the equivalent in $BA
+            asm.LDA(0x01, asm.S),
+            asm.AND(0x10, asm.IMM8),
+            asm.ASL(),
+            asm.ASL(),
+            asm.TSB(0xBA, asm.DIR),
+            "exit",
+            asm.RTS(),
+        ]
+        space = Write(Bank.C2, src, "Control: ignore Randomize Target bit")
+        ignore_randomize_target_addr = space.start_address
 
-        self.controls = []
-        for control_index in range(len(self.attack_data)):
-            control = Control(control_index, self.attack_data[control_index])
-            self.controls.append(control)
+        # Call our new subroutine 
+        space = Reserve(0x2276A, 0x22771, "control: call ignore randomize target bit subroutine", asm.NOP())
+        space.write(
+            asm.JSR(ignore_randomize_target_addr, asm.ABS)
+        )
+
+    def enable_control_casters_stats(self):
+        src = [
+            # X = entity using command (in Control case, this is the monster being controlled)
+            asm.LDA(0x32B9,asm.ABS_X),    # who's Controlling this entity?
+            asm.CMP(0xFF, asm.IMM8),
+            asm.BEQ("exit"),              # branch if nobody controls them
+            asm.TAX(),                    # if there's a valid Controller, use their stats (vigor/magic/level)
+            asm.LDA(0x11A2, asm.ABS),     #Spell Properties
+            asm.LSR(),                    #Check if Physical/Magical
+            asm.LDA(0x3B41, asm.ABS_X),   #Controller's Mag.Pwr
+            asm.BCC("magical"),           #Branch if not physical damage
+            asm.LDA(0x3B2C, asm.ABS_X),   #Controller's Vigor * 2
+            "magical",
+            asm.STA(0x11AE, asm.ABS),     #Set Controller's Magic or Vigor
+            "exit",
+            asm.LDA(0x3B18, asm.ABS_X),   # displaced code: get Level
+            asm.RTS(),
+        ]
+        space = Write(Bank.C2, src, "Controller Caster Stats")
+        use_controller_stats_addr = space.start_address
+
+        # Call our new subroutine
+        space = Reserve(0x22c28, 0x22c2A, "jump to new routine")
+        space.write(
+            asm.JSR(use_controller_stats_addr, asm.ABS)
+        )
 
     def enable_control_chances_always(self):
         # Always Control if the target is valid
@@ -74,9 +127,14 @@ class Controls():
                 index_of_blank = index_of_blank + 1
 
     def mod(self):
+
+        self.ignore_randomize_target()
+
         if self.args.sketch_control_improved_stats:
             self.enable_control_chances_always()
+            self.enable_control_casters_stats()
         if self.args.sketch_control_improved_abilities:
+            self.split_control_table()
             self.enable_control_improved_abilities()
 
     def write(self):
