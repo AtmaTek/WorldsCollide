@@ -46,7 +46,7 @@ custom_commands = {
     name_enemy["Chadarnook (Demon)"] : [name_id["Flash Rain"], name_id["Flash Rain"]],
     name_enemy["Kefka (Narshe)"]     : [name_id["Ice 2"]     , name_id["Ice 2"]],
     name_enemy["Rizopas"]            : [name_id["Mega Volt"] , name_id["Special"]],
-    name_enemy["MagiMaster"]         : [name_id["Ultima"]    , name_id["Scan"]], 
+    name_enemy["MagiMaster"]         : [name_id["Fire 3"]    , name_id["Ice 3"]],      # Powerful abilities, but may heal
     name_enemy["Naughty"]            : [name_id["Cold Dust"] , name_id["Mute"]],
     name_enemy["Phunbaba 3"]         : [name_id["Special"]   , name_id["Blow Fish"]],
     name_enemy["Phunbaba 4"]         : [name_id["Special"]   , name_id["Blow Fish"]],
