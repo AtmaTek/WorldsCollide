@@ -51,7 +51,6 @@ category_types = {
         ResultType(31, "Learn Spells", "Learn {} Spells", list(range(1, len(id_spell) + 1))),
         ResultType(32, "Forget Spells", "Forget {} Spells", list(range(1, len(id_spell) + 1))),
         ResultType(33, "Max Morph Duration", "Max Morph Duration", None),
-        ResultType(59, "Magitek Upgrade", "Magitek Upgrade", None),
     ],
     "Item" : [
         ResultType(34, "Item", "Random", None),
@@ -85,6 +84,9 @@ category_types = {
         ResultType(57, "Sour Mouth", "Sour Mouth", None),
     ],
 }
+
+#Additional results
+category_types["Command"].append(ResultType(59, "Magitek Upgrade", "Magitek Upgrade", None))
 
 categories = list(category_types.keys())
 

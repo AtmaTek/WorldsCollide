@@ -75,11 +75,11 @@ class _MagitekUpgrade:
             asm.RTL(),
         ]
         space = Write(Bank.F0, src, "select from magitek menu")
-        select_from_magitek_menu_addr = space.start_address
+        select_from_magitek_menu_addr_snes = space.start_address_snes
 
         space = Reserve(0x1866a, 0x18683, "select from magitek menu jsl", asm.NOP())
         space.write(
-            asm.JSL(START_ADDRESS_SNES + select_from_magitek_menu_addr),
+            asm.JSL(select_from_magitek_menu_addr_snes),
         )
 
     def get_branch_if_objective_complete_src(self, branch_name):
