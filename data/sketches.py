@@ -31,8 +31,9 @@ class Sketches():
 
         # New subroutine. Note that most of this logic is the same as vanilla logic at C2/2954.
         src = [
+            # A = Character using sketch (from $3417)
             asm.BMI("exit"),            #Branch if no Sketcher
-            asm.TAX(),                  #if there's a valid Sketcher, use their Level for attack
+            asm.TAX(),                  #if there's a valid Sketcher, use their Level for attack by making X = character offset
             asm.LDA(0x11A2, asm.ABS),   #Spell Properties
             asm.LSR(),                  #Check if Physical/Magical
             asm.LDA(0x3B41, asm.ABS_X), #Sketcher's Mag.Pwr
