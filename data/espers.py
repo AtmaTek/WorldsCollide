@@ -45,6 +45,11 @@ class Espers():
             self.espers.append(esper)
 
         self.available_espers = set(range(self.ESPER_COUNT))
+        self.starting_espers = []
+
+        if args.starting_espers_random_min > 0 or args.starting_espers_random_max <= self.ESPER_COUNT:
+            count = random.randint(args.starting_espers_random_min, args.starting_espers_random_max)
+            self.starting_espers = [self.get_random_esper() for _esp in range(count)]
 
     def receive_dialogs_mod(self, dialogs):
         self.receive_dialogs = [1133, 1380, 1381, 1134, 1535, 1082, 1091, 1092, 1136, 1534, 2618, 1093, 1087,\
@@ -271,6 +276,9 @@ class Espers():
         if self.args.esper_spells_random_rates or self.args.esper_spells_shuffle_random_rates:
             self.randomize_rates()
 
+        if len(self.starting_espers):
+            self.randomize_rates()
+
         if self.args.esper_spells_shuffle or self.args.esper_spells_shuffle_random_rates:
             self.shuffle_spells()
         elif self.args.esper_spells_random:
@@ -371,6 +379,8 @@ class Espers():
                 character_names = wrap(character_names, width = COLUMN_WIDTH - 1)
                 entry.append(character_names)
 
+            if esper_index in self.starting_espers:
+                entry.append("Start With Esper")
             if entry_index % 2:
                 rentries.append(entry)
             else:
