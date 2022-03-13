@@ -76,7 +76,7 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.starting_espers_random_min != 100 or args.starting_espers_random_max != 100:
+    if args.starting_espers_random_min or args.starting_espers_random_max:
         flags += f" -sespr {args.starting_espers_random_min} {args.starting_espers_random_max}"
 
     if args.esper_spells_random_rates:
