@@ -179,7 +179,7 @@ class PreGameMenu:
         for submenu_idx in self.common.flags.submenus.keys():
             src += [
                 asm.LDA(0x4b, asm.DIR),         # a = cursor index
-                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = a submenu?
+                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = this submenu?
                 asm.BNE(f"NEXT_SUBMENU_CHECK{submenu_idx}"),    # branch if not
                 asm.TDC(),
                 asm.JSR(0x0eb2, asm.ABS),       # click sound
@@ -196,24 +196,24 @@ class PreGameMenu:
             "EXIT_SCROLL_AREA",
             asm.JSR(0x0EA9, asm.ABS),       # cursor sound
             asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
+            asm.LDA(0x0200, asm.ABS),
         ]
 
         for submenu_idx in self.common.flags.submenus.keys():
             # if current menu is a flags sub-menu, cause it to return to that, rather than main menu
             src += [
-                asm.LDA(0x0200, asm.ABS),
                 asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8), # in Flags submenu?
-                asm.BNE("LOAD_MAIN_PREGAME_MENU"), # branch if not
-                asm.JMP(self.invoke_flags, asm.ABS),
+                asm.BEQ("INVOKE_FLAGS"), # branch if so
             ]
 
         src += [
-            "LOAD_MAIN_PREGAME_MENU",
             asm.LDA(self.MENU_NUMBER, asm.IMM8), # queue up this menu
             asm.STA(0x0200, asm.ABS),
-
             "RETURN",
             asm.RTS(),
+
+            "INVOKE_FLAGS",
+            asm.JMP(self.invoke_flags, asm.ABS),
         ]
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address
