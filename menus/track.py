@@ -222,7 +222,7 @@ class TrackMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            asm.LDA(0x0200, asm.ABS), # if in a scroll-area menu, sustain the scroll area
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.checks.MENU_NUMBER, asm.IMM8),
@@ -231,7 +231,15 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
 
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.JSR(0x072d, asm.ABS),   # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),   # update cursor position
@@ -261,14 +269,52 @@ class TrackMenu:
             asm.RTS(),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
-            asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.LDA(0x09, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),     # b pressed?
+            asm.BNE("EXIT_SCROLL_AREA"), # branch if so
+            
+            # if on the flags menu, check A button press
+            asm.LDA(0x200, asm.ABS), 
+            asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8), # in Flags menu?
+            asm.BNE("HANDLE_SCROLLING"),               # branch if not
+            asm.LDA(0x08, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),        # a pressed?
+            asm.BEQ("HANDLE_SCROLLING"),    # branch if not
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.LDA(0x4b, asm.DIR),         # a = cursor index
+                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = a submenu?
+                asm.BNE(f"NEXT_SUBMENU_CHECK{submenu_idx}"),    # branch if not
+                asm.TDC(),
+                asm.JSR(0x0eb2, asm.ABS),       # click sound
+                asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
+                asm.JMP(self.common.invoke_flags_submenu[submenu_idx], asm.ABS), # load the flags submenu
+                f"NEXT_SUBMENU_CHECK{submenu_idx}",
+            ]
+
+        src += [
+            "HANDLE_SCROLLING",
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
+            asm.JSR(0x0EA9, asm.ABS),    # cursor sound
             asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            # if current menu is a flags sub-menu, cause it to return to that, rather than main menu
+            src += [
+                asm.LDA(0x0200, asm.ABS),
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8), # in Flags submenu?
+                asm.BNE("LOAD_MAIN_TRACK_MENU"), # branch if not
+                asm.JMP(self.common.invoke_flags, asm.ABS),
+            ]
+
+        src += [
+            "LOAD_MAIN_TRACK_MENU",
+            asm.LDA(self.MENU_NUMBER, asm.IMM8), # queue up this menu
             asm.STA(0x0200, asm.ABS),
 
             "RETURN",

@@ -35,6 +35,8 @@ class Espers():
         self.spells = spells
         self.characters = characters
 
+        self.remove_spell_ids = self.args.remove_learnable_spell_ids
+
         self.spells_bonus_data = DataArray(self.rom, self.SPELLS_BONUS_DATA_START, self.SPELLS_BONUS_DATA_END, self.SPELLS_BONUS_DATA_SIZE)
         self.name_data = DataArray(self.rom, self.NAMES_START, self.NAMES_END, self.NAME_SIZE)
         self.ability_data = DataArray(self.rom, self.ABILITY_DATA_START, self.ABILITY_DATA_END, AbilityData.DATA_SIZE)
@@ -141,31 +143,30 @@ class Espers():
                 learn_rate = Esper.LEARN_RATES[learn_rate_index]
                 esper.add_spell(get_spell(), learn_rate)
 
+    def remove_all(self):
+        for spell_id in self.remove_spell_ids:
+            for esper in self.espers:
+                if(esper.has_spell(spell_id)):
+                    esper.remove_spell(spell_id)
+
+    def replace_all(self):
+        for spell_id in self.remove_spell_ids:
+            for esper in self.espers:
+                # Also exclude spells this Esper already knows, to avoid duplicates
+                exclude_spell_ids = self.remove_spell_ids
+                exclude_spell_ids.append(esper.get_spell_ids())
+
+                if(esper.has_spell(spell_id)):
+                    new_spell_id = self.spells.get_replacement(spell_id, exclude_spell_ids)
+                    esper.replace_spell(spell_id, new_spell_id)
+
     def remove_all_ultima(self):
-        ultima_id = self.spells.get_id("Ultima")
-        for esper in self.espers:
-            if esper.has_spell(ultima_id):
-                esper.remove_spell(ultima_id)
+        self.remove_spell_ids.append(self.spells.get_id("Ultima"))
 
     def remove_all_life(self):
-        life_id = self.spells.get_id("Life")
-        life2_id = self.spells.get_id("Life 2")
-        life3_id = self.spells.get_id("Life 3")
-        for esper in self.espers:
-            if esper.has_spell(life_id):
-                esper.remove_spell(life_id)
-            if esper.has_spell(life2_id):
-                esper.remove_spell(life2_id)
-            if esper.has_spell(life3_id):
-                esper.remove_spell(life3_id)
-
-    def remove_top_spells(self):
-        from constants.spells import top_spells
-        for top_spell in top_spells:
-            id = self.spells.get_id(top_spell)
-            for esper in self.espers:
-                if esper.has_spell(id):
-                    esper.remove_spell(id)
+        self.remove_spell_ids.append(self.spells.get_id("Life"))
+        self.remove_spell_ids.append(self.spells.get_id("Life 2"))
+        self.remove_spell_ids.append(self.spells.get_id("Life 3"))
 
     def clear_spells(self):
         for esper in self.espers:
@@ -287,9 +288,7 @@ class Espers():
             self.randomize_spells_tiered()
 
         if self.args.no_ultima:
-            self.remove_all_ultima()
-        if self.args.no_top_spells:
-            self.remove_top_spells()
+            self.remove_all_ultima() #adds Ultima to the removal list
 
         if self.args.esper_bonuses_shuffle:
             self.shuffle_bonuses()
@@ -310,8 +309,15 @@ class Espers():
         espers_asm.equipable_mod(self)
 
         if self.args.permadeath:
-            self.remove_all_life()
+            self.remove_all_life() # adds life spells to removal list
             self.phoenix_life3()
+
+        if self.args.esper_spells_random or self.args.esper_spells_random_tiered:
+            # if random, replace the spells
+            self.replace_all()
+        else:
+            # otherwise (original or shuffled), remove them
+            self.remove_all()
 
         if self.args.esper_multi_summon:
             self.multi_summon()

@@ -56,16 +56,6 @@ id_spell = {
 }
 spell_id = {v: k for k, v in id_spell.items()}
 
-top_spells = [
-    "Cure 3",
-    "Life 3",
-    "Life 2",
-    "Fire 3",
-    "Bolt 3",
-    "Ice 3",
-    "Quick",
-    "Merton",
-    "Ultima",
-    "Flare",
-    "Pearl",
-]
+black_magic_ids = range(0, 24)
+gray_magic_ids = range(24, 45)
+white_magic_ids = range(45, 54)

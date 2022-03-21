@@ -29,6 +29,8 @@ class Items():
         self.dialogs = dialogs
         self.characters = characters
 
+        self.remove_spell_ids = self.args.remove_learnable_spell_ids
+
         self.read()
 
     def read(self):
@@ -205,7 +207,10 @@ class Items():
 
         if self.args.no_ultima:
             from data.spell_names import name_id as spell_name_id
-            self.remove_learnable_spell(spell_name_id["Ultima"])
+            self.remove_spell_ids.append(spell_name_id["Ultima"])
+        
+        for spell_id in self.remove_spell_ids:
+            self.remove_learnable_spell(spell_id)
 
         if self.args.cursed_shield_battles_original:
             self.cursed_shield_battles = 256

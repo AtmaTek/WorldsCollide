@@ -17,11 +17,18 @@ def parse(parser):
                             help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
     challenges.add_argument("-pd", "--permadeath", action = "store_true",
                             help = "Life spells cannot be learned. Fenix Downs unavailable (except from starting items). Buckets/inns/tents/events do not revive characters. Phoenix casts Life 3 on party instead of Life")
-    challenges.add_argument("-nts", "--no-top-spells", action = "store_true",
-                            help = "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare")
+    challenges.add_argument("-rls", "--remove-learnable-spells", type = str,
+                            help = "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives")
 
 def process(args):
-    pass
+    args.remove_learnable_spell_ids = []
+    if args.remove_learnable_spells:
+        if args.remove_learnable_spells.lower().strip() == 'all':
+            args.remove_learnable_spell_ids = range(0,54)
+        else:
+            # Split the comma-separated string, remove duplicates via set, and sort
+            args.remove_learnable_spell_ids = list(set([int(i) for i in args.remove_learnable_spells.split(',')]))
+            args.remove_learnable_spell_ids.sort()
 
 def flags(args):
     flags = ""
@@ -40,8 +47,8 @@ def flags(args):
         flags += " -nfce"
     if args.permadeath:
         flags += " -pd"
-    if args.no_top_spells:
-        flags += " -nts"
+    if args.remove_learnable_spells:
+        flags += f" -rls {args.remove_learnable_spells}"
 
     return flags
 
@@ -54,10 +61,19 @@ def options(args):
         ("No Free Paladin Shields", args.no_free_paladin_shields),
         ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
-        ("No Top Spells", args.no_top_spells),
+        ("Remove Learnable Spells", args.remove_learnable_spell_ids),
     ]
 
+def _format_spells_log_entries(spell_ids):
+    from constants.spells import id_spell
+    spell_entries = []
+    for spell_id in spell_ids:
+        spell_entries.append(("", id_spell[spell_id]))
+    return spell_entries
+
 def menu(args):
+    from menus.flags_remove_learnable_spells import FlagsRemoveLearnableSpells
+
     entries = options(args)
     for index, entry in enumerate(entries):
         key, value = entry
@@ -65,6 +81,9 @@ def menu(args):
             entries[index] = ("No Free Paladin Shlds", entry[1])
         elif key == "No Free Characters/Espers":
             entries[index] = ("No Free Chars/Espers", entry[1])
+        elif key == "Remove Learnable Spells":
+            entries[index] = (key, FlagsRemoveLearnableSpells(key, value)) # flags sub-menu
+
     return (name(), entries)
 
 def log(args):
@@ -73,6 +92,16 @@ def log(args):
 
     entries = options(args)
     for entry in entries:
-        log.append(format_option(*entry))
+        key, value = entry
+        if key == "Remove Learnable Spells":
+            if len(value) == 0:
+                entry = (key, "None")
+            else:
+                entry = (key, "") # The entries will show up on subsequent lines
+            log.append(format_option(*entry))
+            for spell_entry in _format_spells_log_entries(value):
+                log.append(format_option(*spell_entry))
+        else:
+            log.append(format_option(*entry))
 
     return log

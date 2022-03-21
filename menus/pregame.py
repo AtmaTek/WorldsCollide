@@ -8,6 +8,7 @@ class PreGameMenu:
 
     def __init__(self, pregame_track):
         self.common = pregame_track
+        self.invoke_flags_submenu = {}
         self.mod()
 
     def draw_options_mod(self):
@@ -79,6 +80,14 @@ class PreGameMenu:
         space = Write(Bank.C3, src, "pregame invoke flags")
         self.invoke_flags = space.start_address
 
+    def invoke_flags_submenu_mod(self, submenu_idx):
+        src = [
+            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a (workaround for bizhawk snes9x core bug)
+            asm.JMP(self.common.invoke_flags_submenu[submenu_idx], asm.ABS),
+        ]
+        space = Write(Bank.C3, src, "pregame invoke flag submenu")
+        self.invoke_flags_submenu[submenu_idx] = space.start_address
+
     def sustain_mod(self):
         src = [
             asm.JSR(0x2a21, asm.ABS),       # reset game play time
@@ -120,9 +129,19 @@ class PreGameMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            # if in a scroll area, sustain it
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
 
@@ -144,14 +163,53 @@ class PreGameMenu:
             asm.JMP(options_table, asm.ABS_X_16),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
+            asm.LDA(0x09, asm.DIR),
             asm.BIT(0x80, asm.IMM8),        # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.BNE("EXIT_SCROLL_AREA"),    # branch if so
+
+            # if on the flags menu, check A button press
+            asm.LDA(0x200, asm.ABS), 
+            asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8), # in Flags menu?
+            asm.BNE("HANDLE_SCROLLING"),               # branch if not
+            asm.LDA(0x08, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),        # a pressed?
+            asm.BEQ("HANDLE_SCROLLING"),    # branch if not
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.LDA(0x4b, asm.DIR),         # a = cursor index
+                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = a submenu?
+                asm.BNE(f"NEXT_SUBMENU_CHECK{submenu_idx}"),    # branch if not
+                asm.TDC(),
+                asm.JSR(0x0eb2, asm.ABS),       # click sound
+                asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
+                asm.JSR(0x6a3c, asm.ABS),       # clear BG3 a (workaround for bizhawk snes9x core bug)
+                asm.JMP(self.invoke_flags_submenu[submenu_idx], asm.ABS), # load the flags submenu
+                f"NEXT_SUBMENU_CHECK{submenu_idx}",
+            ]
+
+        src += [
+            "HANDLE_SCROLLING",
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
+            asm.JSR(0x0EA9, asm.ABS),       # cursor sound
+            asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            # if current menu is a flags sub-menu, cause it to return to that, rather than main menu
+            src += [
+                asm.LDA(0x0200, asm.ABS),
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8), # in Flags submenu?
+                asm.BNE("LOAD_MAIN_PREGAME_MENU"), # branch if not
+                asm.JMP(self.invoke_flags, asm.ABS),
+            ]
+
+        src += [
+            "LOAD_MAIN_PREGAME_MENU",
+            asm.LDA(self.MENU_NUMBER, asm.IMM8), # queue up this menu
             asm.STA(0x0200, asm.ABS),
 
             "RETURN",
@@ -235,6 +293,8 @@ class PreGameMenu:
         self.initialize_mod()
         self.invoke_objectives_menu_mod()
         self.invoke_flags_menu_mod()
+        for submenu_idx in self.common.flags.submenus.keys():
+            self.invoke_flags_submenu_mod(submenu_idx)
         self.sustain_mod()
 
         self.initialize_config_menu_mod()
