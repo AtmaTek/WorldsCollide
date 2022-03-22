@@ -21,14 +21,31 @@ def parse(parser):
                             help = "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives")
 
 def process(args):
+    from constants.spells import black_magic_ids, white_magic_ids, gray_magic_ids, spell_id
     args.remove_learnable_spell_ids = []
     if args.remove_learnable_spells:
-        if args.remove_learnable_spells.lower().strip() == 'all':
-            args.remove_learnable_spell_ids = range(0,54)
-        else:
-            # Split the comma-separated string, remove duplicates via set, and sort
-            args.remove_learnable_spell_ids = list(set([int(i) for i in args.remove_learnable_spells.split(',')]))
-            args.remove_learnable_spell_ids.sort()
+        # Split the comma-separated string, remove duplicates via set, and sort
+        for a_spell_id in args.remove_learnable_spells.split(','):
+            # look for strings first
+            a_spell_id = a_spell_id.lower().strip()
+            if a_spell_id == 'all':
+                args.remove_learnable_spell_ids.extend(range(0,54))
+            elif a_spell_id == 'white':
+                args.remove_learnable_spell_ids.extend(white_magic_ids)
+            elif a_spell_id == 'black':
+                args.remove_learnable_spell_ids.extend(black_magic_ids)
+            elif a_spell_id == 'gray' or a_spell_id == 'grey':
+                args.remove_learnable_spell_ids.extend(gray_magic_ids)
+            else:
+                spell_ids_lower = {k.lower():v for k,v in spell_id.items()}
+                if a_spell_id in spell_ids_lower:
+                    args.remove_learnable_spell_ids.append(spell_ids_lower[a_spell_id])
+                else:
+                    # assuming it's a number... it'll error out if not
+                    args.remove_learnable_spell_ids.append(int(a_spell_id))
+        # remove duplicates and sort
+        args.remove_learnable_spell_ids = list(set(args.remove_learnable_spell_ids))
+        args.remove_learnable_spell_ids.sort()
 
 def flags(args):
     flags = ""
@@ -82,7 +99,7 @@ def menu(args):
         elif key == "No Free Characters/Espers":
             entries[index] = ("No Free Chars/Espers", entry[1])
         elif key == "Remove Learnable Spells":
-            entries[index] = (key, FlagsRemoveLearnableSpells(key, value)) # flags sub-menu
+            entries[index] = ("Remove L. Spells", FlagsRemoveLearnableSpells(value)) # flags sub-menu
 
     return (name(), entries)
 

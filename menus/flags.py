@@ -22,10 +22,10 @@ class Flags(scroll_area.ScrollArea):
 
                     key = "  " + key.replace("&", "+")
 
-                    # if we're given a scroll area, save it as a sub-menu with a value of …
+                    # if we're given a scroll area, save it as a sub-menu with a value of X …, where X is the number of items in the sub-menu
                     if isinstance(value, scroll_area.ScrollArea):
                         self.submenus[len(self.lines)] = value
-                        value = chr(text_value['…'])
+                        value = f"{value.number_items} {chr(text_value['…'])}"
 
                     value = str(value)
                     if value == "True":

@@ -5,10 +5,11 @@ import instruction.f0 as f0
 class FlagsRemoveLearnableSpells(scroll_area.ScrollArea):
     MENU_NUMBER = 15
 
-    def __init__(self, key, spell_ids):
+    def __init__(self, spell_ids):
+        self.number_items = len(spell_ids)
         self.lines = []
 
-        self.lines.append(scroll_area.Line(f"{key}", f0.set_blue_text_color))
+        self.lines.append(scroll_area.Line(f"Remove Learnable Spells", f0.set_blue_text_color))
 
         spell_lines = FlagsRemoveLearnableSpells._format_spells_menu(spell_ids)
 
