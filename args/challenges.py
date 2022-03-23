@@ -22,14 +22,24 @@ def parse(parser):
 
 def process(args):
     from constants.spells import black_magic_ids, white_magic_ids, gray_magic_ids, spell_id
+
+    # If no_ultima is on, add it to our exclude list for downstream use
+    # If permadeath is on, add it to our exclude list for downstream use
     args.remove_learnable_spell_ids = []
+    if args.no_ultima:
+        args.remove_learnable_spell_ids.append(spell_id["Ultima"])
+    if args.permadeath:
+        args.remove_learnable_spell_ids.append(spell_id["Life"])
+        args.remove_learnable_spell_ids.append(spell_id["Life 2"])
+        args.remove_learnable_spell_ids.append(spell_id["Life 3"])
+
     if args.remove_learnable_spells:
-        # Split the comma-separated string, remove duplicates via set, and sort
+        # Split the comma-separated string
         for a_spell_id in args.remove_learnable_spells.split(','):
             # look for strings first
             a_spell_id = a_spell_id.lower().strip()
             if a_spell_id == 'all':
-                args.remove_learnable_spell_ids.extend(range(0,54))
+                args.remove_learnable_spell_ids.extend(range(len(spell_id)))
             elif a_spell_id == 'white':
                 args.remove_learnable_spell_ids.extend(white_magic_ids)
             elif a_spell_id == 'black':
@@ -43,9 +53,9 @@ def process(args):
                 else:
                     # assuming it's a number... it'll error out if not
                     args.remove_learnable_spell_ids.append(int(a_spell_id))
-        # remove duplicates and sort
-        args.remove_learnable_spell_ids = list(set(args.remove_learnable_spell_ids))
-        args.remove_learnable_spell_ids.sort()
+    # remove duplicates and sort
+    args.remove_learnable_spell_ids = list(set(args.remove_learnable_spell_ids))
+    args.remove_learnable_spell_ids.sort()
 
 def flags(args):
     flags = ""

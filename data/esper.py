@@ -106,7 +106,7 @@ class Esper(AbilityData):
                 learn_rate = self.spells[spell_index].rate
 
         self.remove_spell(old_spell)
-        if new_spell:
+        if new_spell is not None:
             self.add_spell(new_spell, learn_rate)
 
     def clear_spells(self):
