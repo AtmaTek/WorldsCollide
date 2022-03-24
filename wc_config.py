@@ -130,8 +130,8 @@ def main():
     print(configuration)
 
     # Load rom
-    from memory.rom import ROM
-    r = ROM(filename, False)  # Use modified memory.rom.ROM() to allow loading an already-patched ff6wc file
+    from config.wcrom import WCROM
+    r = WCROM(filename)  # Use modified memory.rom.ROM() to load an already-patched ff6wc file
 
     # Patch config
     c.set_config(r, configuration)

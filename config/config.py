@@ -1,4 +1,41 @@
 # Tools for writing new default values for config values to a FF6 ROM
+
+# Version 2: Concept
+#   - Use WC memory tools to find & patch a default config section of the rom when running wc.py
+#   - Have Config.py read the value at 0x0374C2 as a pointer to the config section with relative offsets.
+# Memory location stored at:
+#   0x0370C2: ['20', PP, NN, '20', PP+06, NN]])  # JSR #$NNPP; JSR #$NNPP+06
+# Memory structure at new location:
+#   Location:  0xMMNNPP + 00: ['A9', '00', '8D', '54', '1D', '60']  # LDA #$00; STA $1D54; RTS  # Config #2
+#   Location:  0xMMNNPP + 06: ['A9', '00', '8D', '4E', '1D', '60']  # LDA #$00; STA $1D4E; RTS  # Config #3
+
+### Relevant code from battle/multipliers.py:
+# from memory.space import Bank, Reserve, Write
+# import instruction.asm as asm
+# import instruction.c2 as c2
+# import args
+#
+# class Multipliers():
+#     ...
+#     def set_xp_multiplier(self, multiplier):
+#         src = [    # Programmatically write your new source code
+#             asm.A8(),
+#             asm.LDA(multiplier, asm.IMM8),
+#             asm.STA(0xe8, asm.DIR),                     # $e8 = given multiplier
+#             asm.A16(),
+#             asm.LDA(0x3d8c, asm.ABS_X),                 # a = enemy exp
+#             asm.JSR(c2.multiply_max_65535, asm.ABS),    # a = enemy exp * multiplier
+#             asm.RTS(),
+#         ]
+#         space = Write(Bank.C2, src, "exp multiply function")
+#         multiply_exp = space.start_address
+#         ...
+#         space = Reserve(0x25dc1, 0x25dc3, "call exp multiply function")
+#         space.write(
+#             asm.JSR(multiply_exp, asm.ABS),
+#         )
+
+
 def rgb2bytes(rgb):
     # Convert RGB value to writeable bytes
     b = [bin(n)[2:].zfill(5) for n in rgb]
@@ -53,8 +90,8 @@ memory_config = {         # Memory codes for configuration variables
     0x18e806 : "Font1",   # Default font color, 2 bytes.  Note, setting this doesn't change default slider position for some reason.
     0x03709F : "Font2",   # Default font color, 2 bytes.  Does this just affect new game??
     0x0370B9 : "Config1", # RAM $1D4D, one byte sets: cmmm wbbb (command set c, message spd mmm, battle mode w, battle speed bbb)
-    0x03FC19 : "Config2", # RAM $1D54, one byte sets: mbcc csss (controller 2 m, custom buttons b, font and window pallette ccc?, default spell order sss). Note all these are set to 0 in default, there is no default memory location.
-    0x03FC1F : "Config3" # RAM $1D4E, one byte sets: gcsr wwww (gauge g, cursor c, sound s, reequip r, wallpaper wwww (0-7)). Note all these are set to 0 in default, there is no default memory location.
+    #0x03FC19 : "Config2", # RAM $1D54, one byte sets: mbcc csss (controller 2 m, custom buttons b, font and window pallette ccc?, default spell order sss). Note all these are set to 0 in default, there is no default memory location.
+    #0x03FC1F : "Config3" # RAM $1D4E, one byte sets: gcsr wwww (gauge g, cursor c, sound s, reequip r, wallpaper wwww (0-7)). Note all these are set to 0 in default, there is no default memory location.
 }
 
 config_memory = {v: k for k, v in memory_config.items()}
@@ -92,20 +129,32 @@ Window_default = {
     'Window8': [[20, 12, 13], [25, 24, 22], [20, 19, 16], [26, 17, 0], [25, 13, 0], [20, 11, 0], [4, 4, 4]]
 }
 
-def patch_config(rom):
-    # Patch the ROM to create a default value for Config2 and Config3
-    # Patch lines that set default value = zero to jump to subroutines
-    rom.set_bytes(0x0370C2, [int(k, 16) for k in ['20', '18', 'FC', '20', '1E', 'FC']])  # JSR #$FC18; JSR #$FC1E
-    # Subroutine for Config2 ($1D54)
-    rom.set_bytes(0x03FC18, [int(k, 16) for k in ['A9', '00', '8D', '54', '1D', '60']])  # LDA #$00; STA $1D54; RTS
-    # Subroutine for Config3 ($1D4E)
-    rom.set_bytes(0x03FC1E, [int(k, 16) for k in ['A9', '00', '8D', '4E', '1D', '60']])  # LDA #$00; STA $1D4E; RTS
+#def patch_config(rom):
+#    # Patch the ROM to create a default value for Config2 and Config3
+#    # Patch lines that set default value = zero to jump to subroutines
+#    rom.set_bytes(0x0370C2, [int(k, 16) for k in ['20', '18', 'FC', '20', '1E', 'FC']])  # JSR #$FC18; JSR #$FC1E
+#    # Subroutine for Config2 ($1D54)
+#    rom.set_bytes(0x03FC18, [int(k, 16) for k in ['A9', '00', '8D', '54', '1D', '60']])  # LDA #$00; STA $1D54; RTS
+#    # Subroutine for Config3 ($1D4E)
+#    rom.set_bytes(0x03FC1E, [int(k, 16) for k in ['A9', '00', '8D', '4E', '1D', '60']])  # LDA #$00; STA $1D4E; RTS
 
 
 def set_config(rom, config_set):
-    ### Write configuration values to a ROM.  Currently works for Config set #1 and window palettes.
+    ### Write configuration values to a ROM.
+    # Version 1: use fixed offset values
+    #patch_config(rom) # patch the ROM to accept default config values
 
-    patch_config(rom) # patch the ROM to accept default config values
+    # Version 2: read the variable offset values for Config #2 and #3 from the rom
+    conf2_mem = rom.get_bytes_endian_swap(0x0370C3, 2)
+    conf3_mem = rom.get_bytes_endian_swap(0x0370C6, 2)
+    # Update memory values in config_memory: 1 byte past of the offsets extracted above.
+    config2_value = '0x03'+ hex(int(bytes2hex(conf2_mem)[0]+bytes2hex(conf2_mem)[1], 16) + 1)[2:]
+    config_memory["Config2"] = int(config2_value, 16)
+    config3_value = '0x03'+ hex(int(bytes2hex(conf3_mem)[0]+bytes2hex(conf3_mem)[1], 16) + 1)[2:]
+    config_memory["Config3"] = int(config3_value, 16)
+    #print('Config #1 default at memory location: ' + str(config_memory["Config1"]))
+    #print('Config #2 default at memory location: ' + str(config2_value))
+    #print('Config #3 default at memory location: ' + str(config3_value))
 
     # Set default Config1 object & populate with requested options
     con1_set = {k: v for k, v in Config1_default.items()}
