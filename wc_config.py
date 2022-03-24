@@ -127,7 +127,7 @@ def main():
             configuration[opt] = this_val
 
     # Say the loaded configuration options
-    print(configuration)
+    #print(configuration)
 
     # Load rom
     from config.wcrom import WCROM
