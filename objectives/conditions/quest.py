@@ -9,3 +9,6 @@ class Condition(ObjectiveCondition):
 
     def __str__(self):
         return super().__str__(self.quest)
+
+    def quest_name(self):
+        return quest_bit[self.quest].name

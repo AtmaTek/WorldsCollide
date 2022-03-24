@@ -104,8 +104,11 @@ class MagitekFactory(Event):
         space = Reserve(0xc7998, 0xc799a, "magitek factory they drained our powers", field.NOP())
 
         space = Reserve(0xc79a4, 0xc79cf, "magitek factory ifrit/shiva magicite", field.NOP())
-        space.write(
-            field.FlashScreen(field.Flash.WHITE),
+        src = []
+        if not self.args.flashes_remove_most:
+            src.append(field.FlashScreen(field.Flash.WHITE))
+
+        src.append([
             field.PlaySoundEffect(80),
             field.HideEntity(ifrit_npc_id),
             field.HideEntity(shiva_npc_id),
@@ -118,7 +121,8 @@ class MagitekFactory(Event):
             field.SetEventBit(event_bit.GOT_IFRIT_SHIVA),
             field.FinishCheck(),
             field.Return(),
-        )
+        ])
+        space.write(src)
 
     def ifrit_shiva_esper_mod(self, esper):
         self.ifrit_shiva_mod([
@@ -334,6 +338,7 @@ class MagitekFactory(Event):
         space = Reserve(0xb3ff1, 0xb40e0, "magitek factory scene before crane fight", field.NOP())
         space.write(
             field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.IncrementEventWord(event_word.CHECKS_COMPLETE), # objectives finished after battle
             field.Branch(space.end_address + 1), # skip nops
         )
 

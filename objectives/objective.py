@@ -22,6 +22,12 @@ class Objective:
         self.conditions_complete = ConditionsComplete(self)
         self.check_complete = CheckComplete(self)
 
+        self.has_suplex_train_condition = False
+        for condition in self.conditions:
+            if condition.NAME == "Quest" and condition.quest_name() == Objective.suplex_train_quest_name:
+                self.has_suplex_train_condition = True
+                break
+
     def _init_result(self, arg_result):
         if arg_result.format_string != "Random":
             self.result = results[arg_result.name](*arg_result.args)
@@ -64,6 +70,9 @@ class Objective:
             _type = name_type[type_name]
             if not _type.min_max:
                 possible_random_values[type_name] = [value for value  in _type.value_range if value != 'r']
+
+        if not args.blitz_command_possible:
+            possible_random_values["Quest"].remove(Objective.suplex_train_quest_value)
 
         # to prevent running out of possibilities, must initalize and remove possibilities in specific order
 
@@ -108,3 +117,16 @@ class Objective:
         for condition in self.conditions:
             result += f"\n  {str(condition)}"
         return result
+
+    @classmethod
+    def _init_suplex_train_quest_value(cls):
+        from constants.objectives.conditions import name_type
+        from constants.objectives.condition_bits import quest_bit
+
+        cls.suplex_train_quest_name = "Suplex A Train"
+        for value in name_type["Quest"].value_range:
+            if value != 'r' and quest_bit[value].name == cls.suplex_train_quest_name:
+                cls.suplex_train_quest_value = value
+                return
+        assert False, f"'{suplex_train_quest_name}' quest value not found"
+Objective._init_suplex_train_quest_value()

@@ -124,8 +124,8 @@ def imperial():
 
 def main_character():
     from data.characters import Characters
-    from args.custom import DEFAULT_CHARACTER_SPRITES
-    from args.custom import DEFAULT_CHARACTER_SPRITE_PALETTES
+    from data.character_sprites import DEFAULT_CHARACTER_SPRITES
+    from data.character_palettes import DEFAULT_CHARACTER_SPRITE_PALETTES
 
     sprites = DEFAULT_CHARACTER_SPRITES[:Characters.CHARACTER_COUNT]
     palettes = args.sprite_palettes

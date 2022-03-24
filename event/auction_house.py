@@ -92,21 +92,26 @@ class AuctionHouse(Event):
         elif self.reward2.type == RewardType.ITEM:
             self.item2_mod(self.reward2.id)
 
+        self.cherub_down_item = self.items.get_id("Cherub Down")
+        self.cure_ring_item = self.items.get_id("Cure Ring")
+        self.hero_ring_item = self.items.get_id("Hero Ring")
+        self.zephyr_cape_item = self.items.get_id("Zephyr Cape")
+
         if self.args.auction_random_items:
-            self.cherub_down_new_item = self.items.get_random()
-            self.cure_ring_new_item = self.items.get_random()
-            self.hero_ring_new_item = self.items.get_random()
-            self.zephyr_cape_new_item = self.items.get_random()
+            self.cherub_down_item = self.items.get_random()
+            self.cure_ring_item = self.items.get_random()
+            self.hero_ring_item = self.items.get_random()
+            self.zephyr_cape_item = self.items.get_random()
 
-            self.cherub_down_mod(self.cherub_down_new_item)
-            self.cure_ring_mod(self.cure_ring_new_item)
-            self.hero_ring_mod(self.hero_ring_new_item)
-            self.zephyr_cape_mod(self.zephyr_cape_new_item)
+            self.log_change("Cherub Down", f"{self.items.get_name(self.cherub_down_item):<12} (10,000, WOB, multiple)")
+            self.log_change("Cure Ring", f"{self.items.get_name(self.cure_ring_item):<12} (20,000, WOB, multiple)")
+            self.log_change("Hero Ring", f"{self.items.get_name(self.hero_ring_item):<12} (50,000, WOR, single)")
+            self.log_change("Zephyr Cape", f"{self.items.get_name(self.zephyr_cape_item):<12} (10,000, WOR, single)")
 
-            self.log_change("Cherub Down", f"{self.items.get_name(self.cherub_down_new_item):<12} (10,000, WOB, multiple)")
-            self.log_change("Cure Ring", f"{self.items.get_name(self.cure_ring_new_item):<12} (20,000, WOB, multiple)")
-            self.log_change("Hero Ring", f"{self.items.get_name(self.hero_ring_new_item):<12} (50,000, WOR, single)")
-            self.log_change("Zephyr Cape", f"{self.items.get_name(self.zephyr_cape_new_item):<12} (10,000, WOR, single)")
+        self.cherub_down_mod(self.cherub_down_item)
+        self.cure_ring_mod(self.cure_ring_item)
+        self.hero_ring_mod(self.hero_ring_item)
+        self.zephyr_cape_mod(self.zephyr_cape_item)
 
         self.log_reward(self.reward1, suffix = " (10,000)") # zoneseek
         self.log_reward(self.reward2, suffix = " (20,000)") # golem

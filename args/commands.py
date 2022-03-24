@@ -1,4 +1,4 @@
-from constants.commands import COMMAND_OPTIONS, RANDOM_COMMAND, RANDOM_UNIQUE_COMMAND, NONE_COMMAND, RANDOM_EXCLUDE_COMMANDS, id_name
+from constants.commands import COMMAND_OPTIONS, RANDOM_COMMAND, RANDOM_UNIQUE_COMMAND, NONE_COMMAND, RANDOM_EXCLUDE_COMMANDS, id_name, name_id
 
 def name():
     return "Commands"
@@ -12,9 +12,11 @@ def parse(parser):
     commands.add_argument("-rec3", "--random-exclude-command3", type = int, choices = RANDOM_EXCLUDE_COMMANDS, metavar = "VALUE", default = NONE_COMMAND, help = "Exclude selected command from random possibilities")
     commands.add_argument("-rec4", "--random-exclude-command4", type = int, choices = RANDOM_EXCLUDE_COMMANDS, metavar = "VALUE", default = NONE_COMMAND, help = "Exclude selected command from random possibilities")
     commands.add_argument("-rec5", "--random-exclude-command5", type = int, choices = RANDOM_EXCLUDE_COMMANDS, metavar = "VALUE", default = NONE_COMMAND, help = "Exclude selected command from random possibilities")
+    commands.add_argument("-rec6", "--random-exclude-command6", type = int, choices = RANDOM_EXCLUDE_COMMANDS, metavar = "VALUE", default = NONE_COMMAND, help = "Exclude selected command from random possibilities")
 
 def process(args):
     if not args.commands:
+        args.blitz_command_possible = True
         return
 
     digits = 2 # number of digits each command id substring is
@@ -42,6 +44,12 @@ def process(args):
         args.random_exclude_commands.append(args.random_exclude_command4)
     if args.random_exclude_command5 != NONE_COMMAND:
         args.random_exclude_commands.append(args.random_exclude_command5)
+    if args.random_exclude_command6 != NONE_COMMAND:
+        args.random_exclude_commands.append(args.random_exclude_command6)
+
+    random_exists = "Random" in args.command_strings or "Random Unique" in args.command_strings
+    blitz_excluded = name_id["Blitz"] in args.random_exclude_commands
+    args.blitz_command_possible = ("Blitz" in args.command_strings) or (random_exists and not blitz_excluded)
 
 def flags(args):
     flags = ""
@@ -62,6 +70,8 @@ def flags(args):
         flags += f" -rec4 {args.random_exclude_command4}"
     if args.random_exclude_command5 != NONE_COMMAND:
         flags += f" -rec5 {args.random_exclude_command5}"
+    if args.random_exclude_command6 != NONE_COMMAND:
+        flags += f" -rec6 {args.random_exclude_command6}"
 
     return flags
 
@@ -84,6 +94,7 @@ def options(args):
     add_exclude_command(args.random_exclude_command3)
     add_exclude_command(args.random_exclude_command4)
     add_exclude_command(args.random_exclude_command5)
+    add_exclude_command(args.random_exclude_command6)
 
     return result
 
