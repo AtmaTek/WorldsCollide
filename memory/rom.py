@@ -2,11 +2,10 @@ class ROM():
     SHORT_PTR_SIZE = 2  # short ptr (16-bit)
     LONG_PTR_SIZE = 3   # long ptr  (24-bit)
 
-    def __init__(self, file_name, do_test=True):
-        if do_test:
-            from valid_rom_file import valid_rom_file
-            if not valid_rom_file(file_name):
-                raise ValueError("Invalid ROM File")
+    def __init__(self, file_name):
+        from valid_rom_file import valid_rom_file
+        if not valid_rom_file(file_name):
+            raise ValueError("Invalid ROM File")
 
         with open(file_name, "rb") as rom_file:
             self.data = list(rom_file.read())
