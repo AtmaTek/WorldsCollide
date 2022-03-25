@@ -222,7 +222,8 @@ class TrackMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            # if in a scroll-area menu, sustain the scroll area
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.checks.MENU_NUMBER, asm.IMM8),
@@ -231,7 +232,15 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
 
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.JSR(0x072d, asm.ABS),   # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),   # update cursor position
@@ -261,19 +270,21 @@ class TrackMenu:
             asm.RTS(),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
-            asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.LDA(0x09, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),     # b pressed?
+            asm.BNE("EXIT_SCROLL_AREA"), # branch if so
+        ]
+
+        src.extend(self.common.get_flags_a_check_src(self.common.invoke_flags_submenu[submenu_idx]))
+
+        src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
-            asm.STA(0x0200, asm.ABS),
-
-            "RETURN",
-            asm.RTS(),
         ]
+
+        src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.common.invoke_flags))
+
         space = Write(Bank.C3, src, "track sustain")
         self.sustain = space.start_address
 

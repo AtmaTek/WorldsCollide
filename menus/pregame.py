@@ -8,6 +8,7 @@ class PreGameMenu:
 
     def __init__(self, pregame_track):
         self.common = pregame_track
+        self.invoke_flags_submenu = {}
         self.mod()
 
     def draw_options_mod(self):
@@ -79,6 +80,14 @@ class PreGameMenu:
         space = Write(Bank.C3, src, "pregame invoke flags")
         self.invoke_flags = space.start_address
 
+    def invoke_flags_submenu_mod(self, submenu_idx):
+        src = [
+            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a (workaround for bizhawk snes9x core bug)
+            asm.JMP(self.common.invoke_flags_submenu[submenu_idx], asm.ABS),
+        ]
+        space = Write(Bank.C3, src, "pregame invoke flag submenu")
+        self.invoke_flags_submenu[submenu_idx] = space.start_address
+
     def sustain_mod(self):
         src = [
             asm.JSR(0x2a21, asm.ABS),       # reset game play time
@@ -120,12 +129,21 @@ class PreGameMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            # if in a scroll area, sustain it
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
 
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.JSR(0x072d, asm.ABS),       # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),       # update cursor position
@@ -144,19 +162,21 @@ class PreGameMenu:
             asm.JMP(options_table, asm.ABS_X_16),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
+            asm.LDA(0x09, asm.DIR),
             asm.BIT(0x80, asm.IMM8),        # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.BNE("EXIT_SCROLL_AREA"),    # branch if so
+
+        ]
+
+        src.extend(self.common.get_flags_a_check_src(self.invoke_flags_submenu[submenu_idx]))
+
+        src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
-            asm.STA(0x0200, asm.ABS),
-
-            "RETURN",
-            asm.RTS(),
         ]
+        src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.invoke_flags))
+        
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address
 
@@ -235,6 +255,8 @@ class PreGameMenu:
         self.initialize_mod()
         self.invoke_objectives_menu_mod()
         self.invoke_flags_menu_mod()
+        for submenu_idx in self.common.flags.submenus.keys():
+            self.invoke_flags_submenu_mod(submenu_idx)
         self.sustain_mod()
 
         self.initialize_config_menu_mod()

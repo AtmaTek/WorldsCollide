@@ -6,7 +6,7 @@ Adds the following flags for new features:
 3) -np flag for Sprites in peekable checks are left a mystery until reward
 4) -cc flag for Controllable Coliseum
 5) -shoedash flag for Kielbasigo's "Sprint Shoes providing Speed 5 run when B is held."
-6) -nts flag for "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare"
+6) -rls flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
 7) -scis flag for "Sketch & Control 100%% accurate and use Sketcher/Controller's stats"
 8) -scia flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
 
@@ -24,5 +24,5 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/21>
 <https://github.com/AtmaTek/WorldsCollide/pull/22>
 <https://github.com/AtmaTek/WorldsCollide/pull/25>
-<https://github.com/AtmaTek/WorldsCollide/pull/26>
 <https://github.com/AtmaTek/WorldsCollide/pull/28>
+<https://github.com/AtmaTek/WorldsCollide/pull/30>

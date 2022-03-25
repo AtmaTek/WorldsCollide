@@ -21,11 +21,45 @@ def parse(parser):
                             help = "Life spells cannot be learned. Fenix Downs unavailable (except from starting items). Buckets/inns/tents/events do not revive characters. Phoenix casts Life 3 on party instead of Life")
     challenges.add_argument("-np", "--no-peeking", action = "store_true",
                             help = "Sprites in peekable checks are left a mystery until reward.")
-    challenges.add_argument("-nts", "--no-top-spells", action = "store_true",
-                            help = "Remove top magic spells: all Tier 3, Ultima, Merton, Life 2, Quick, Pearl, and Flare")
+    challenges.add_argument("-rls", "--remove-learnable-spells", type = str,
+                            help = "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives")
 
 def process(args):
-    pass
+    from constants.spells import black_magic_ids, white_magic_ids, gray_magic_ids, spell_id
+
+    # If no_ultima is on, add it to our exclude list for downstream use
+    # If permadeath is on, add it to our exclude list for downstream use
+    args.remove_learnable_spell_ids = []
+    if args.no_ultima:
+        args.remove_learnable_spell_ids.append(spell_id["Ultima"])
+    if args.permadeath:
+        args.remove_learnable_spell_ids.append(spell_id["Life"])
+        args.remove_learnable_spell_ids.append(spell_id["Life 2"])
+        args.remove_learnable_spell_ids.append(spell_id["Life 3"])
+
+    if args.remove_learnable_spells:
+        # Split the comma-separated string
+        for a_spell_id in args.remove_learnable_spells.split(','):
+            # look for strings first
+            a_spell_id = a_spell_id.lower().strip()
+            if a_spell_id == 'all':
+                args.remove_learnable_spell_ids.extend(range(len(spell_id)))
+            elif a_spell_id == 'white':
+                args.remove_learnable_spell_ids.extend(white_magic_ids)
+            elif a_spell_id == 'black':
+                args.remove_learnable_spell_ids.extend(black_magic_ids)
+            elif a_spell_id == 'gray' or a_spell_id == 'grey':
+                args.remove_learnable_spell_ids.extend(gray_magic_ids)
+            else:
+                spell_ids_lower = {k.lower():v for k,v in spell_id.items()}
+                if a_spell_id in spell_ids_lower:
+                    args.remove_learnable_spell_ids.append(spell_ids_lower[a_spell_id])
+                else:
+                    # assuming it's a number... it'll error out if not
+                    args.remove_learnable_spell_ids.append(int(a_spell_id))
+    # remove duplicates and sort
+    args.remove_learnable_spell_ids = list(set(args.remove_learnable_spell_ids))
+    args.remove_learnable_spell_ids.sort()
 
 def flags(args):
     flags = ""
@@ -49,8 +83,8 @@ def flags(args):
         flags += " -pd"
     if args.no_peeking:
         flags += " -np"
-    if args.no_top_spells:
-        flags += " -nts"
+    if args.remove_learnable_spells:
+        flags += f" -rls {args.remove_learnable_spells}"
 
     return flags
 
@@ -65,10 +99,19 @@ def options(args):
         ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
         ("No Peeking", args.no_peeking),
-        ("No Top Spells", args.no_top_spells),
+        ("Remove Learnable Spells", args.remove_learnable_spell_ids),
     ]
 
+def _format_spells_log_entries(spell_ids):
+    from constants.spells import id_spell
+    spell_entries = []
+    for spell_id in spell_ids:
+        spell_entries.append(("", id_spell[spell_id]))
+    return spell_entries
+
 def menu(args):
+    from menus.flags_remove_learnable_spells import FlagsRemoveLearnableSpells
+
     entries = options(args)
     for index, entry in enumerate(entries):
         key, value = entry
@@ -76,6 +119,9 @@ def menu(args):
             entries[index] = ("No Free Paladin Shlds", entry[1])
         elif key == "No Free Characters/Espers":
             entries[index] = ("No Free Chars/Espers", entry[1])
+        elif key == "Remove Learnable Spells":
+            entries[index] = ("Remove L. Spells", FlagsRemoveLearnableSpells(value)) # flags sub-menu
+
     return (name(), entries)
 
 def log(args):
@@ -84,6 +130,16 @@ def log(args):
 
     entries = options(args)
     for entry in entries:
-        log.append(format_option(*entry))
+        key, value = entry
+        if key == "Remove Learnable Spells":
+            if len(value) == 0:
+                entry = (key, "None")
+            else:
+                entry = (key, "") # The entries will show up on subsequent lines
+            log.append(format_option(*entry))
+            for spell_entry in _format_spells_log_entries(value):
+                log.append(format_option(*spell_entry))
+        else:
+            log.append(format_option(*entry))
 
     return log
