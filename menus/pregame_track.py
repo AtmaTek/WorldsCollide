@@ -26,6 +26,62 @@ class PreGameTrack:
         self.characters = characters
         self.mod()
 
+    def get_flags_a_check_src(self, invoke_submenu_addr):
+        # get the ASM for sustain_mod that checks whether we are in the flags menu
+        # and the A button is clicked to launch a submenu.
+        src = [
+            # if on the flags menu, check A button press
+            asm.LDA(0x200, asm.ABS), 
+            asm.CMP(self.flags.MENU_NUMBER, asm.IMM8), # in Flags menu?
+            asm.BNE("HANDLE_SCROLLING"),               # branch if not
+            asm.LDA(0x08, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),        # a pressed?
+            asm.BEQ("HANDLE_SCROLLING"),    # branch if not
+        ]
+
+        for submenu_idx in self.flags.submenus.keys():
+            src += [
+                asm.LDA(0x4b, asm.DIR),         # a = cursor index
+                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = this submenu?
+                asm.BNE(f"NEXT_SUBMENU_CHECK{submenu_idx}"),    # branch if not
+                asm.TDC(),
+                asm.JSR(0x0eb2, asm.ABS),       # click sound
+                asm.JSR(self.exit_scroll_area, asm.ABS), # save current submenu position
+                asm.JMP(invoke_submenu_addr, asm.ABS), # load the flags submenu
+                f"NEXT_SUBMENU_CHECK{submenu_idx}",
+            ]
+        src += ["HANDLE_SCROLLING"]
+
+        return src
+
+    def get_scroll_area_exit_src(self, destination_menu_number, invoke_flags_addr):
+        # Get the ASM for sustain_mod that handles exit from a scroll area, either returning to flags if in
+        # a flags submenu or to the given destination_menu_number otherwise.
+        src = [
+            asm.JSR(0x0EA9, asm.ABS),       # cursor sound
+            asm.JSR(self.exit_scroll_area, asm.ABS), # save current submenu position
+            asm.LDA(0x0200, asm.ABS),
+        ]
+
+        for submenu_idx in self.flags.submenus.keys():
+            # if current menu is a flags sub-menu, cause it to return to that, rather than main menu
+            src += [
+                asm.CMP(self.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8), # in Flags submenu?
+                asm.BEQ("INVOKE_FLAGS"), # branch if so
+            ]
+
+        src += [
+            asm.LDA(destination_menu_number, asm.IMM8), # queue up this menu
+            asm.STA(0x0200, asm.ABS),
+            "RETURN",
+            asm.RTS(),
+
+            "INVOKE_FLAGS",
+            asm.JMP(invoke_flags_addr, asm.ABS),
+        ]
+
+        return src
+
     def draw_layout_mod(self):
         # layouts: 2 bytes for bg/tilemap/position, 1 byte inner width, 1 byte inner height
         # e.g. $5849 is start of bg2 tilemap a, add 0x42 for top left of visible screen area

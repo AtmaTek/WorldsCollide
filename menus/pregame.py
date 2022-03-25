@@ -133,6 +133,8 @@ class PreGameMenu:
             asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
+            asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
         for submenu_idx in self.common.flags.submenus.keys():
@@ -142,9 +144,6 @@ class PreGameMenu:
             ]
 
         src += [
-            asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
-            asm.BEQ("SUSTAIN_SCROLL_AREA"),
-
             asm.JSR(0x072d, asm.ABS),       # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),       # update cursor position
@@ -167,54 +166,17 @@ class PreGameMenu:
             asm.BIT(0x80, asm.IMM8),        # b pressed?
             asm.BNE("EXIT_SCROLL_AREA"),    # branch if so
 
-            # if on the flags menu, check A button press
-            asm.LDA(0x200, asm.ABS), 
-            asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8), # in Flags menu?
-            asm.BNE("HANDLE_SCROLLING"),               # branch if not
-            asm.LDA(0x08, asm.DIR),
-            asm.BIT(0x80, asm.IMM8),        # a pressed?
-            asm.BEQ("HANDLE_SCROLLING"),    # branch if not
         ]
 
-        for submenu_idx in self.common.flags.submenus.keys():
-            src += [
-                asm.LDA(0x4b, asm.DIR),         # a = cursor index
-                asm.CMP(submenu_idx, asm.IMM8), # is the cursor index = this submenu?
-                asm.BNE(f"NEXT_SUBMENU_CHECK{submenu_idx}"),    # branch if not
-                asm.TDC(),
-                asm.JSR(0x0eb2, asm.ABS),       # click sound
-                asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
-                asm.JSR(0x6a3c, asm.ABS),       # clear BG3 a (workaround for bizhawk snes9x core bug)
-                asm.JMP(self.invoke_flags_submenu[submenu_idx], asm.ABS), # load the flags submenu
-                f"NEXT_SUBMENU_CHECK{submenu_idx}",
-            ]
+        src.extend(self.common.get_flags_a_check_src(self.invoke_flags_submenu[submenu_idx]))
 
         src += [
-            "HANDLE_SCROLLING",
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(0x0EA9, asm.ABS),       # cursor sound
-            asm.JSR(self.common.exit_scroll_area, asm.ABS), # save current submenu position
-            asm.LDA(0x0200, asm.ABS),
         ]
-
-        for submenu_idx in self.common.flags.submenus.keys():
-            # if current menu is a flags sub-menu, cause it to return to that, rather than main menu
-            src += [
-                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8), # in Flags submenu?
-                asm.BEQ("INVOKE_FLAGS"), # branch if so
-            ]
-
-        src += [
-            asm.LDA(self.MENU_NUMBER, asm.IMM8), # queue up this menu
-            asm.STA(0x0200, asm.ABS),
-            "RETURN",
-            asm.RTS(),
-
-            "INVOKE_FLAGS",
-            asm.JMP(self.invoke_flags, asm.ABS),
-        ]
+        src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.invoke_flags))
+        
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address
 
