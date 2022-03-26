@@ -141,13 +141,13 @@ class Espers():
                 learn_rate = Esper.LEARN_RATES[learn_rate_index]
                 esper.add_spell(get_spell(), learn_rate)
 
-    def remove_all(self):
+    def remove_flagged_learnables(self):
         for a_spell_id in self.args.remove_learnable_spell_ids:
             for esper in self.espers:
                 if(esper.has_spell(a_spell_id)):
                     esper.remove_spell(a_spell_id)
 
-    def replace_all(self):
+    def replace_flagged_learnables(self):
         for esper in self.espers:
             for a_spell_id in self.args.remove_learnable_spell_ids:
                 if(esper.has_spell(a_spell_id)):
@@ -301,10 +301,10 @@ class Espers():
 
         if self.args.esper_spells_random or self.args.esper_spells_random_tiered:
             # if random, replace the spells
-            self.replace_all()
+            self.replace_flagged_learnables()
         else:
             # otherwise (original or shuffled), remove them
-            self.remove_all()
+            self.remove_flagged_learnables()
 
         if self.args.esper_multi_summon:
             self.multi_summon()
