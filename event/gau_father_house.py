@@ -22,6 +22,7 @@ class GauFatherHouse(Event):
 
         self.merchant_mod()
         self.entrance_event_mod()
+        self.reunion_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -113,4 +114,18 @@ class GauFatherHouse(Event):
         space = Reserve(0xb0b02, 0xb0b05, "gau father house recruit shadow bit, fade in", field.NOP())
         space.write(
             field.Call(finish_check),
+        )
+
+    def reunion_mod(self):
+        src = [
+            Read(0xb6785, 0xb678a), # displaced code
+            field.CheckObjectives(),
+            field.Return(),
+        ]
+        space = Write(Bank.CB, src, "gau father reunion set event bit, check objectives")
+        check_objectives = space.start_address
+
+        space = Reserve(0xb6785, 0xb678a, "gau father reunion field bit set", field.NOP())
+        space.write(
+            field.Call(check_objectives),
         )
