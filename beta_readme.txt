@@ -15,6 +15,7 @@ Other changes:
 - QoL: Once you have 22 coral, every teleporter will take you to chest
 - Feature: The Top 4 Magitek default to disabled for all characters, and are now unlockable for an objective (result = 59, "Magitek Upgrade")
 - Bugfix: Learn Spells reward can no longer give Life spells during permadeath seeds.
+- Feature: Added Gau-Father Reunion as a Quest objective (objective string ends with .12.10). Hint: take Gau + Sabin to Gau's Father House in WoR.
 
 Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/3>
@@ -26,3 +27,4 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/25>
 <https://github.com/AtmaTek/WorldsCollide/pull/28>
 <https://github.com/AtmaTek/WorldsCollide/pull/30>
+<https://github.com/AtmaTek/WorldsCollide/pull/32>
