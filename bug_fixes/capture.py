@@ -137,14 +137,14 @@ class Capture:
         src = [
             asm.PHP(),
             asm.A8(),  # Set 8 bit accumulator
-            asm.LDA(0x11a9, asm.ABS), 
-            asm.PHP(),
-            asm.JSR(0x387e, asm.ABS),
+            asm.LDA(0x11a9, asm.ABS), # Load A with the current attack special effect -- based on table at c2/3dcd
+            asm.PHA(),
+            asm.JSR(0x387e, asm.ABS), # Call special effect function once for value in 11a9
             asm.LDA(NEW_SPECIAL_EFFECT_VAR, asm.ABS),
-            asm.CMP(0x1, asm.S),
-            asm.BEQ("SKIP_IT"),
+            asm.CMP(0x1, asm.S), # does the custom match the original?
+            asm.BEQ("SKIP_IT"),  # branch if so
             asm.STA(0x11a9, asm.ABS),
-            asm.JSR(0x387e, asm.ABS),
+            asm.JSR(0x387e, asm.ABS), # Call special effect function again for our special effect var
             "SKIP_IT",
             asm.PLA(),
             asm.STA(0x11a9, asm.ABS),
