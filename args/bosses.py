@@ -1,3 +1,6 @@
+from data.bosses import BossLocations
+
+
 def name():
     return "Bosses"
 
@@ -9,10 +12,22 @@ def parse(parser):
                         help = "Boss battles shuffled")
     bosses_battles.add_argument("-bbr", "--boss-battles-random", action = "store_true",
                         help = "Boss battles randomized")
-    bosses.add_argument("-bmbd", "--mix-bosses-dragons", action = "store_true",
+
+    dragons = bosses.add_mutually_exclusive_group()
+    dragons.add_argument("-drloc", "--dragon-boss-location", default = BossLocations.SHUFFLE, type = str.lower, choices = BossLocations.ALL,
+                        help = "Decides which locations the eight dragon encounters can be fought")
+
+    dragons.add_argument("-bmbd", "--mix-bosses-dragons", action = "store_true",
                         help = "Shuffle/randomize bosses and dragons together")
-    bosses.add_argument("-bmbs", "--mix-bosses-statues", action = "store_true",
-                        help = "Shuffle/randomize bosses and statues together")
+    # dragons.add_argument("-shud", "--shuffle-dragons", action = "store_true",
+                        #  help = "Shuffles the eight dragon encounters")
+
+    statues = bosses.add_mutually_exclusive_group()
+
+
+    statues.add_argument("-stloc", "--statue-boss-location", default = BossLocations.MIX, type = str.lower, choices = BossLocations.ALL,
+                        help = "Decides which locations the three statue encounters can be fought")
+
     bosses.add_argument("-srp3", "--shuffle-random-phunbaba3", action = "store_true",
                         help = "Apply Shuffle/Random to Phunbaba 3 (otherwise he will only appear in Mobliz WOR)")
     bosses.add_argument("-bnds", "--boss-normalize-distort-stats", action = "store_true",
@@ -23,7 +38,8 @@ def parse(parser):
                         help = "Undead status removed from bosses")
 
 def process(args):
-    pass
+    if args.mix_bosses_dragons:
+        args.dragon_boss_location = BossLocations.MIX
 
 def flags(args):
     flags = ""
@@ -33,10 +49,16 @@ def flags(args):
     elif args.boss_battles_random:
         flags += " -bbr"
 
+    if args.dragon_boss_location:
+        flags += f" -drloc {args.statue_boss_location}"
     if args.mix_bosses_dragons:
-        flags += " -bmbd"
-    if args.mix_bosses_statues:
-        flags += " -bmbs"
+        flags += f" -drloc {BossLocations.MIX}"
+    else:
+        flags += f" -drloc {BossLocations.SHUFFLE}"
+
+    if args.statue_boss_location:
+        flags += f" -stloc {args.statue_boss_location}"
+
     if args.shuffle_random_phunbaba3:
         flags += " -srp3"
     if args.boss_normalize_distort_stats:
@@ -55,10 +77,13 @@ def options(args):
     elif args.boss_battles_random:
         boss_battles = "Random"
 
+    dragon_battles = args.dragon_boss_location
+    statue_battles = args.statue_boss_location
+
     return [
         ("Boss Battles", boss_battles),
-        ("Mix Bosses & Dragons", args.mix_bosses_dragons),
-        ("Mix Bosses & Statues", args.mix_bosses_statues),
+        ("Dragons", dragon_battles),
+        ("Statues", statue_battles),
         ("Shuffle/Random Phunbaba 3", args.shuffle_random_phunbaba3),
         ("Normalize & Distort Stats", args.boss_normalize_distort_stats),
         ("Boss Experience", args.boss_experience),

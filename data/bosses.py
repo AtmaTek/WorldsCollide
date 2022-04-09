@@ -255,3 +255,10 @@ enemy_name.update(normal_enemy_name)
 enemy_name.update(removed_enemy_name)
 
 name_enemy = {v: k for k, v in enemy_name.items()}
+
+class BossLocations:
+    MIX = "mix"
+    ORIGINAL = "original"
+    SHUFFLE = "shuffle"
+
+    ALL = [MIX, ORIGINAL, SHUFFLE]
