@@ -40,12 +40,13 @@ class EnemyPacks():
             pack = EnemyPack2(pack2_index, self.pack2_data[pack2_index])
             self.packs.append(pack)
 
+    # Returns the list of all non-statue, non-dragon bosses
     def _replaceable_bosses(self):
-        replaceable = list(bosses.normal_pack_name)
-        if not self.args.mix_bosses_statues:
-            for boss in [self.DOOM, self.GODDESS, self.POLTERGEIST]:
-                replaceable.remove(boss)
-                self.event_boss_replacements[boss] = boss
+        dragon_packs = list(bosses.dragon_pack_name)
+        statue_packs = list(bosses.statue_pack_name)
+        boss_packs = list(bosses.normal_pack_name)
+        replaceable = [boss for boss in boss_packs if boss not in statue_packs and boss not in dragon_packs]
+
         if not self.args.shuffle_random_phunbaba3:
             replaceable.remove(self.PHUNBABA3)
             self.event_boss_replacements[self.PHUNBABA3] = self.PHUNBABA3
@@ -55,8 +56,57 @@ class EnemyPacks():
             # how would that work with him being in his original spot and the others? How to know when to get bahamut esper?
             replaceable.remove(self.DOOM_GAZE)
             self.event_boss_replacements[self.DOOM_GAZE] = self.DOOM_GAZE
-        return replaceable
+        return replaceable + self._replaceable_dragons() + self._replaceable_statues()
 
+    # statue locations that become available for the general boss pool
+    def _replaceable_statues(self):
+        import random
+        statues = list(bosses.statue_pack_name)
+        random.shuffle(statues)
+        return statues if self.args.statue_boss_location == bosses.BossLocations.MIX else []
+
+    # dragon locations that become available for the general boss pool
+    def _replaceable_dragons(self):
+        import random
+        statues = list(bosses.dragon_pack_name)
+        random.shuffle(statues)
+        return statues if self.args.dragon_boss_location == bosses.BossLocations.MIX else []
+
+    def _handle_statues(self):
+        statues = list(bosses.statue_pack_name)
+
+        if self.args.statue_boss_location == bosses.BossLocations.ORIGINAL:
+            for statue in statues:
+                self.event_boss_replacements[statue] = statue
+        elif self.args.statue_boss_location == bosses.BossLocations.SHUFFLE:
+            import random
+            replacements = statues.copy()
+            random.shuffle(statues)
+            random.shuffle(replacements)
+
+            for statue in statues:
+                self.event_boss_replacements[replacements.pop()] = statue
+        else:
+            # boss assignment is handled in the shuffle/random functions
+            pass
+
+
+    def _handle_dragons(self):
+        dragons = list(bosses.dragon_pack_name)
+        if self.args.dragon_boss_location == bosses.BossLocations.ORIGINAL:
+            for dragon in dragons:
+                self.event_boss_replacements[dragon] = dragon
+        elif self.args.dragon_boss_location == bosses.BossLocations.SHUFFLE:
+            import random
+            replacements = dragons.copy()
+            random.shuffle(dragons)
+            random.shuffle(replacements)
+
+            for dragon in dragons:
+                self.event_boss_replacements[replacements.pop()] = dragon
+        else:
+            # boss assignment is handled in the shuffle/random functions
+            pass
     def phunbaba3_safety_check(self, bosses_possible):
         import random
 
@@ -83,31 +133,14 @@ class EnemyPacks():
         import random
         self.event_boss_replacements = {}
 
-        if self.args.mix_bosses_dragons:
-            bosses_dragons_to_replace = self._replaceable_bosses() + list(bosses.dragon_pack_name)
-            bosses_dragons_possible = bosses_dragons_to_replace.copy()
+        bosses_to_replace = self._replaceable_bosses()
+        bosses_possible = bosses_to_replace.copy()
 
-            random.shuffle(bosses_dragons_possible)
-            for index, boss in enumerate(bosses_dragons_to_replace):
-                self.event_boss_replacements[boss] = bosses_dragons_possible[index]
+        random.shuffle(bosses_possible)
+        for index, boss in enumerate(bosses_to_replace):
+            self.event_boss_replacements[boss] = bosses_possible[index]
 
-            self.phunbaba3_safety_check(bosses_dragons_to_replace)
-        else:
-            bosses_to_replace = self._replaceable_bosses()
-            bosses_possible = bosses_to_replace.copy()
-
-            random.shuffle(bosses_possible)
-            for index, boss in enumerate(bosses_to_replace):
-                self.event_boss_replacements[boss] = bosses_possible[index]
-
-            dragons_to_replace = list(bosses.dragon_pack_name)
-            dragons_possible = dragons_to_replace.copy()
-
-            random.shuffle(dragons_possible)
-            for index, dragon in enumerate(dragons_to_replace):
-                self.event_boss_replacements[dragon] = dragons_possible[index]
-
-            self.phunbaba3_safety_check(bosses_to_replace)
+        self.phunbaba3_safety_check(bosses_to_replace)
 
     def randomize_event_bosses(self):
         import args, random, objectives
@@ -155,46 +188,21 @@ class EnemyPacks():
                 if formation_id in required_dragon_formations:
                     required_dragon_packs.add(pack_id)
 
-        if self.args.mix_bosses_dragons:
-            bosses_dragons_to_replace = self._replaceable_bosses() + list(bosses.dragon_pack_name)
-            random.shuffle(bosses_dragons_to_replace)
+        # randomizing and shuffling
+        bosses_to_replace = self._replaceable_bosses()
+        random.shuffle(bosses_to_replace)
+        for pack in required_boss_packs:
+            self.event_boss_replacements[bosses_to_replace.pop()] = pack
 
-            for pack in required_boss_packs:
-                self.event_boss_replacements[bosses_dragons_to_replace.pop()] = pack
+        for pack in required_dragon_packs:
+            self.event_boss_replacements[bosses_to_replace.pop()] = pack
 
-            for pack in required_dragon_packs:
-                self.event_boss_replacements[bosses_dragons_to_replace.pop()] = pack
+        random.shuffle(bosses_to_replace)
+        bosses_possible = self._replaceable_bosses()
+        for boss in bosses_to_replace:
+            self.event_boss_replacements[boss] = random.choice(bosses_possible)
 
-            # guarantee 8 dragons
-            dragons_possible = list(bosses.dragon_pack_name)
-            for index in range(len(required_dragon_packs), len(bosses.dragon_pack_name)):
-                self.event_boss_replacements[bosses_dragons_to_replace.pop()] = random.choice(dragons_possible)
-
-            bosses_possible = self._replaceable_bosses()
-            for boss in bosses_dragons_to_replace:
-                self.event_boss_replacements[boss] = random.choice(bosses_possible)
-
-            self.phunbaba3_safety_check(bosses_possible + dragons_possible)
-        else:
-            bosses_to_replace = self._replaceable_bosses()
-            random.shuffle(bosses_to_replace)
-            for pack in required_boss_packs:
-                self.event_boss_replacements[bosses_to_replace.pop()] = pack
-
-            bosses_possible = self._replaceable_bosses()
-            for boss in bosses_to_replace:
-                self.event_boss_replacements[boss] = random.choice(bosses_possible)
-
-            dragons_to_replace = list(bosses.dragon_pack_name)
-            random.shuffle(dragons_to_replace)
-            for pack in required_dragon_packs:
-                self.event_boss_replacements[dragons_to_replace.pop()] = pack
-
-            dragons_possible = list(bosses.dragon_pack_name)
-            for dragon in dragons_to_replace:
-                self.event_boss_replacements[dragon] = random.choice(dragons_possible)
-
-            self.phunbaba3_safety_check(bosses_possible)
+        self.phunbaba3_safety_check(bosses_possible)
 
     def randomize_packs(self, packs, boss_percent, no_phunbaba3 = False):
         exclude_bosses = None
@@ -317,6 +325,10 @@ class EnemyPacks():
             self.randomize_event_bosses()
         else:
             self.event_boss_replacements = None
+
+        self._handle_dragons()
+
+        self._handle_statues()
 
         if not self.args.fixed_encounters_original:
             self.randomize_fixed()

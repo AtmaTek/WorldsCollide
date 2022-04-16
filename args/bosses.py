@@ -16,15 +16,10 @@ def parse(parser):
     dragons = bosses.add_mutually_exclusive_group()
     dragons.add_argument("-drloc", "--dragon-boss-location", default = BossLocations.SHUFFLE, type = str.lower, choices = BossLocations.ALL,
                         help = "Decides which locations the eight dragon encounters can be fought")
-
     dragons.add_argument("-bmbd", "--mix-bosses-dragons", action = "store_true",
                         help = "Shuffle/randomize bosses and dragons together")
-    # dragons.add_argument("-shud", "--shuffle-dragons", action = "store_true",
-                        #  help = "Shuffles the eight dragon encounters")
 
     statues = bosses.add_mutually_exclusive_group()
-
-
     statues.add_argument("-stloc", "--statue-boss-location", default = BossLocations.MIX, type = str.lower, choices = BossLocations.ALL,
                         help = "Decides which locations the three statue encounters can be fought")
 
@@ -40,6 +35,7 @@ def parse(parser):
 def process(args):
     if args.mix_bosses_dragons:
         args.dragon_boss_location = BossLocations.MIX
+        args.mix_bosses_dragons = None
 
 def flags(args):
     flags = ""
@@ -50,8 +46,8 @@ def flags(args):
         flags += " -bbr"
 
     if args.dragon_boss_location:
-        flags += f" -drloc {args.statue_boss_location}"
-    if args.mix_bosses_dragons:
+        flags += f" -drloc {args.dragon_boss_location}"
+    elif args.mix_bosses_dragons:
         flags += f" -drloc {BossLocations.MIX}"
     else:
         flags += f" -drloc {BossLocations.SHUFFLE}"
