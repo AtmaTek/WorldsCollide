@@ -49,8 +49,6 @@ def flags(args):
         flags += f" -drloc {args.dragon_boss_location}"
     elif args.mix_bosses_dragons:
         flags += f" -drloc {BossLocations.MIX}"
-    else:
-        flags += f" -drloc {BossLocations.SHUFFLE}"
 
     if args.statue_boss_location:
         flags += f" -stloc {args.statue_boss_location}"
