@@ -9,6 +9,7 @@ Adds the following flags for new features:
 6) -rls flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
 7) -scis flag for "Sketch & Control 100%% accurate and use Sketcher/Controller's stats"
 8) -scia flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
+9) -stesp <MIN> <MAX> for "Give Player between MIN - MAX espers at the start of the seed
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
@@ -28,3 +29,4 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/28>
 <https://github.com/AtmaTek/WorldsCollide/pull/30>
 <https://github.com/AtmaTek/WorldsCollide/pull/32>
+<https://github.com/AtmaTek/WorldsCollide/pull/34>
