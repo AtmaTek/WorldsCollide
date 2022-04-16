@@ -383,12 +383,13 @@ class Espers():
                 character_names = wrap(character_names, width = COLUMN_WIDTH - 1)
                 entry.append(character_names)
 
-            if esper_index in self.starting_espers:
-                entry.append("Start With Esper")
             if entry_index % 2:
                 rentries.append(entry)
             else:
                 lentries.append(entry)
+
+        lentries.append("")
+        lentries.append("* = Starting Esper")
 
         section_entries("Espers", lentries, rentries)
 
