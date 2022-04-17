@@ -28,6 +28,11 @@ class KefkaTower(Event):
         self.item = self.atma_reward.id
         self.atma_battle_mod()
         self.atma_mod()
+        self.inferno_mod()
+        self.guardian_mod()
+        self.doom_mod()
+        self.goddess_mod()
+        self.poltergeist_mod()
 
         self.inferno_battle_mod()
         if self.args.fix_boss_skip:
@@ -242,6 +247,17 @@ class KefkaTower(Event):
         space.write(
             field.InvokeBattle(boss_pack_id),
         )
+
+    def guardian_mod(self):
+        pass
+    def inferno_mod(self):
+        pass
+    def doom_mod(self):
+        pass
+    def goddess_mod(self):
+        pass
+    def poltergeist_mod(self):
+        pass
 
     def atma_mod(self):
         src = [
