@@ -146,7 +146,7 @@ def options(args):
         equipable = f"Balanced Random {args.esper_equipable_balanced_random_value}"
 
     result = []
-    result.append(("Starting Espers", f"Random {args.starting_espers_min}-{args.starting_espers_max}"))
+    result.append(("Starting Espers", f"{args.starting_espers_min}-{args.starting_espers_max}"))
     result.append(("Spells", spells))
     result.append(("Bonuses", bonuses))
     if args.esper_bonuses_random:
