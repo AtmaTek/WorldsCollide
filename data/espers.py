@@ -354,9 +354,7 @@ class Espers():
             esper_index = self.esper_menu_order[entry_index]
             esper = self.espers[esper_index]
             prefix = "*" if esper.id in self.starting_espers else ""
-            # esper_name = f"{esper.get_name()}"
-            # esper_name = "*" + esper_name if esper_name in self.starting_espers else esper_name
-            # entry = [f"{esper_name:<self.NAME_SIZE}  {esper.mp:>3} MP"]
+
             entry = [f"{prefix}{esper.get_name():<{self.NAME_SIZE}}  {esper.mp:>3} MP"]
 
             for spell_index in range(esper.spell_count):
