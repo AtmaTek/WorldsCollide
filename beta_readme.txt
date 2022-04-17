@@ -1,7 +1,7 @@
 Beta Branch for 1.1.x
 
 Adds the following flags for new features:
-1) -bmbs for Kielbasigo's "Shuffle/randomize bosses and statues together"
+1) -stloc/-drloc <original | shuffle | mix> for Kielbasigo's Status Boss Location, Dragon Boss Location shuffle or mix. Shuffle = shuffled amongst themselves, Mix = mixed boss pool
 2) -fc to Fix Capture Bugs (multi-steal not giving more than 1 item and weapon specials not proccing)
 3) -np flag for Sprites in peekable checks are left a mystery until reward
 4) -cc flag for Controllable Coliseum
@@ -20,7 +20,7 @@ Other changes:
 - Bugfix: Fixing bug that prevented learning Bum Rush if the Blitzer was recruited at level >= 42
 
 Associated PRs:
-<https://github.com/AtmaTek/WorldsCollide/pull/3>
+<https://github.com/AtmaTek/WorldsCollide/pull/35>
 <https://github.com/AtmaTek/WorldsCollide/pull/16>
 <https://github.com/AtmaTek/WorldsCollide/pull/15>
 <https://github.com/AtmaTek/WorldsCollide/pull/18>
@@ -32,4 +32,5 @@ Associated PRs:
 <https://github.com/AtmaTek/WorldsCollide/pull/32>
 <https://github.com/AtmaTek/WorldsCollide/pull/34>
 <https://github.com/AtmaTek/WorldsCollide/pull/36>
+
 
