@@ -15,8 +15,9 @@ class EnemyPacks():
 
     ZONE_EATER = 32
     VELDT = 255 # placeholder for veldt in wob/wor
-    PHUNBABA3 = 386
-    DOOM_GAZE = 349
+
+    PHUNBABA3 = bosses.name_pack["Phunbaba 3"]
+    DOOM_GAZE = bosses.name_pack["Doom Gaze"]
 
     def __init__(self, rom, args, formations):
         self.rom = rom
@@ -43,14 +44,19 @@ class EnemyPacks():
         replaceable = [boss for boss in boss_packs if boss not in statue_packs and boss not in dragon_packs]
 
         if not self.args.shuffle_random_phunbaba3:
-            replaceable.remove(self.PHUNBABA3)
             self.event_boss_replacements[self.PHUNBABA3] = self.PHUNBABA3
+            if self.PHUNBABA3 in replaceable:
+                replaceable.remove(self.PHUNBABA3)
+
         if not self.args.doom_gaze_no_escape:
             # if doom gaze can escape, don't shuffle/randomize him
             # possibly having multiple doom gazes while trying to keep track of hp is awkward
             # how would that work with him being in his original spot and the others? How to know when to get bahamut esper?
-            replaceable.remove(self.DOOM_GAZE)
             self.event_boss_replacements[self.DOOM_GAZE] = self.DOOM_GAZE
+
+            if self.DOOM_GAZE in replaceable:
+                replaceable.remove(self.DOOM_GAZE)
+
         return replaceable + self._replaceable_dragons() + self._replaceable_statues()
 
     # Statue locations that become available for the general boss pool
@@ -129,7 +135,6 @@ class EnemyPacks():
 
     def shuffle_event_bosses(self):
         import random
-        self.event_boss_replacements = {}
 
         bosses_to_replace = self._replaceable_bosses()
         bosses_possible = bosses_to_replace.copy()
@@ -143,8 +148,6 @@ class EnemyPacks():
     def randomize_event_bosses(self):
         import args, random, objectives
         from constants.objectives.conditions import names as possible_condition_names
-
-        self.event_boss_replacements = {}
 
         boss_condition_name = "Boss"
         dragon_condition_name = "Dragon"
@@ -321,7 +324,7 @@ class EnemyPacks():
 
     def get_event_boss_replacement(self, original_boss_name):
         original_boss_id = self.get_id(original_boss_name)
-        if self.event_boss_replacements is None:
+        if not original_boss_id in self.event_boss_replacements:
             return original_boss_id
 
         return self.event_boss_replacements[original_boss_id]
@@ -333,12 +336,15 @@ class EnemyPacks():
                 pack.extra_formations[formation_index] = False
 
     def mod(self):
+        self.event_boss_replacements = {
+            self.DOOM_GAZE: self.DOOM_GAZE,
+            self.PHUNBABA3: self.PHUNBABA3
+        }
+
         if self.args.boss_battles_shuffle:
             self.shuffle_event_bosses()
         elif self.args.boss_battles_random:
             self.randomize_event_bosses()
-        else:
-            self.event_boss_replacements = None
 
         self._handle_original_shuffle_dragons()
         self._handle_original_shuffle_statues()
