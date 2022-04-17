@@ -231,6 +231,18 @@ class EnemyPacks():
             else:
                 exclude_bosses.append(self.formations.DOOM_GAZE)
 
+        # We only want statues and dragons to show up when they are intentionally
+        #   mixed into the general boss pool
+        # Statues are currently seen as normal bosses in regards to scaling,
+        #   but the long-term goal is to add their own scaling option so it
+        #   makes most sense to begin treating these similarly to dragons.
+        if self.args.statue_boss_location != bosses.BossLocations.MIX:
+            exclude_bosses += self.formations.ALL_STATUES
+
+        # This is more futureproofing in the event we consolidate dragons in the future
+        if self.args.dragon_boss_location != bosses.BossLocations.MIX:
+            exclude_bosses += self.formations.ALL_DRAGONS
+
         import random
         for pack_id in packs:
             if random.random() < boss_percent:
