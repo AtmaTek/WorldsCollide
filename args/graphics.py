@@ -16,6 +16,8 @@ def parse(parser):
     remove_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",
                               help = "Removes most flashes from animations. Includes Kefka Death.")
 
+    graphics.add_argument("-wmhc", "--world-minimap-high-contrast", action = "store_true",
+                              help = "World Minimap made Opaque with Minimap icon changed to higher contrast to improve visibility.")
 
 def process(args):
     import graphics.palettes.palettes as palettes
@@ -109,7 +111,8 @@ def flags(args):
         flags += " -frw"
     if args.flashes_remove_most:
         flags += " -frm"
-
+    if args.world_minimap_high_contrast:
+        flags += " -wmhc"
     return flags
 
 def _truncated_name(name):
@@ -170,8 +173,13 @@ def _other_options_log(args):
     elif args.flashes_remove_most:
         remove_flashes = "Most"
 
+    world_minimap = "Original"
+    if args.world_minimap_high_contrast:
+        world_minimap = "High Contrast"
+
     entries = [
         ("Remove Flashes", remove_flashes),
+        ("World Minimap", world_minimap),
     ]
 
     for entry in entries:
