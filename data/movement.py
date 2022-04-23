@@ -1,11 +1,11 @@
 class MovementActions:
     # Original. MS 3, MS 4 with sprint shoes
-    ORIGINAL = 'ORIGINAL'
+    ORIGINAL = 'original'
     # Auto sprint, holding B with sprint will move player at ms 3
-    DEFAULT = 'DEFAULT'
+    DEFAULT = 'default'
     # Holding B with sprint will move player at ms 5
-    DASH = 'DASH'
+    DASH = 'dash'
     # Holding B with sprint will move player at ms 5
-    SPRINT_SHOE_DASH = 'SHOE_DASH'
+    SPRINT_SHOE_DASH = 'sprint_shoe_dash'
 
     ALL = [ORIGINAL, DEFAULT, DASH, SPRINT_SHOE_DASH]

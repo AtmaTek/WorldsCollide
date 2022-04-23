@@ -6,7 +6,7 @@ def name():
 
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
-    misc.add_argument("-move", "--movement", type = str.upper, choices = MovementActions.ALL,
+    misc.add_argument("-move", "--movement", type = str.lower, choices = MovementActions.ALL,
                       help = "Player movement options")
     misc.add_argument("-shoedash", "--sprint-shoes-b-dash", action = "store_true",
                       help = " Can cause a visual bug in Owzer's Mansion.")
