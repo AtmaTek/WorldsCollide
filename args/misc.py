@@ -1,12 +1,15 @@
+from data.movement import MovementActions
+
+
 def name():
     return "Misc."
 
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
-    misc.add_argument("-as", "--auto-sprint", action = "store_true",
-                      help = "Player always sprints. Sprint Shoes have no effect")
+    misc.add_argument("-move", "--movement", type = str.upper, choices = MovementActions.ALL,
+                      help = "Player movement options")
     misc.add_argument("-shoedash", "--sprint-shoes-b-dash", action = "store_true",
-                      help = "Holding B with sprint shoes on will increase movement speed beyond a sprint. Can cause a visual bug in Owzer's Mansion.")
+                      help = " Can cause a visual bug in Owzer's Mansion.")
     misc.add_argument("-ond", "--original-name-display", action = "store_true",
                       help = "Display original character names in party and party select menus")
     misc.add_argument("-rr", "--random-rng", action = "store_true",
@@ -63,10 +66,8 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.auto_sprint:
-        flags += " -as"
-    if args.sprint_shoes_b_dash:
-        flags += " -shoedash"
+    if args.movement:
+        flags += f" -move {args.movement}"
     if args.original_name_display:
         flags += " -ond"
     if args.random_rng:
@@ -145,7 +146,7 @@ def options(args):
         remove_flashes = "Most"
 
     return [
-        ("Auto Sprint", args.auto_sprint),
+        ("Movement", args.movement),
         ("Sprint Shoes B-Dash", args.sprint_shoes_b_dash),
         ("Original Name Display", args.original_name_display),
         ("Random RNG", args.random_rng),

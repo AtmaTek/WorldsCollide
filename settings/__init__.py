@@ -1,4 +1,4 @@
-from settings.auto_sprint import AutoSprint
+from settings.movement import Movement
 from settings.scan_all import ScanAll
 from settings.random_rng import RandomRNG
 from settings.permadeath import Permadeath
@@ -10,7 +10,7 @@ import instruction.asm as asm
 __all__ = ["Settings"]
 class Settings:
     def __init__(self):
-        self.auto_sprint = AutoSprint()
+        self.movement = Movement()
         self.scan_all = ScanAll()
         self.random_rng = RandomRNG()
         self.permadeath = Permadeath()
