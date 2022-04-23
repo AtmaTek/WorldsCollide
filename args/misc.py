@@ -147,7 +147,6 @@ def options(args):
 
     return [
         ("Movement", args.movement),
-        ("Sprint Shoes B-Dash", args.sprint_shoes_b_dash),
         ("Original Name Display", args.original_name_display),
         ("Random RNG", args.random_rng),
         ("Random Clock", args.random_clock),

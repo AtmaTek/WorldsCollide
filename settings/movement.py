@@ -1,6 +1,10 @@
 from data.movement import MovementActions
-from memory.space import Allocate, Bank, Reserve
+from memory.space import Allocate, Bank, Reserve, Read
 import instruction.asm as asm
+
+WALK_SPEED = 2
+SPRINT_SPEED = 3
+DASH_SPEED = 4
 
 class Movement:
     def __init__(self):
@@ -11,15 +15,10 @@ class Movement:
             self.mod()
 
     def mod(self):
-        WALK_SPEED = 2
-        SPRINT_SPEED = 3
-        DASH_SPEED = 4
         length = 0
         src = []
-        DEFAULT_SPEED = WALK_SPEED if self.movement == MovementActions.ORIGINAL else SPRINT_SPEED
-        B_SPEED = WALK_SPEED if self.movement == MovementActions.DEFAULT else DASH_SPEED
 
-        (length, src) = self.get_auto_sprint_src(DEFAULT_SPEED, B_SPEED)
+        (length, src) = self.get_auto_sprint_src()
 
         space = Allocate(Bank.F0, length, "Sprint subroutine")
 
@@ -34,7 +33,7 @@ class Movement:
         self.sliding_dash_fix()
 
 
-    def get_auto_sprint_src(self, DEFAULT_SPEED, B_SPEED):
+    def get_auto_sprint_src(self):
         import args
         CURRENT_MAP_BYTE = 0x82 # 2 bytes
         OWZERS_MANSION_ID = 0x0D1 # the door room can create visual artifacts on the map while dashing
@@ -63,37 +62,49 @@ class Movement:
 
         asm_length = 9
 
-        if self.movement == MovementActions.DEFAULT or self.movement == MovementActions.DASH:
-            asm_length += 5
+        if self.movement == MovementActions.DEFAULT:
+            asm_length += 6
             src += [
-                "B_BUTTON",
+                "ON_B_BUTTON",
                 asm.A8(),
-                asm.LDA(B_SPEED, asm.IMM8),
-                asm.BRA("STORE")
+                asm.LDA(WALK_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
             ]
-        elif self.movement == MovementActions.SPRINT_SHOE_DASH:
-            asm_length += 12
+        elif self.movement == MovementActions.DASH:
+            asm_length += 6
             src += [
-                "SPRINT_SHOES_CHECK",
+                "ON_B_BUTTON",
+                asm.A8(),
+                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
+            ]
+
+        elif self.movement == MovementActions.SPRINT_SHOE_DASH:
+            asm_length += 17
+            src += [
+                "ON_B_BUTTON",
                 asm.A8(),
                 asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store secondary movement speed
                 asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
-                asm.BEQ("STORE_DEFAULT"),
-                asm.LDA(B_SPEED, asm.IMM8),
+                asm.BEQ("WALK"),
+                "DASH",
+                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
+                "WALK",
+                asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
             ]
 
         src += [
             "STORE_DEFAULT",
-            asm.A8(),
-            asm.LDA(DEFAULT_SPEED, asm.IMM8),
+            asm.LDA(SPRINT_SPEED, asm.IMM8),
 
             "STORE",
             asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),        # store speed in ram
             asm.RTL(),                                  # return
         ]
 
-        asm_length += 9
+        asm_length += 6
         return (asm_length, src)
 
 
@@ -106,7 +117,7 @@ class Movement:
     #            11 = left
 
     # https://silentenigma.neocities.org/ff6/index.html
-    # Will leave bits of documentation about in the vent neocities does not stand the test of time
+    # Will leave bits of documentation about in the event neocities does not stand the test of time
 
     # With dash enabled, this causes a bug that the player will appear to be standing still when
     # running down or right at move speed 5. This is because two sprite instances are thrown out of
@@ -145,17 +156,27 @@ class Movement:
             "RETURN",
             asm.PLA(),
             asm.LSR(),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        subroutine_space = Allocate(Bank.C0, 20, "walking speed calculation", asm.NOP())
-        subroutine_space.write(subroutine_src)
+        subroutine_space = Allocate(Bank.F0, 22, "walking speed calculation", asm.NOP())
+        subroutine_space.write([Read(0x5882, 0x5884)] + subroutine_src)
 
         src = [
-            asm.JSR(subroutine_space.start_address, asm.ABS)
+            asm.JSL(subroutine_space.start_address_snes),
         ]
 
-        space = Reserve(0x5885, 0x5887, "Sprite offset calculation 1", asm.NOP())
+        space = Reserve(0x5882, 0x5887, "Sprite offset calculation 1", asm.NOP())
         space.write(src)
 
-        space = Reserve(0x5892, 0x5894, "Sprite offset calculation 2")
+
+        subroutine_space = Allocate(Bank.F0, 22, "walking speed calculation", asm.NOP())
+        subroutine_space.write([Read(0x588f, 0x5891)] + subroutine_src)
+
+
+        src = [
+            asm.JSL(subroutine_space.start_address_snes),
+        ]
+
+
+        space = Reserve(0x588f, 0x5894, "Sprite offset calculation 2")
         space.write(src)
