@@ -22,6 +22,7 @@ class PreGameTrack:
         self.progress = progress.Progress()
         self.flags = flags.Flags()
 
+        self.invoke_flags_submenu = {}
         self.characters = characters
         self.mod()
 
@@ -55,6 +56,7 @@ class PreGameTrack:
         src += [HANDLE_SCROLLING_LABEL]
 
         return src
+
 
     def get_scroll_area_exit_src(self, destination_menu_number, invoke_flags_addr):
         # Get the ASM for sustain_mod that handles exit from a scroll area, either returning to flags if in
@@ -182,7 +184,15 @@ class PreGameTrack:
             asm.BEQ("DRAW_PROGRESS"),
             asm.CMP(self.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("DRAW_FLAG"),
+        ]
 
+        for submenu_idx in self.flags.submenus.keys():
+            src += [
+                asm.CMP(self.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ(f"DRAW_FLAGS_SUBMENU{submenu_idx}"),
+            ]
+
+        src += [
             "DRAW_ITEM",
             Read(0x37fa1, 0x37fa3),
             asm.JMP(0x7fa4, asm.ABS),
@@ -199,6 +209,13 @@ class PreGameTrack:
             "DRAW_FLAG",
             asm.JMP(self.flags.draw_line, asm.ABS),
         ]
+
+        for submenu_idx in self.flags.submenus.keys():
+            src += [
+                f"DRAW_FLAGS_SUBMENU{submenu_idx}",
+                asm.JMP(self.flags.submenus[submenu_idx].draw_line, asm.ABS),
+            ]
+
         space = Write(Bank.C3, src, "pregame track draw entry")
         draw_entry = space.start_address
 
@@ -296,6 +313,11 @@ class PreGameTrack:
             src+= [
                 asm.JSL(START_ADDRESS_SNES + self.flags.initialize),
             ]
+        for submenu_idx in self.flags.submenus.keys():
+            if self.flags.submenus[submenu_idx].initialize is not None:
+                src+= [
+                    asm.JSL(START_ADDRESS_SNES + self.flags.submenus[submenu_idx].initialize),
+                ]
 
         src += [
             asm.STZ(0x4a, asm.DIR),     # index of first row displayed
@@ -337,7 +359,15 @@ class PreGameTrack:
             asm.BEQ("REMEMBER_PROGRESS"),
             asm.CMP(self.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("REMEMBER_FLAGS"),
+        ]
 
+        for submenu_idx in self.flags.submenus.keys():
+            src += [
+                asm.CMP(self.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ(f"REMEMBER_FLAGS_SUBMENU{submenu_idx}"),
+            ]
+
+        src += [
             "REMEMBER_OBJECTIVES",
             asm.LDA(self.objectives.MENU_NUMBER, asm.IMM8),     # load objectives menu number
             asm.STA(self.MEMORY_SCROLL_AREA_NUMBER, asm.ABS),   # save in case no scroll area memory
@@ -352,6 +382,13 @@ class PreGameTrack:
             "REMEMBER_FLAGS",
             asm.JMP(self.flags.remember_draw, asm.ABS),
         ]
+
+        for submenu_idx in self.flags.submenus.keys():
+            src += [
+                f"REMEMBER_FLAGS_SUBMENU{submenu_idx}",
+                asm.JMP(self.flags.submenus[submenu_idx].remember_draw, asm.ABS),
+            ]
+
         space = Write(Bank.C3, src, "pregame track initialize scroll area")
         self.initialize_scroll_area = space.start_address
 
@@ -391,6 +428,13 @@ class PreGameTrack:
         ]
         space = Write(Bank.C3, src, "pregame track invoke flags")
         self.invoke_flags = space.start_address
+
+    def invoke_flags_submenu_mod(self, submenu_idx):
+        src = [
+            self.InvokeScrollArea(self.flags.submenus[submenu_idx]),
+        ]
+        space = Write(Bank.C3, src, "pregame track invoke flags submenu")
+        self.invoke_flags_submenu[submenu_idx] = space.start_address
 
     def sustain_scroll_area_mod(self):
         src = [
@@ -727,8 +771,10 @@ class PreGameTrack:
         self.invoke_checks_mod()
         self.invoke_progress_mod()
         self.invoke_flags_mod()
-        self.sustain_scroll_area_mod()
+        for submenu_idx in self.flags.submenus.keys():
+            self.invoke_flags_submenu_mod(submenu_idx)
         self.exit_scroll_area_mod()
+        self.sustain_scroll_area_mod()
 
         self.initialize_mod()
         self.wait_for_fade_mod()
