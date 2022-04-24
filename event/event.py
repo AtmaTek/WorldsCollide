@@ -1,3 +1,4 @@
+from data.item import Item
 from memory.space import Bank, Space, Reserve, Allocate, Free, Write, Read
 import data.direction as direction
 
@@ -41,7 +42,28 @@ class Event():
     def characters_required(self):
         return 1
 
-    def add_reward(self, possible_types):
+    def get_reward_type(self, default: RewardType, check_info = None):
+        from constants.checks import character_esper_name_check
+
+        fallback_bit = character_esper_name_check.get(self.name())
+        bit = check_info.bit if check_info else fallback_bit
+
+        assert (bit or fallback_bit)
+
+        if bit in self.args.item_reward_checks:
+            return RewardType.ITEM
+
+        return default
+
+    # check_info can be passed if name / bit differs.
+    # This will only be the case when a check is broken up into multiple pieces (Auction House, Floating Contintent, Mtek, etc.)
+    # @example
+    # from data.checks import AUCTION1, AUCTION2
+    # self.reward1 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION1)
+    # self.reward2 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION2)
+    def add_reward(self, possible_types, check_info = None):
+        any_type = [RewardType.CHARACTER, RewardType.ESPER, RewardType.ITEM, RewardType.NONE]
+        possible_types = possible_types if (possible_types in any_type) else self.get_reward_type(possible_types, check_info)
         new_reward = Reward(self, possible_types)
         self.rewards.append(new_reward)
         return new_reward
@@ -65,7 +87,7 @@ class Event():
         if reward.type == RewardType.CHARACTER:
             reward_string += self.characters.get_name(reward.id)
         elif reward.type == RewardType.ESPER:
-            reward_string += self.espers.get_name(reward.id)
+            reward_string += "*" + self.espers.get_name(reward.id)
         elif reward.type == RewardType.ITEM:
             reward_string += self.items.get_name(reward.id)
         self.rewards_log.append(reward_string + suffix)
@@ -79,6 +101,7 @@ class Event():
             log_string += f" {', '.join(self.rewards_log)}"
         if self.changes_log:
             log_string += '\n' + '\n'.join(self.changes_log)
+
         return log_string
 
     def mod(self):

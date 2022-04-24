@@ -1,17 +1,15 @@
 from event.event import *
+from constants.checks import NARSHE_WEAPON_SHOP
 
 class NarsheWOR(Event):
     def name(self):
-        return "Narshe WOR"
+        return NARSHE_WEAPON_SHOP.name
 
     def character_gate(self):
         return self.characters.LOCKE
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward1 = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
         self.reward2 = self.add_reward(RewardType.ITEM)
 
     def init_event_bits(self, space):

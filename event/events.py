@@ -52,6 +52,8 @@ class Events():
 
             if self.args.spoiler_log and (event.rewards_log or event.changes_log):
                 log_strings.append(event.log_string())
+
+        log_strings.append("* = Esper/Magicite")
         space.write(field.Return())
 
         if self.args.spoiler_log:

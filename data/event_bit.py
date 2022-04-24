@@ -1,9 +1,15 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 DISABLE_SAVE_POINT_TUTORIAL = 0x133
 DISABLE_CHOCOBO_TUTORIAL = 0x134
+
+# DEFEATED_STOOGES
+# FINISHED_DOMA_WOR
+# GOT_ALEXANDR
+# NAMED_EDGAR
+# DEFEATED_TENTACLES_FIGARO
 
 VICKS_BROKE_WHELK_GATE = 0x12c
 NARSHE_GUARDS_SAW_TERRA_ON_BRIDGE = 0x12d

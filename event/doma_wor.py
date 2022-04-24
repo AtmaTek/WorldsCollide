@@ -2,15 +2,16 @@ from event.event import *
 
 class DomaWOR(Event):
     def name(self):
-        return "Doma WOR"
+        return "Doma Dream"
 
     def character_gate(self):
         return self.characters.CYAN
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward3 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import DOMA_DREAM_DOOR, DOMA_DREAM_AWAKEN, DOMA_DREAM_THRONE
+        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, DOMA_DREAM_AWAKEN)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, DOMA_DREAM_THRONE)
+        self.reward3 = self.add_reward(RewardType.ESPER | RewardType.ITEM, DOMA_DREAM_DOOR)
 
     def mod(self):
         self.cyan_phantom_train_npc_id = 0x10

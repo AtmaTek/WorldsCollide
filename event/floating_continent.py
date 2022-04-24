@@ -15,9 +15,11 @@ class FloatingContinent(Event):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward3 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        from constants.checks import FLOATING_CONT_ARRIVE, FLOATING_CONT_BEAST, FLOATING_CONT_ESCAPE
+
+        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, FLOATING_CONT_ARRIVE)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, FLOATING_CONT_BEAST)
+        self.reward3 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, FLOATING_CONT_ESCAPE)
 
     def mod(self):
         self.shadow_leaves_mod()

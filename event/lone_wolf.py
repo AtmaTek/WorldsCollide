@@ -1,3 +1,4 @@
+from constants.checks import LONE_WOLF_CHASE, LONE_WOLF_MOOGLE_ROOM
 from event.event import *
 
 class LoneWolf(Event):
@@ -8,8 +9,8 @@ class LoneWolf(Event):
         return self.characters.MOG
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, LONE_WOLF_CHASE)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, LONE_WOLF_MOOGLE_ROOM)
 
     def init_event_bits(self, space):
         space.write(
