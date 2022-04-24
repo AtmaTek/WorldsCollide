@@ -1,5 +1,5 @@
 from event.event import *
-from constants.checks import NARSHE_WEAPON_SHOP
+from constants.checks import NARSHE_WEAPON_SHOP, NARSHE_WEAPON_SHOP_MINES
 
 class NarsheWOR(Event):
     def name(self):
@@ -10,7 +10,7 @@ class NarsheWOR(Event):
 
     def init_rewards(self):
         self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
 
     def init_event_bits(self, space):
         space.write(

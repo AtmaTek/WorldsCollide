@@ -1,3 +1,4 @@
+from constants.checks import FANATICS_TOWER_FOLLOWER, FANATICS_TOWER_LEADER
 from event.event import *
 
 class FanaticsTower(Event):
@@ -8,9 +9,8 @@ class FanaticsTower(Event):
         return self.characters.STRAGO
 
     def init_rewards(self):
-        from constants.checks import FANATICS_TOWER_FOLLOWER
         self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, FANATICS_TOWER_FOLLOWER)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, FANATICS_TOWER_LEADER)
 
     def mod(self):
         self.strago_npc_id = 0x13

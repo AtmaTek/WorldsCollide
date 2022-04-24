@@ -1,16 +1,15 @@
 
 def name():
-    return "Advanced Checks"
+    return "Checks"
 
 def parse(parser):
     advanced_checks = parser.add_argument_group("Checks")
-    nfce = advanced_checks.add_mutually_exclusive_group()
-    nfce.name = "Advanced Checks"
-    nfce.name = "No Free Character/Esper Checks"
-    nfce.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
+    check_rewards = advanced_checks.add_mutually_exclusive_group()
+    check_rewards.name = "Check Rewards"
+    check_rewards.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
 
-    nfce.add_argument("-fir", "--force-item-reward-checks", type = str,
+    check_rewards.add_argument("-fir", "--force-item-reward-checks", type = str,
                 help = "Forces list of checks to give an item reward. Maximum of 9 checks.")
 
 def process(args):
@@ -21,13 +20,16 @@ def process(args):
 
         LONE_WOLF_MOOGLE_ROOM,
         FANATICS_TOWER_LEADER,
-        NARSHE_WEAPON_SHOP_MINES
+        NARSHE_WEAPON_SHOP_MINES,
     )
 
     if args.force_item_reward_checks:
         args.item_reward_checks =  [int(check) for check in args.force_item_reward_checks.split(',')]
     elif args.no_free_characters_espers:
         args.item_reward_checks = [
+            FANATICS_TOWER_LEADER.bit,
+            LONE_WOLF_MOOGLE_ROOM.bit,
+            NARSHE_WEAPON_SHOP_MINES.bit,
             AUCTION1.bit,
             AUCTION2.bit,
             COLLAPSING_HOUSE.bit,
@@ -39,14 +41,14 @@ def process(args):
             SOUTH_FIGARO_PRISONER.bit,
         ]
     else:
-        # legacy behavior
+        # classic behavior
         args.item_reward_checks = [
             FANATICS_TOWER_LEADER,
             LONE_WOLF_MOOGLE_ROOM,
             NARSHE_WEAPON_SHOP_MINES,
         ]
     # max amount (can probably calculate this somehow)
-    assert len(args.item_reward_checks) < 10
+    assert len(args.item_reward_checks) < 14
 
 def flags(args):
     flags = ""
@@ -74,11 +76,12 @@ def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
         key, value = entry
-
-        if key == "Forced Item Checks" and value:
-            entries[index] = ("Forced Item Checks", FlagsForceItemRewardChecks(value)) # flags sub-menu
-        elif key == "Forced Item Checks":
-            entries[index] = ("Forced Item Checks", "None") # flags sub-menu
+        if key == "Forced Item Checks":
+            is_classic = not args.force_item_reward_checks
+            if value:
+                entries[index] = ("Forced Item Checks", FlagsForceItemRewardChecks(value, args.no_free_characters_espers, is_classic)) # flags sub-menu
+            else:
+                entries[index] = ("Forced Item Checks", "None") # flags sub-menu
 
     return (name(), entries)
 

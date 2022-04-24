@@ -82,11 +82,6 @@ item_check_name = {
 
     # kt bosses
     KEFKAS_TOWER_CELL_BEAST.bit: KEFKAS_TOWER_CELL_BEAST.name,
-
-    # secondary quest objectives
-    LONE_WOLF_MOOGLE_ROOM.bit: LONE_WOLF_MOOGLE_ROOM.name,
-    FANATICS_TOWER_LEADER.bit: FANATICS_TOWER_LEADER.name,
-    NARSHE_WEAPON_SHOP_MINES.bit: NARSHE_WEAPON_SHOP_MINES.name,
 }
 
 # Checks that can give either character/esper/item
@@ -140,6 +135,11 @@ character_esper_check_name = {
     WHELK_GATE.bit:             WHELK_GATE.name,
     ZONE_EATER.bit:             ZONE_EATER.name,
     ZOZO_TOWER.bit:             ZOZO_TOWER.name,
+
+    # secondary quest objectives
+    LONE_WOLF_MOOGLE_ROOM.bit: LONE_WOLF_MOOGLE_ROOM.name,
+    FANATICS_TOWER_LEADER.bit: FANATICS_TOWER_LEADER.name,
+    NARSHE_WEAPON_SHOP_MINES.bit: NARSHE_WEAPON_SHOP_MINES.name,
 }
 
 all_checks_check_name = character_esper_check_name.copy()
@@ -155,7 +155,6 @@ CYAN = [
 ]
 EDGAR = [
     ANCIENT_CASTLE,
-    ANCIENT_CASTLE_DRAGON,
     FIGARO_CASTLE_THRONE,
     FIGARO_CASTLE_ENGINE,
 ]
@@ -227,9 +226,12 @@ UNGATED = [
     KEFKAS_TOWER_CELL_BEAST,
 
     # dragons
+    ANCIENT_CASTLE_DRAGON,
     FANATICS_TOWER_DRAGON,
     KEFKAS_TOWER_DRAGON_G,
     KEFKAS_TOWER_DRAGON_S,
+    MT_ZOZO_DRAGON,
+    NARSHE_DRAGON,
     OPERA_HOUSE_DRAGON,
     PHOENIX_CAVE_DRAGON,
 ]
