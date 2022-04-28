@@ -217,6 +217,7 @@ class Start(Event):
             ),
             field.ShowEntity(field_entity.PARTY0),
             field.RefreshEntities(),
+            field.LoadMap(0x16c, direction.UP, default_music = True, x = 7, y =7, entrance_event = False),
             field.FreeScreen(),
             field.FadeInScreen(speed = 4),
             field.Return(),

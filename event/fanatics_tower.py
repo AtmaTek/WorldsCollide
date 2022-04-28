@@ -1,4 +1,6 @@
 from constants.checks import FANATICS_TOWER_FOLLOWER, FANATICS_TOWER_LEADER
+from data.map_event import MapEvent
+from data.npc import NPC
 from event.event import *
 
 class FanaticsTower(Event):
@@ -9,23 +11,31 @@ class FanaticsTower(Event):
         return self.characters.STRAGO
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, FANATICS_TOWER_FOLLOWER)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, FANATICS_TOWER_LEADER)
+        self.reward1 = self.add_reward(RewardType.CHARACTER, FANATICS_TOWER_FOLLOWER)
+        # TODO replce when chest esper is working
+        self.reward2 = self.add_reward(RewardType.ESPER, FANATICS_TOWER_LEADER)
+        # self.reward2 = self.add_reward(RewardType.ITEM, FANATICS_TOWER_LEADER)
 
     def mod(self):
+        self.top_treasure_room_id = 0x16e
         self.strago_npc_id = 0x13
         self.strago_npc = self.maps.get_npc(0x16a, self.strago_npc_id)
 
         self.relm_event_mod()
-        self.tower_top_mod()
         self.magimaster_battle_mod()
 
-        if self.reward1.type == RewardType.CHARACTER:
+        if self.reward1.is_character():
             self.character_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ESPER:
+        elif self.reward1.is_esper():
             self.esper_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ITEM:
+        elif self.reward1.is_item():
             self.item_mod(self.reward1.id)
+
+        # TODO
+        if self.reward2.is_esper():
+          self.tower_top_esper_mod()
+        elif self.reward2.is_item():
+          self.tower_top_item_mod()
 
         self.finish_magimaster_check_mod()
         self.finish_strago_check_mod()
@@ -122,12 +132,71 @@ class FanaticsTower(Event):
 
         space = Reserve(0xc5407, 0xc5408, "fanatics tower stop relm song before screen fade", field.NOP())
 
-    def tower_top_mod(self):
+    def tower_top_esper_mod(self):
+        # space = Reserve(0xc5548, 0xc554a, "fanatics tower master kefka's treasure", field.NOP())
+        # space = Reserve(0xc554d, 0xc554e, "fanatics tower long pause before magic master appears", field.NOP())
+
+        # self.item = self.reward2.id
+
+        # from constants.items import name_id
+        # self.maps.set_chest_item(self.top_treasure_room_id, 7, 7, name_id["Empty"])
+
+        # # TODO
+        # # 1) Remove chest from the room
+        # # 2) Create NPC w/ magicite sprite. Same behavior as Mt Zozo when an esper
+        # # 2) Change tile at 7,7 with the center carpet piece
+        # #       Before: https://i.imgur.com/MkkIt3R.png
+        # #       After : https://i.imgur.com/TVGzuvT.png
+
+        chest = self.maps.get_chests(0x16e)[0]
+        chest.x = 9 # valid coords?
+        chest.y = 8 # valid coords?
+        chest.type = chest.EMPTY
+        chest.contents = 255
+
+        self.magicite_npc_id =  0x2a
+
+        src = [
+            field.AddEsper(self.reward2.id),
+            field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
+            field.HideEntity(self.magicite_npc_id),
+            # field.SetEventBit(event_bit.RECEIVED_FANATICS_TOWER_REWARD),
+            asm.RTL(),
+        ]
+
+        space = Write(Bank.CC, src, "fanatics tower magicite")
+
+        event_space = Reserve(0xc5440, 0xc544a, "Set defeated magimaster true", asm.NOP())
+
+        event_space.write([
+            asm.JSL(space.start_address_snes),
+            # field.Return(),
+        ])
+
+
+        self.magicite_npc = NPC()
+        self.magicite_npc.sprite = 91 # Magicite
+        self.magicite_npc.palette = 2
+        self.magicite_npc.split_sprite = 1
+        self.magicite_npc.direction = direction.UP
+        self.magicite_npc.x = 6
+        self.magicite_npc.y = 8
+        self.magicite_npc.set_event_address(space.start_address)
+        # self.magicite_npc.event_byte = event_bit.RECEIVED_FANATICS_TOWER_REWARD // 8
+        # self.magicite_npc.event_bit = event_bit.RECEIVED_FANATICS_TOWER_REWARD % 8
+
+        # #  Delete the original "flip bit" event
+        self.maps.delete_event(self.top_treasure_room_id, 7, 8)
+        # # map_event.event_address = self.magicite_npc.event_address
+        # # self.maps.add_event(self.top_treasure_room, )
+        self.maps.append_npc(self.top_treasure_room_id, self.magicite_npc)
+
+    def tower_top_item_mod(self):
         space = Reserve(0xc5548, 0xc554a, "fanatics tower master kefka's treasure", field.NOP())
         space = Reserve(0xc554d, 0xc554e, "fanatics tower long pause before magic master appears", field.NOP())
 
         self.item = self.reward2.id
-        self.maps.set_chest_item(0x16e, 7, 7, self.item)
+        self.maps.set_chest_item(self.top_treasure_room_id, 7, 7, self.item)
 
     def magimaster_battle_mod(self):
         boss_pack_id = self.get_boss("MagiMaster")

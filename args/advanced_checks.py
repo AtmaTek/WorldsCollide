@@ -10,7 +10,7 @@ def parse(parser):
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
 
     check_rewards.add_argument("-fir", "--force-item-reward-checks", type = str,
-                help = "Forces list of checks to give an item reward. Maximum of 9 checks.")
+                help = "Forces list of checks to give an item reward. Maximum of 12 checks.")
 
 def process(args):
     from constants.checks import (
@@ -23,7 +23,9 @@ def process(args):
         NARSHE_WEAPON_SHOP_MINES,
     )
 
-    if args.force_item_reward_checks:
+    if args.force_item_reward_checks == 'none':
+        args.item_reward_checks = []
+    elif args.force_item_reward_checks:
         args.item_reward_checks =  [int(check) for check in args.force_item_reward_checks.split(',')]
     elif args.no_free_characters_espers:
         args.item_reward_checks = [
@@ -43,12 +45,12 @@ def process(args):
     else:
         # classic behavior
         args.item_reward_checks = [
-            FANATICS_TOWER_LEADER,
-            LONE_WOLF_MOOGLE_ROOM,
-            NARSHE_WEAPON_SHOP_MINES,
+            FANATICS_TOWER_LEADER.bit,
+            LONE_WOLF_MOOGLE_ROOM.bit,
+            NARSHE_WEAPON_SHOP_MINES.bit,
         ]
     # max amount (can probably calculate this somehow)
-    assert len(args.item_reward_checks) < 14
+    assert len(args.item_reward_checks) < 13
 
 def flags(args):
     flags = ""
@@ -63,12 +65,12 @@ def options(args):
         ("Forced Item Checks", args.item_reward_checks),
     ]
 
-def _format_check_log_entries(spell_ids):
+def _format_check_log_entries(check_ids):
     from constants.checks import all_checks_check_name
-    spell_entries = []
-    for spell_id in spell_ids:
-        spell_entries.append(("", all_checks_check_name[spell_id]))
-    return spell_entries
+    check_entries = []
+    for check_id in check_ids:
+        check_entries.append(("", all_checks_check_name[check_id]))
+    return check_entries
 
 def menu(args):
     from menus.submenu_force_item_reward_checks import FlagsForceItemRewardChecks
@@ -81,7 +83,7 @@ def menu(args):
             if value:
                 entries[index] = ("Forced Item Checks", FlagsForceItemRewardChecks(value, args.no_free_characters_espers, is_classic)) # flags sub-menu
             else:
-                entries[index] = ("Forced Item Checks", "None") # flags sub-menu
+                 entries[index] = ("Forced Item Checks", "None") # flags sub-menu
 
     return (name(), entries)
 

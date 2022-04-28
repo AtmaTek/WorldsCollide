@@ -62,9 +62,11 @@ class Event():
     # self.reward1 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION1)
     # self.reward2 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION2)
     def add_reward(self, possible_types, check_info = None):
-        any_type = [RewardType.CHARACTER, RewardType.ESPER, RewardType.ITEM, RewardType.NONE]
-        possible_types = possible_types if (possible_types in any_type) else self.get_reward_type(possible_types, check_info)
+        assert possible_types
+
         new_reward = Reward(self, possible_types)
+        # We don't need any extra logic if only one type is selected
+        possible_types = possible_types if new_reward.single_possible_type() else self.get_reward_type(possible_types, check_info)
         self.rewards.append(new_reward)
         return new_reward
 
