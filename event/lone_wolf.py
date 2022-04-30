@@ -263,7 +263,7 @@ class LoneWolf(Event):
         import data.text
         esper_name = data.text.convert(self.espers.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
-        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get my<line><     >“" + esper_name + "”!<end>")
+        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + esper_name + "”!<end>")
         self.dialogs.set_text(1742, f" <line>     Received the Magicite<line>              “{esper_name}.”<end>")
 
     def lone_wolf_dialog_item_mod(self):

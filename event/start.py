@@ -189,14 +189,10 @@ class Start(Event):
             ]
 
         if self.args.debug:
-            src += [
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-            ]
+            from constants.items import name_id
+            for char in self.characters.characters:
+                char.init_relic1 = name_id["Moogle Charm"]
+
         src += [
             field.Return(),
         ]
@@ -209,15 +205,14 @@ class Start(Event):
             field.LoadMap(0x00, direction.DOWN, default_music = False,
                           x = 84, y = 34, fade_in = True, airship = True),
             vehicle.SetPosition(84, 34),
-            vehicle.LoadMap(0x06, direction.DOWN, default_music = True,
-                            x = 16, y = 6, entrance_event = True),
+            vehicle.LoadMap(364, direction.UP, default_music = True,
+                            x = 7, y = 7, entrance_event = True),
 
             field.EntityAct(field_entity.PARTY0, True,
                 field_entity.CenterScreen(),
             ),
             field.ShowEntity(field_entity.PARTY0),
             field.RefreshEntities(),
-            field.LoadMap(0x16c, direction.UP, default_music = True, x = 7, y =7, entrance_event = False),
             field.FreeScreen(),
             field.FadeInScreen(speed = 4),
             field.Return(),
