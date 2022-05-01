@@ -45,6 +45,11 @@ class Espers():
             self.espers.append(esper)
 
         self.available_espers = set(range(self.ESPER_COUNT))
+        self.starting_espers = []
+
+        if args.starting_espers_min > 0:
+            count = random.randint(args.starting_espers_min, args.starting_espers_max)
+            self.starting_espers = [self.get_random_esper() for _esp in range(count)]
 
     def receive_dialogs_mod(self, dialogs):
         self.receive_dialogs = [1133, 1380, 1381, 1134, 1535, 1082, 1091, 1092, 1136, 1534, 2618, 1093, 1087,\
@@ -271,6 +276,9 @@ class Espers():
         if self.args.esper_spells_random_rates or self.args.esper_spells_shuffle_random_rates:
             self.randomize_rates()
 
+        if len(self.starting_espers):
+            self.randomize_rates()
+
         if self.args.esper_spells_shuffle or self.args.esper_spells_shuffle_random_rates:
             self.shuffle_spells()
         elif self.args.esper_spells_random:
@@ -345,8 +353,10 @@ class Espers():
         for entry_index in range(self.ESPER_COUNT):
             esper_index = self.esper_menu_order[entry_index]
             esper = self.espers[esper_index]
+            prefix = "*" if esper.id in self.starting_espers else ""
 
-            entry = [f"{esper.get_name():<{self.NAME_SIZE}}  {esper.mp:>3} MP"]
+            entry = [f"{prefix}{esper.get_name():<{self.NAME_SIZE}}  {esper.mp:>3} MP"]
+
             for spell_index in range(esper.spell_count):
                 spell_name = self.spells.get_name(esper.spells[spell_index].id)
                 learn_rate = esper.spells[spell_index].rate
@@ -375,6 +385,9 @@ class Espers():
                 rentries.append(entry)
             else:
                 lentries.append(entry)
+
+        lentries.append("")
+        lentries.append("* = Starting Esper")
 
         section_entries("Espers", lentries, rentries)
 
