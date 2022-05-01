@@ -168,7 +168,8 @@ class PreGameMenu:
 
         ]
 
-        src.extend(self.common.get_flags_a_check_src(self.invoke_flags_submenu[submenu_idx]))
+        for submenu_id in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_id, self.invoke_flags_submenu[submenu_id]))
 
         src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
