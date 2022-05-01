@@ -275,7 +275,8 @@ class TrackMenu:
             asm.BNE("EXIT_SCROLL_AREA"), # branch if so
         ]
 
-        src.extend(self.common.get_flags_a_check_src(self.common.invoke_flags_submenu[submenu_idx]))
+        for submenu_idx in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_idx, self.common.invoke_flags_submenu[submenu_idx]))
 
         src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
