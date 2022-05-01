@@ -13,12 +13,16 @@ class WorldMap:
 
         # High contrast location indicator on minimaps
         location_indicator_addr = [0x12eeb8,  # WoB default: 1100
-                                   0x12eeba,  # WoB default: 1f00
-                                   0x12efb8,  # WoR default: 1100
+                                   0x12efb8]  # WoR default: 1100
+        for loc_addr in location_indicator_addr:
+            space = Reserve(loc_addr, loc_addr+1, "high contrast minimap indicator")
+            space.write(0x1f, 0x00) # red
+
+        location_indicator_addr = [0x12eeba,  # WoB default: 1f00
                                    0x12efba]  # WoR default: 1f00
         for loc_addr in location_indicator_addr:
             space = Reserve(loc_addr, loc_addr+1, "high contrast minimap indicator")
-            space.write(0x7f, 0xff)
+            space.write(0xff, 0x03) # yellow
 
     def mod(self):
         if self.args.world_minimap_high_contrast:
