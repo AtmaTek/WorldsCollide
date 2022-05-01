@@ -1,7 +1,6 @@
 from data.espers import Espers
 from event.event_reward import CHARACTER_ESPER_ONLY_REWARDS
 
-
 # If all 27 espers are allocated at start, there will be logic errors when it comes to
 # assigning characters to character/esper only checks.
 # We would have to ensure that a character is assigned to the {6} char/esper only rewards.
@@ -19,7 +18,7 @@ def parse(parser):
     esper_start = espers.add_mutually_exclusive_group()
     esper_start.add_argument("-stesp", "--starting-espers", default = [0, 0], type = int,
                                 nargs = 2, metavar = ("MIN", "MAX"), choices = range(MAX_STARTING_ESPERS + 1),
-                                help = "Starting espers random")
+                                help = "Party starts with %(metavar) random espers")
 
     esper_spells = espers.add_mutually_exclusive_group()
 
