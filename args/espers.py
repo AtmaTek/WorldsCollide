@@ -1,5 +1,12 @@
 from data.espers import Espers
+from event.event_reward import CHARACTER_ESPER_ONLY_REWARDS
 
+
+# If all 27 espers are allocated at start, there will be logic errors when it comes to
+# assigning characters to character/esper only checks.
+# We would have to ensure that a character is assigned to the {6} char/esper only rewards.
+# We could account for this in the logic, but it would gentrify the routing logic a bit much.
+MAX_STARTING_ESPERS = Espers.ESPER_COUNT - CHARACTER_ESPER_ONLY_REWARDS
 
 def name():
     return "Espers"
@@ -11,7 +18,7 @@ def parse(parser):
 
     esper_start = espers.add_mutually_exclusive_group()
     esper_start.add_argument("-stesp", "--starting-espers", default = [0, 0], type = int,
-                                nargs = 2, metavar = ("MIN", "MAX"), choices = range(Espers.ESPER_COUNT + 1),
+                                nargs = 2, metavar = ("MIN", "MAX"), choices = range(MAX_STARTING_ESPERS + 1),
                                 help = "Starting espers random")
 
     esper_spells = espers.add_mutually_exclusive_group()

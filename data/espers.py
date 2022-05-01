@@ -47,7 +47,7 @@ class Espers():
         self.available_espers = set(range(self.ESPER_COUNT))
         self.starting_espers = []
 
-        if args.starting_espers_min > 0 or args.starting_espers_max <= self.ESPER_COUNT:
+        if args.starting_espers_min > 0:
             count = random.randint(args.starting_espers_min, args.starting_espers_max)
             self.starting_espers = [self.get_random_esper() for _esp in range(count)]
 
