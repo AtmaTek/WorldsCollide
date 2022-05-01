@@ -7,7 +7,7 @@ Adds the following flags for new features:
 4. `-cc` flag for Controllable Coliseum
 5. `-shoedash` flag for Kielbasigo's "Sprint Shoes providing Speed 5 run when B is held."
 6. `-rls` flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
-7. `-scis` flag for "Sketch & Control 100%% accurate and use Sketcher/Controller's stats"
+7. `-scis` flag for "Sketch & Control 100% accurate and use Sketcher/Controller's stats"
 8. `-scia` flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
 9. `-stesp <MIN> <MAX>` for "Give Player between MIN - MAX espers at the start of the seed
 10. `-wmhc` for "World Minimap High Contrast -- makes minimap opaque and increases contrast of location indicator"
