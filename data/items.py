@@ -283,7 +283,7 @@ class Items():
         if self.args.no_illuminas:
             exclude.append(name_id["Illumina"])
         # Sprint shoes are a literal dead item if not ORIGINAL or SPRINT_SHOES_B_DASH
-        if self.args.no_sprint_shoes or self.movement in [MovementActions.AUTO_SPRINT, MovementActions.B_DASH]:
+        if self.args.no_sprint_shoes or self.args.movement in [MovementActions.AUTO_SPRINT, MovementActions.B_DASH]:
             exclude.append(name_id["Sprint Shoes"])
         if self.args.no_free_paladin_shields:
             exclude.append(name_id["Paladin Shld"])
