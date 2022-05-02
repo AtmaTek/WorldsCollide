@@ -21,7 +21,6 @@ class Movement:
         (length, src) = self.get_auto_sprint_src()
 
         space = Allocate(Bank.F0, length, "Sprint subroutine")
-
         space.write(src)
 
         src = [
@@ -48,25 +47,24 @@ class Movement:
         src = [
             # Need a sanity check here - This is causing an issue. Go to most maps and you will be unable to move south
             # "CHECK_OWZERS",
-            # asm.A16(),                         # set register A bit size to 16
-            # asm.LDA(CURRENT_MAP_BYTE, asm.ABS),    # if current map owzers mansion, disable the b-button
+            # asm.A16(),                                  # set register A bit size to 16
+            # asm.LDA(CURRENT_MAP_BYTE, asm.ABS),         # if current map owzers mansion, disable the b-button
             # asm.CMP(OWZERS_MANSION_ID, asm.IMM16),
             # asm.BEQ("STORE_DEFAULT"),
+            # asm.A8(),
 
             "B_BUTTON_CHECK",
-            asm.A8(),                         # set register A bit size to 8
             asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
             asm.AND(B_BUTTON_MASK, asm.IMM8),
-            asm.BEQ("STORE_DEFAULT"), # do nothing if b pressed
+            asm.BEQ("STORE_DEFAULT"),               # do nothing if b pressed
         ]
 
-        asm_length = 9
+        asm_length = 25
 
         if self.movement == MovementActions.AUTO_SPRINT:
             asm_length += 6
             src += [
                 "ON_B_BUTTON",
-                asm.A8(),
                 asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
             ]
@@ -74,7 +72,6 @@ class Movement:
             asm_length += 6
             src += [
                 "ON_B_BUTTON",
-                asm.A8(),
                 asm.LDA(DASH_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
             ]
@@ -83,7 +80,6 @@ class Movement:
             asm_length += 17
             src += [
                 "ON_B_BUTTON",
-                asm.A8(),
                 asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store secondary movement speed
                 asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
                 asm.BEQ("WALK"),
@@ -97,6 +93,7 @@ class Movement:
 
         src += [
             "STORE_DEFAULT",
+            asm.A8(),
             asm.LDA(SPRINT_SPEED, asm.IMM8),
 
             "STORE",
@@ -156,27 +153,17 @@ class Movement:
             "RETURN",
             asm.PLA(),
             asm.LSR(),
-            asm.RTL(),
+            asm.RTS(),
         ]
-        subroutine_space = Allocate(Bank.F0, 22, "walking speed calculation", asm.NOP())
-        subroutine_space.write([Read(0x5882, 0x5884)] + subroutine_src)
+        subroutine_space = Allocate(Bank.C0, 20, "walking speed calculation", asm.NOP())
+        subroutine_space.write(subroutine_src)
 
         src = [
-            asm.JSL(subroutine_space.start_address_snes),
+            asm.JSR(subroutine_space.start_address, asm.ABS)
         ]
 
-        space = Reserve(0x5882, 0x5887, "Sprite offset calculation 1", asm.NOP())
+        space = Reserve(0x5885, 0x5887, "Sprite offset calculation 1", asm.NOP())
         space.write(src)
 
-
-        subroutine_space = Allocate(Bank.F0, 22, "walking speed calculation", asm.NOP())
-        subroutine_space.write([Read(0x588f, 0x5891)] + subroutine_src)
-
-
-        src = [
-            asm.JSL(subroutine_space.start_address_snes),
-        ]
-
-
-        space = Reserve(0x588f, 0x5894, "Sprite offset calculation 2")
+        space = Reserve(0x5892, 0x5894, "Sprite offset calculation 2")
         space.write(src)
