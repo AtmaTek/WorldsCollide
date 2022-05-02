@@ -5,6 +5,7 @@ from constants.items import good_items
 from constants.items import id_name, name_id
 
 import data.items_asm as items_asm
+from data.movement import MovementActions
 
 class Items():
     ITEM_COUNT = 256
@@ -281,7 +282,8 @@ class Items():
             exclude.append(name_id["Exp. Egg"])
         if self.args.no_illuminas:
             exclude.append(name_id["Illumina"])
-        if self.args.no_sprint_shoes:
+        # Sprint shoes are a literal dead item if not ORIGINAL or SPRINT_SHOES_B_DASH
+        if self.args.no_sprint_shoes or self.movement in [MovementActions.AUTO_SPRINT, MovementActions.B_DASH]:
             exclude.append(name_id["Sprint Shoes"])
         if self.args.no_free_paladin_shields:
             exclude.append(name_id["Paladin Shld"])

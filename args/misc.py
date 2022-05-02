@@ -7,8 +7,6 @@ def name():
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
 
-    misc.add_argument("-shoedash", "--sprint-shoes-b-dash", action = "store_true",
-                      help = " Can cause a visual bug in Owzer's Mansion.")
     misc.add_argument("-ond", "--original-name-display", action = "store_true",
                       help = "Display original character names in party and party select menus")
     misc.add_argument("-rr", "--random-rng", action = "store_true",
