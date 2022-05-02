@@ -6,8 +6,7 @@ def name():
 
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
-    misc.add_argument("-move", "--movement", type = str.lower, choices = MovementActions.ALL,
-                      help = "Player movement options")
+
     misc.add_argument("-shoedash", "--sprint-shoes-b-dash", action = "store_true",
                       help = " Can cause a visual bug in Owzer's Mansion.")
     misc.add_argument("-ond", "--original-name-display", action = "store_true",
@@ -18,6 +17,13 @@ def parse(parser):
                       help = "Randomize clock's correct time and NPC clues in Zozo")
     misc.add_argument("-scan", "--scan-all", action = "store_true",
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
+
+    movement = misc.add_mutually_exclusive_group()
+    movement.name = "Movement"
+    movement.add_argument("-move", "--movement", type = str.lower, choices = MovementActions.ALL,
+                      help = "Player movement options")
+    movement.add_argument("-as", "--auto-sprint", action = "store_true",
+                      help = "DEPRECATED - Use `-move as` instead. Player always sprints. Sprint Shoes have no effect")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",

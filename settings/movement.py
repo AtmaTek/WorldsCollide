@@ -9,7 +9,7 @@ DASH_SPEED = 4
 class Movement:
     def __init__(self):
         import args
-        self.movement = args.movement or MovementActions.DEFAULT
+        self.movement = args.movement or MovementActions.AUTO_SPRINT
 
         if self.movement != MovementActions.ORIGINAL:
             self.mod()
@@ -62,7 +62,7 @@ class Movement:
 
         asm_length = 9
 
-        if self.movement == MovementActions.DEFAULT:
+        if self.movement == MovementActions.AUTO_SPRINT:
             asm_length += 6
             src += [
                 "ON_B_BUTTON",
@@ -70,7 +70,7 @@ class Movement:
                 asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
             ]
-        elif self.movement == MovementActions.DASH:
+        elif self.movement == MovementActions.B_DASH:
             asm_length += 6
             src += [
                 "ON_B_BUTTON",
@@ -79,7 +79,7 @@ class Movement:
                 asm.BRA("STORE"),
             ]
 
-        elif self.movement == MovementActions.SPRINT_SHOE_DASH:
+        elif self.movement == MovementActions.SPRINT_SHOES_B_DASH:
             asm_length += 17
             src += [
                 "ON_B_BUTTON",
