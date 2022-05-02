@@ -59,7 +59,7 @@ class Movement:
             asm.BEQ("STORE_DEFAULT"),               # do nothing if b pressed
         ]
 
-        asm_length = 25
+        asm_length = 10
 
         if self.movement == MovementActions.AUTO_SPRINT:
             asm_length += 6
