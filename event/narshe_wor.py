@@ -9,8 +9,13 @@ class NarsheWOR(Event):
         return self.characters.LOCKE
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
+
+        if self.args.debug:
+            self.reward1 = self.add_reward(RewardType.ESPER, NARSHE_WEAPON_SHOP)
+            self.reward2 = self.add_reward(RewardType.ESPER, NARSHE_WEAPON_SHOP_MINES)
+        else:
+            self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
+            self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
 
         # This is to make sure you don't ever get an esper in the secondary slot and an item in the first.
         # This ensures if either slot rolls an esper, the old man will pull one out.
@@ -175,8 +180,8 @@ class NarsheWOR(Event):
         guard_npc.palette = 0
         guard_npc.direction = direction.DOWN
         guard_npc.speed = 3
-        guard_npc.event_byte = 0x60
-        guard_npc.event_bit = 0x05
+        guard_npc.event_byte = npc_bit.event_byte(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)
+        guard_npc.event_bit = npc_bit.event_bit(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)
 
         guard_npc_id = self.maps.append_npc(0x02b, guard_npc)
 

@@ -11,22 +11,18 @@ class FanaticsTower(Event):
         return self.characters.STRAGO
 
     def init_event_bits(self, space):
-        chest = self.maps.get_chests(0x16e)[0]
         space.write([
-            # asm.BRK(),
-            field.SetEventBit(npc_bit.FANATICS_TOWER_REWARD),
-            # asm.LDA(0x1e40 + chest.id // 8, asm.ABS),                 # a = character recruited byte
-            # asm.ORA(chest.id % 8, asm.ABS),                   # set character recruited bit
-            # asm.STA(0x1e40 + chest.id // 8, asm.ABS)
+            field.SetEventBit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD),
         ])
-        print(space)
 
 
     def init_rewards(self):
         self.reward1 = self.add_reward(RewardType.CHARACTER, FANATICS_TOWER_FOLLOWER)
-        # TODO replce when chest esper is working
-        self.reward2 = self.add_reward(RewardType.ESPER, FANATICS_TOWER_LEADER)
-        # self.reward2 = self.add_reward(RewardType.ITEM, FANATICS_TOWER_LEADER)
+
+        if self.args.debug:
+            self.reward2 = self.add_reward(RewardType.ESPER, FANATICS_TOWER_LEADER)
+        else:
+            self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, FANATICS_TOWER_LEADER)
 
     def mod(self):
         self.top_treasure_room_id = 0x16e
@@ -43,7 +39,6 @@ class FanaticsTower(Event):
         elif self.reward1.is_item():
             self.item_mod(self.reward1.id)
 
-        # TODO
         if self.reward2.is_esper():
           self.tower_top_esper_mod()
         elif self.reward2.is_item():
@@ -148,14 +143,19 @@ class FanaticsTower(Event):
         space = Reserve(0xc5548, 0xc554a, "fanatics tower master kefka's treasure", field.NOP())
         space = Reserve(0xc554d, 0xc554e, "fanatics tower long pause before magic master appears", field.NOP())
 
+        # Move the chest to inaccessible location, empty it..
         chest = self.maps.get_chests(0x16e)[0]
         chest.type = chest.EMPTY
         chest.contents = 255
+        chest.x = 0
+        chest.y = 0
 
-        # This event will allow you to fight magimaster and spawn the cultists outside
-        # We copy the relevant code to run below
+        # This event flips the bit to trigger the MagiMaster fight outside,
+        # And also spawns the cultists during the cutscene
+        # We copy the relevant code from this event to event_space below
         self.maps.delete_event(self.top_treasure_room_id, 7, 8)
 
+        # Place magicite in front of the chest
         self.magicite_npc = NPC()
         self.magicite_npc.sprite = 91 # Magicite
         self.magicite_npc.palette = 2
@@ -163,18 +163,18 @@ class FanaticsTower(Event):
         self.magicite_npc.direction = direction.UP
         self.magicite_npc.x = 7
         self.magicite_npc.y = 8
-        self.magicite_npc.event_byte = npc_bit.event_byte(npc_bit.FANATICS_TOWER_REWARD)
-        self.magicite_npc.event_bit = npc_bit.event_bit(npc_bit.FANATICS_TOWER_REWARD)
+        self.magicite_npc.event_byte = npc_bit.event_byte(npc_bit.FANATICS_TOWER_SECONDARY_REWARD)
+        self.magicite_npc.event_bit = npc_bit.event_bit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD)
 
         self.magicite_npc_id = self.maps.append_npc(self.top_treasure_room_id, self.magicite_npc)
 
-        event_space = Allocate(Bank.CC,34, " give fanatics esper subroutine", asm.NOP())
+        event_space = Allocate(Bank.CC, 40, "Give fanatics tower esper subroutine", asm.NOP())
         event_space.write([
             Read(0xc5440, 0xc5441), # Set npc bit hex(730) true  (top treasure received)
             Read(0xc5448, 0xc5449), # Set npc bit hex(1689) true (cultists outside treasure room)
             field.AddEsper(self.reward2.id),
             field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
-            field.ClearEventBit(npc_bit.FANATICS_TOWER_REWARD),
+            field.ClearEventBit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD),
             field.DeleteEntity(self.magicite_npc_id),
             field.RefreshEntities(),
             field.FinishCheck(),
@@ -182,7 +182,7 @@ class FanaticsTower(Event):
         ])
 
         # Re-using space from removed event above
-        space = Reserve(0xc5440, 0xc544a, "Run esper subroutine", asm.NOP())
+        space = Reserve(0xc5440, 0xc544a, "Call esper subroutine", asm.NOP())
         space.write([
             field.Call(event_space.start_address),
             field.Return(),

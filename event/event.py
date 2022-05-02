@@ -57,6 +57,7 @@ class Event():
 
     # check_info can be passed if name / bit differs.
     # This will only be the case when a check is broken up into multiple pieces (Auction House, Floating Contintent, Mtek, etc.)
+    # Otherwise, `self.name()` will provide the name for the check
     # @example
     # from data.checks import AUCTION1, AUCTION2
     # self.reward1 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION1)

@@ -205,9 +205,8 @@ class Start(Event):
             field.LoadMap(0x00, direction.DOWN, default_music = False,
                           x = 84, y = 34, fade_in = True, airship = True),
             vehicle.SetPosition(84, 34),
-            vehicle.LoadMap(364, direction.UP, default_music = True,
-                            x = 7, y = 7, entrance_event = True),
-
+            vehicle.LoadMap(0x06, direction.DOWN, default_music = True,
+                            x = 16, y = 6, entrance_event = True),
             field.EntityAct(field_entity.PARTY0, True,
                 field_entity.CenterScreen(),
             ),
