@@ -187,7 +187,10 @@ class Start(Event):
             src += [
                 field.AddItem("Moogle Charm", sound_effect = False),
             ]
-
+        for mc in range(self.args.start_sprint_shoes):
+            src += [
+                field.AddItem("Sprint Shoes", sound_effect = False),
+            ]
         for ws in range(self.args.start_warp_stones):
             src += [
                 field.AddItem("Warp Stone", sound_effect = False),

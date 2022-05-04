@@ -1,12 +1,12 @@
+from data.movement import MovementActions
+
+
 def name():
     return "Misc."
 
 def parse(parser):
     misc = parser.add_argument_group("Misc.")
-    misc.add_argument("-as", "--auto-sprint", action = "store_true",
-                      help = "Player always sprints. Sprint Shoes have no effect")
-    misc.add_argument("-shoedash", "--sprint-shoes-b-dash", action = "store_true",
-                      help = "Holding B with sprint shoes on will increase movement speed beyond a sprint. Can cause a visual bug in Owzer's Mansion.")
+
     misc.add_argument("-ond", "--original-name-display", action = "store_true",
                       help = "Display original character names in party and party select menus")
     misc.add_argument("-rr", "--random-rng", action = "store_true",
@@ -15,6 +15,13 @@ def parse(parser):
                       help = "Randomize clock's correct time and NPC clues in Zozo")
     misc.add_argument("-scan", "--scan-all", action = "store_true",
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
+
+    movement = misc.add_mutually_exclusive_group()
+    movement.name = "Movement"
+    movement.add_argument("-move", "--movement", type = str.lower, choices = MovementActions.ALL,
+                      help = "Player movement options")
+    movement.add_argument("-as", "--auto-sprint", action = "store_true",
+                      help = "DEPRECATED - Use `-move as` instead. Player always sprints. Sprint Shoes have no effect")
 
     event_timers = misc.add_mutually_exclusive_group()
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
@@ -57,10 +64,8 @@ def process(args):
 def flags(args):
     flags = ""
 
-    if args.auto_sprint:
-        flags += " -as"
-    if args.sprint_shoes_b_dash:
-        flags += " -shoedash"
+    if args.movement:
+        flags += f" -move {args.movement}"
     if args.original_name_display:
         flags += " -ond"
     if args.random_rng:
@@ -128,8 +133,7 @@ def options(args):
         y_npc = "Remove"
 
     return [
-        ("Auto Sprint", args.auto_sprint),
-        ("Sprint Shoes B-Dash", args.sprint_shoes_b_dash),
+        ("Movement", args.movement),
         ("Original Name Display", args.original_name_display),
         ("Random RNG", args.random_rng),
         ("Random Clock", args.random_clock),

@@ -87,6 +87,7 @@ category_types = {
 
 #Additional results
 category_types["Command"].append(ResultType(59, "Magitek Upgrade", "Magitek Upgrade", None))
+category_types["Item"].append(ResultType(60, "Sprint Shoes", "Sprint Shoes", None))
 
 categories = list(category_types.keys())
 

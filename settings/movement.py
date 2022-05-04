@@ -1,80 +1,108 @@
-from memory.space import Allocate, Bank, Reserve
+from data.movement import MovementActions
+from memory.space import Allocate, Bank, Reserve, Read
 import instruction.asm as asm
-import args
 
-class AutoSprint:
+WALK_SPEED = 2
+SPRINT_SPEED = 3
+DASH_SPEED = 4
+
+class Movement:
     def __init__(self):
-        if args.auto_sprint:
+        import args
+        self.movement = args.movement or MovementActions.AUTO_SPRINT
+
+        if self.movement != MovementActions.ORIGINAL:
             self.mod()
 
     def mod(self):
-        # set sprint by default, b button to walk, sprint shoes do nothing
+        length = 0
+        src = []
 
-        WALK_SPEED = 2
-        SPRINT_SPEED = 3
-        DASH_SPEED = 4
+        (length, src) = self.get_auto_sprint_src()
 
-        if args.auto_sprint or args.sprint_shoes_b_dash:
-            src = self.get_auto_sprint_src(WALK_SPEED, SPRINT_SPEED, DASH_SPEED)
-            space = Allocate(Bank.C0, 28, "Sprint subroutine")
-            space.write(src)
-            src = [
-                asm.JSR(space.start_address, asm.ABS),
-            ]
-            space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
-            space.write(src)
+        space = Allocate(Bank.F0, length, "Sprint subroutine")
+        space.write(src)
 
-            self.sliding_dash_fix()
+        src = [
+            asm.JSL(space.start_address_snes),
+        ]
+        space = Reserve(0x04e21, 0x04e37, "auto sprint", asm.NOP())
+        space.write(src)
 
-    def get_auto_sprint_src(self, WALK_SPEED, SPRINT_SPEED, DASH_SPEED):
+        self.sliding_dash_fix()
+
+
+    def get_auto_sprint_src(self):
         import args
+        CURRENT_MAP_BYTE = 0x82 # 2 bytes
+        OWZERS_MANSION_ID = 0x0D1 # the door room can create visual artifacts on the map while dashing
         CONTROLLER1_BYTE2 = 0x4219
         SPRINT_SHOES_BYTE = 0x11df
         SPRINT_SHOES_MASK = 0x20
         B_BUTTON_MASK = 0x80
         FIELD_RAM_SPEED = 0x0875
 
-        if args.auto_sprint:
-            src = [
-                asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
-                asm.AND(B_BUTTON_MASK, asm.IMM8),
-                asm.BNE("WALK"), # branch if b button down
+        # moving at dash speed in Owzer's door room, or carrying it out via the door glitch will cause graphical artifacting randomly.
+        # Simply disabling B button in Owzers to keep it consistent in WC. Will not worry about the door glitch
+        src = [
+            # Need a sanity check here - This is causing an issue. Go to most maps and you will be unable to move south
+            # "CHECK_OWZERS",
+            # asm.A16(),                                  # set register A bit size to 16
+            # asm.LDA(CURRENT_MAP_BYTE, asm.ABS),         # if current map owzers mansion, disable the b-button
+            # asm.CMP(OWZERS_MANSION_ID, asm.IMM16),
+            # asm.BEQ("STORE_DEFAULT"),
+            # asm.A8(),
 
-                "SPRINT",
-                asm.LDA(SPRINT_SPEED, asm.IMM8),
-                asm.BRA("STORE"),
+            "B_BUTTON_CHECK",
+            asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
+            asm.AND(B_BUTTON_MASK, asm.IMM8),
+            asm.BEQ("STORE_DEFAULT"),               # do nothing if b pressed
+        ]
 
-                "WALK",
+        asm_length = 10
+
+        if self.movement == MovementActions.AUTO_SPRINT:
+            asm_length += 6
+            src += [
+                "ON_B_BUTTON",
                 asm.LDA(WALK_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
+            ]
+        elif self.movement == MovementActions.B_DASH:
+            asm_length += 6
+            src += [
+                "ON_B_BUTTON",
+                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
             ]
 
-        if args.sprint_shoes_b_dash:
-            src = [
-                asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
-                asm.AND(B_BUTTON_MASK, asm.IMM8),
-                asm.BNE("DASH1"),                           # b button just store default
-                "STORE_DEFAULT",
-                asm.LDA(SPRINT_SPEED, asm.IMM8),
-                asm.BRA("STORE"),
-
-                "DASH1",
-                asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),        # If sprint shoes equipped, store dash speed
+        elif self.movement == MovementActions.SPRINT_SHOES_B_DASH:
+            asm_length += 17
+            src += [
+                "ON_B_BUTTON",
+                asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store secondary movement speed
                 asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
-                asm.BNE("DASH2"),
+                asm.BEQ("WALK"),
+                "DASH",
+                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.BRA("STORE"),
+                "WALK",
                 asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
-
-                "DASH2",
-                asm.LDA(DASH_SPEED, asm.IMM8),              # load fastest speed (DASH)
             ]
 
         src += [
+            "STORE_DEFAULT",
+            asm.A8(),
+            asm.LDA(SPRINT_SPEED, asm.IMM8),
+
             "STORE",
             asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),        # store speed in ram
-            asm.RTS(),                                  # return
+            asm.RTL(),                                  # return
         ]
 
-        return src
+        asm_length += 6
+        return (asm_length, src)
 
 
     #  DIRECTION VALUE
@@ -86,7 +114,7 @@ class AutoSprint:
     #            11 = left
 
     # https://silentenigma.neocities.org/ff6/index.html
-    # Will leave bits of documentation about in the vent neocities does not stand the test of time
+    # Will leave bits of documentation about in the event neocities does not stand the test of time
 
     # With dash enabled, this causes a bug that the player will appear to be standing still when
     # running down or right at move speed 5. This is because two sprite instances are thrown out of
