@@ -15,7 +15,7 @@ class NarsheWOR(Event):
             self.reward2 = self.add_reward(RewardType.ESPER, NARSHE_WEAPON_SHOP_MINES)
         else:
             self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
-            self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
+            self.reward2 = self.add_reward(RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
 
         # This is to make sure you don't ever get an esper in the secondary slot and an item in the first.
         # This ensures if either slot rolls an esper, the old man will pull one out.
@@ -143,7 +143,6 @@ class NarsheWOR(Event):
         src = [
             # add reward 1 based on item type
             add_esper(self.reward1.id) if reward1_esper else add_item(self.reward1.id),
-            field.SetEventBit(event_bit.GOT_RAGNAROK),
             field.SetEventBit(event_bit.CHOSE_RAGNAROK_ESPER),
             field.FinishCheck(),
             field.Return(),
