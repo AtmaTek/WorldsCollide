@@ -1,5 +1,5 @@
 from data.movement import MovementActions
-from memory.space import Allocate, Bank, Reserve, Read
+from memory.space import Allocate, Bank, Reserve, Write
 import instruction.asm as asm
 
 WALK_SPEED = 2
@@ -18,10 +18,9 @@ class Movement:
         length = 0
         src = []
 
-        (length, src) = self.get_auto_sprint_src()
+        src = self.get_auto_sprint_src()
 
-        space = Allocate(Bank.F0, length, "Sprint subroutine")
-        space.write(src)
+        space = Write(Bank.F0, src, "Sprint subroutine")
 
         src = [
             asm.JSL(space.start_address_snes),
@@ -35,7 +34,7 @@ class Movement:
     def get_auto_sprint_src(self):
         import args
         CURRENT_MAP_BYTE = 0x82 # 2 bytes
-        OWZERS_MANSION_ID = 0x0D1 # the door room can create visual artifacts on the map while dashing
+        OWZERS_MANSION_ID = 0x00CF # the door room can create visual artifacts on the map while dashing
         CONTROLLER1_BYTE2 = 0x4219
         SPRINT_SHOES_BYTE = 0x11df
         SPRINT_SHOES_MASK = 0x20
@@ -59,17 +58,14 @@ class Movement:
             asm.BEQ("STORE_DEFAULT"),               # do nothing if b pressed
         ]
 
-        asm_length = 10
 
         if self.movement == MovementActions.AUTO_SPRINT:
-            asm_length += 6
             src += [
                 "ON_B_BUTTON",
                 asm.LDA(WALK_SPEED, asm.IMM8),
                 asm.BRA("STORE"),
             ]
         elif self.movement == MovementActions.B_DASH:
-            asm_length += 6
             src += [
                 "ON_B_BUTTON",
                 asm.LDA(DASH_SPEED, asm.IMM8),
@@ -77,7 +73,6 @@ class Movement:
             ]
 
         elif self.movement == MovementActions.SPRINT_SHOES_B_DASH:
-            asm_length += 17
             src += [
                 "ON_B_BUTTON",
                 asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store secondary movement speed
@@ -101,8 +96,7 @@ class Movement:
             asm.RTL(),                                  # return
         ]
 
-        asm_length += 6
-        return (asm_length, src)
+        return src
 
 
     #  DIRECTION VALUE
