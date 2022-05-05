@@ -45,12 +45,13 @@ class Movement:
         # Simply disabling B button in Owzers to keep it consistent in WC. Will not worry about the door glitch
         src = [
             # Need a sanity check here - This is causing an issue. Go to most maps and you will be unable to move south
-            # "CHECK_OWZERS",
-            # asm.A16(),                                  # set register A bit size to 16
-            # asm.LDA(CURRENT_MAP_BYTE, asm.ABS),         # if current map owzers mansion, disable the b-button
-            # asm.CMP(OWZERS_MANSION_ID, asm.IMM16),
-            # asm.BEQ("STORE_DEFAULT"),
-            # asm.A8(),
+            "CHECK_OWZERS",
+            asm.A16(),                                  # set register A bit size to 16
+            asm.LDA(CURRENT_MAP_BYTE, asm.ABS),         # if current map owzers mansion, disable the b-button
+            asm.CMP(OWZERS_MANSION_ID, asm.IMM16),
+            asm.BEQ("STORE_DEFAULT"),
+            asm.LDA(0x0000, asm.IMM16),                 # clear A, otherwise will cause issues in albrook/imperial base
+            asm.A8(),
 
             "B_BUTTON_CHECK",
             asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
