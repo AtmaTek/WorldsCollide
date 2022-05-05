@@ -9,7 +9,7 @@ class SouthFigaro(Event):
         return self.characters.CELES
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, SOUTH_FIGARO_PRISONER)
+        self.reward = self.add_reward(SOUTH_FIGARO_PRISONER)
 
     def init_event_bits(self, space):
         space.write(

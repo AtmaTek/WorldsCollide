@@ -9,7 +9,7 @@ class FigaroCastleWOR(Event):
         return self.characters.EDGAR
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, FIGARO_CASTLE_ENGINE)
+        self.reward = self.add_reward(FIGARO_CASTLE_ENGINE)
 
     def init_event_bits(self, space):
         if self.args.character_gating:

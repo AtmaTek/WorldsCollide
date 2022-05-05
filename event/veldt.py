@@ -1,3 +1,4 @@
+from constants.checks import VELDT
 from event.event import *
 from event.veldt_helpers import *
 
@@ -14,7 +15,7 @@ class Veldt(Event):
         return self.characters.GAU
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        self.reward = self.add_reward(VELDT)
 
     def init_event_bits(self, space):
         # abusing init event bits space here...

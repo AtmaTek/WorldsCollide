@@ -1,3 +1,4 @@
+from constants.checks import ZONE_EATER
 from event.event import *
 
 class ZoneEater(Event):
@@ -8,7 +9,7 @@ class ZoneEater(Event):
         return self.characters.GOGO
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(ZONE_EATER)
 
     def mod(self):
         self.gogo_npc_id = 0x10

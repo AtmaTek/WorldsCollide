@@ -42,34 +42,33 @@ class Event():
     def characters_required(self):
         return 1
 
-    def get_reward_type(self, default: RewardType, check_info = None):
-        from constants.checks import character_esper_name_check
+    def get_reward_type(self, check_info = None):
+        bit = check_info.bit
 
-        fallback_bit = character_esper_name_check.get(self.name())
-        bit = check_info.bit if check_info else fallback_bit
-
-        assert (bit or fallback_bit)
+        assert bit
 
         if bit in self.args.item_reward_checks:
             return RewardType.ITEM
 
-        return default
+        return check_info.reward_types
 
-    # check_info can be passed if name / bit differs.
-    # This will only be the case when a check is broken up into multiple pieces (Auction House, Floating Contintent, Mtek, etc.)
-    # Otherwise, `self.name()` will provide the name for the check
-    # @example
-    # from data.checks import AUCTION1, AUCTION2
-    # self.reward1 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION1)
-    # self.reward2 = self.add_reward(RewardType.Esper | RewardType.Item, AUCTION2)
-    def add_reward(self, possible_types, check_info = None):
+    def add_item_reward(self):
+        reward = Reward(self, RewardType.ITEM)
+        self.rewards.append(reward)
+        return reward
+
+    def add_character_reward(self):
+        reward = Reward(self, RewardType.CHARACTER)
+        self.rewards.append(reward)
+        return reward
+
+    def add_reward(self, check_info):
+        possible_types = self.get_reward_type(check_info)
         assert possible_types
 
-        new_reward = Reward(self, possible_types)
-        # We don't need any extra logic if only one type is selected
-        possible_types = possible_types if new_reward.single_possible_type() else self.get_reward_type(possible_types, check_info)
-        self.rewards.append(new_reward)
-        return new_reward
+        reward = Reward(self, possible_types)
+        self.rewards.append(reward)
+        return reward
 
     def init_rewards(self):
         pass

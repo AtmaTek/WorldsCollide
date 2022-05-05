@@ -17,12 +17,8 @@ class FanaticsTower(Event):
 
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER, FANATICS_TOWER_FOLLOWER)
-
-        if self.args.debug:
-            self.reward2 = self.add_reward(RewardType.ESPER, FANATICS_TOWER_LEADER)
-        else:
-            self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, FANATICS_TOWER_LEADER)
+        self.reward1 = self.add_reward(FANATICS_TOWER_FOLLOWER)
+        self.reward2 = self.add_reward(FANATICS_TOWER_LEADER)
 
     def mod(self):
         self.top_treasure_room_id = 0x16e

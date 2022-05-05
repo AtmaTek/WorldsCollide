@@ -9,7 +9,7 @@ class DoomGaze(Event):
 
     def init_rewards(self):
         from constants.checks import SEARCH_THE_SKIES
-        self.reward = self.add_reward(RewardType.ESPER | RewardType.ITEM, SEARCH_THE_SKIES)
+        self.reward = self.add_reward(SEARCH_THE_SKIES)
 
     def mod(self):
         self.magicite_npc_id = 0x12

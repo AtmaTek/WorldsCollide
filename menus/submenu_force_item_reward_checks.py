@@ -53,7 +53,7 @@ class FlagsForceItemRewardChecks(scroll_area.ScrollArea):
 
         if is_legacy:
             self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
-            self.lines.append(scroll_area.Line("Legacy Item Reward Checks", f0.set_user_text_color))
+            self.lines.append(scroll_area.Line("Classic Item Reward Checks", f0.set_user_text_color))
             self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
             for check in legacy:
                 self.lines.append(scroll_area.Line(f"{check.name}", f0.set_user_text_color))

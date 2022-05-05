@@ -14,7 +14,6 @@ def parse(parser):
 
 def process(args):
     from constants.checks import (
-        character_esper_check_name,
         AUCTION1, AUCTION2, COLLAPSING_HOUSE, FIGARO_CASTLE_THRONE, GAUS_FATHERS_HOUSE,
         KOHLINGEN_CAFE, NARSHE_WEAPON_SHOP, SEALED_GATE, SOUTH_FIGARO_PRISONER,
 
@@ -49,7 +48,8 @@ def process(args):
             LONE_WOLF_MOOGLE_ROOM.bit,
             NARSHE_WEAPON_SHOP_MINES.bit,
         ]
-    # max amount (can probably calculate this somehow)
+
+    # assert that no items in item_reward_checks is CHAR | ESPER only reward
     assert len(args.item_reward_checks) < 13
 
 def flags(args):
@@ -66,10 +66,10 @@ def options(args):
     ]
 
 def _format_check_log_entries(check_ids):
-    from constants.checks import all_checks_check_name
+    from constants.checks import check_name
     check_entries = []
     for check_id in check_ids:
-        check_entries.append(("", all_checks_check_name[check_id]))
+        check_entries.append(("", check_name[check_id]))
     return check_entries
 
 def menu(args):

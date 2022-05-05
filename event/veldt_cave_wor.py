@@ -9,7 +9,7 @@ class VeldtCaveWOR(Event):
 
     def init_rewards(self):
         from constants.checks import VELDT_CAVE
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, VELDT_CAVE)
+        self.reward = self.add_reward(VELDT_CAVE)
 
     def mod(self):
         self.shadow_npc_id = 0x12

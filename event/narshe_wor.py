@@ -10,12 +10,8 @@ class NarsheWOR(Event):
 
     def init_rewards(self):
 
-        if self.args.debug:
-            self.reward1 = self.add_reward(RewardType.ESPER, NARSHE_WEAPON_SHOP)
-            self.reward2 = self.add_reward(RewardType.ESPER, NARSHE_WEAPON_SHOP_MINES)
-        else:
-            self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, NARSHE_WEAPON_SHOP)
-            self.reward2 = self.add_reward(RewardType.ITEM, NARSHE_WEAPON_SHOP_MINES)
+        self.reward1 = self.add_reward(NARSHE_WEAPON_SHOP)
+        self.reward2 = self.add_reward(NARSHE_WEAPON_SHOP_MINES)
 
         # This is to make sure you don't ever get an esper in the secondary slot and an item in the first.
         # This ensures if either slot rolls an esper, the old man will pull one out.
@@ -179,8 +175,8 @@ class NarsheWOR(Event):
         guard_npc.palette = 0
         guard_npc.direction = direction.DOWN
         guard_npc.speed = 3
-        guard_npc.event_byte = npc_bit.event_byte(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)
-        guard_npc.event_bit = npc_bit.event_bit(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)
+        guard_npc.event_byte = npc_bit.event_byte(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB) # 0x60
+        guard_npc.event_bit = npc_bit.event_bit(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)   # 0x05
 
         guard_npc_id = self.maps.append_npc(0x02b, guard_npc)
 
@@ -197,15 +193,18 @@ class NarsheWOR(Event):
             field.BranchIfEventBitSet(event_bit.CHOSE_RAGNAROK_ESPER, "RECEIVE_SECONDARY")
         ]
 
-        # Add esper one reward based on type
+        # Add reward one based on reward type
         src += add_esper(self.reward1.id) if self.reward1.type == RewardType.ESPER else add_item(self.reward1.id)
 
         src += [
-            "RECEIVE_SECONDARY"
+            field.Branch("DELETE_GUARD"),
+            "RECEIVE_SECONDARY",
         ]
 
-        # add esper two reward based on type
-        src += add_esper(self.reward2.id) if self.reward2.type == RewardType.ESPER else add_item(self.reward2.id)
+        # Add reward two based on reward type
+        src += [
+            add_esper(self.reward2.id) if self.reward2.type == RewardType.ESPER else add_item(self.reward2.id),
+        ]
 
         src += [
             "DELETE_GUARD",
@@ -219,6 +218,7 @@ class NarsheWOR(Event):
             field.FinishCheck(),
             field.Return(),
         ]
+
         space = Write(Bank.CC, src, "narshe wor second weapon shop reward guard npc event")
         guard_event = space.start_address
 
@@ -228,7 +228,7 @@ class NarsheWOR(Event):
         self.weapon_shop_mod("This stone gives off an eerie aura!")
         self.behind_whelk_mod()
 
-    def weapon_shop_item_mod(self, item):
+    def weapon_shop_item_mod(self):
         magicite_npc_id = 0x11
         magicite_npc = self.maps.get_npc(0x18, magicite_npc_id)
         magicite_npc.sprite = 106

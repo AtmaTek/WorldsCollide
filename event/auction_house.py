@@ -45,8 +45,8 @@ class AuctionHouse(Event):
 
     def init_rewards(self):
         from constants.checks import AUCTION1, AUCTION2
-        self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, AUCTION1)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, AUCTION2)
+        self.reward1 = self.add_reward(AUCTION1)
+        self.reward2 = self.add_reward(AUCTION2)
 
     def mod(self):
         self.requirements_mod()

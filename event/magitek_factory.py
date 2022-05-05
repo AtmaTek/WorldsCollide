@@ -9,9 +9,9 @@ class MagitekFactory(Event):
 
     def init_rewards(self):
         from constants.checks import MAGITEK_FACTORY_TRASH, MAGITEK_FACTORY_GUARD, MAGITEK_FACTORY_FINISH
-        self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM, MAGITEK_FACTORY_TRASH)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, MAGITEK_FACTORY_GUARD)
-        self.reward3 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER, MAGITEK_FACTORY_FINISH)
+        self.reward1 = self.add_reward(MAGITEK_FACTORY_TRASH)
+        self.reward2 = self.add_reward(MAGITEK_FACTORY_GUARD)
+        self.reward3 = self.add_reward(MAGITEK_FACTORY_FINISH)
 
     def init_event_bits(self, space):
         space.write(

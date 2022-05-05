@@ -11,12 +11,8 @@ class LoneWolf(Event):
         return self.characters.MOG
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, LONE_WOLF_CHASE)
-
-        if self.args.debug:
-            self.reward2 = self.add_reward(RewardType.ESPER, LONE_WOLF_MOOGLE_ROOM)
-        else:
-            self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM, LONE_WOLF_MOOGLE_ROOM)
+        self.reward1 = self.add_reward(LONE_WOLF_CHASE)
+        self.reward2 = self.add_reward(LONE_WOLF_MOOGLE_ROOM)
 
     def init_event_bits(self, space):
         space.write(
@@ -27,9 +23,9 @@ class LoneWolf(Event):
         # Load into narshe cliffs and you can trigger lone wolf easily with these bits
         # if self.args.debug:
         #     space.write(
-        #         field.SetEventBit(572), # Spectate lone wolf cross the bridge to cliff
+        #         field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
         #         field.ClearEventBit(573), # Haven't witnessed lone wolf event
-        #         field.SetEventBit(831), # Visibility bits for lone wolf npc
+        #         field.SetEventBit(831),   # Visibility bits for lone wolf npcs
         #         field.SetEventBit(832),
         #     )
 
@@ -183,19 +179,6 @@ class LoneWolf(Event):
             field.Call(esper_space.start_address)
         ])
 
-        if self.args.debug:
-            space = Allocate(Bank.CC, 10, "debug trigger lone worf", field.NOP())
-            space.write([
-                field.LoadMap(44, direction.UP, default_music = True, x = 121, y = 50, fade_in = True),
-                field.Return()
-            ])
-
-            new_event = MapEvent()
-            new_event.x = 20
-            new_event.y = 7
-            new_event.set_event_address(space.start_address)
-
-            self.maps.add_event(22, new_event)
 
     def alternative_item_mod(self):
         self.lone_wolf_dialog_item_mod()

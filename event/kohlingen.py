@@ -12,7 +12,7 @@ class Kohlingen(Event):
         return self.characters.SETZER
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, KOHLINGEN_CAFE)
+        self.reward = self.add_reward(KOHLINGEN_CAFE)
 
     def init_event_bits(self, space):
         space.write(

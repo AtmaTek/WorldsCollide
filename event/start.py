@@ -25,7 +25,7 @@ class Start(Event):
         # assign chosen character rewards
         for character_id in party:
             if character_id is not None:
-                reward = self.add_reward(RewardType.CHARACTER)
+                reward = self.add_character_reward()
                 reward.id = character_id
                 reward.type = RewardType.CHARACTER
 

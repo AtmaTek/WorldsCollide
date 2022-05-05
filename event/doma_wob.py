@@ -9,7 +9,7 @@ class DomaWOB(Event):
         return self.characters.CYAN
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, DOMA_SIEGE)
+        self.reward = self.add_reward(DOMA_SIEGE)
 
     def init_event_bits(self, space):
         space.write(

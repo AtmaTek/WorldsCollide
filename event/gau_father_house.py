@@ -9,7 +9,7 @@ class GauFatherHouse(Event):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM, GAUS_FATHERS_HOUSE)
+        self.reward = self.add_reward(GAUS_FATHERS_HOUSE)
 
     def mod(self):
         self.shadow_npc_id = 0x10
