@@ -1,11 +1,15 @@
+# Terminology
+#   WALK   - movespeed 3
+#   SPRINT - movespeed 4
+#   DASH   - movespeed 5
 class MovementActions:
-    # Original. MS 3, MS 4 with sprint shoes
+    # WALK by default, SPRINT with sprint shoes equipped
     ORIGINAL = 'og'
-    # Auto sprint, holding B with sprint will move player at ms 3
+    # SPRINT by default, WALK when holding B
     AUTO_SPRINT = 'as'
-    # Holding B with sprint will move player at ms 5
+    # SPRINT by default, DASH when holding B
     B_DASH = 'bd'
-    # Holding B with sprint will move player at ms 5
+    # SPRINT by default, DASH when holding B with sprint shoes equipped
     SPRINT_SHOES_B_DASH = 'ssbd'
 
     ALL = [ORIGINAL, AUTO_SPRINT, B_DASH, SPRINT_SHOES_B_DASH]
