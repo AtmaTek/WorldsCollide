@@ -70,12 +70,12 @@ class FlagsForceItemRewardChecks(scroll_area.ScrollArea):
         super().__init__()
 
     def _format_check_list_menu(check_ids):
-        from constants.checks import all_checks_check_name
+        from constants.checks import check_name
         check_lines = []
 
         # Step through each check
         for a_check_bit in check_ids:
-            check_str = f"{all_checks_check_name.get(a_check_bit)}"
+            check_str = f"{check_name.get(a_check_bit)}"
             current_line = f"{'  '}{check_str}"
             # Write the line
             check_lines.append(current_line)
