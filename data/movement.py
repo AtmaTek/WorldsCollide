@@ -2,12 +2,12 @@
 from enum import IntEnum
 
 
-class MovementSpeed:
+class MovementSpeed(IntEnum):
     WALK = 2    # Original FF6 walk speed
     SPRINT = 3  # Original FF6 sprint speed
     DASH = 4    # Custom, move twice as fast as sprint.
 
-class MovementActions(IntEnum):
+class MovementActions:
     # WALK by default
     # SPRINT with sprint shoes equipped
     ORIGINAL = 'og'
