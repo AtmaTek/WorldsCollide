@@ -1,10 +1,6 @@
-from data.movement import MovementActions
+from data.movement import MovementActions, MovementSpeed
 from memory.space import Allocate, Bank, Reserve, Write
 import instruction.asm as asm
-
-WALK_SPEED = 2
-SPRINT_SPEED = 3
-DASH_SPEED = 4
 
 class Movement:
     def __init__(self):
@@ -43,8 +39,7 @@ class Movement:
 
         # moving at dash speed in Owzer's door room, or carrying it out via the door glitch will cause graphical artifacting randomly.
         # Simply disabling B button in Owzers to keep it consistent in WC. Will not worry about the door glitch
-        src = [
-            # Need a sanity check here - This is causing an issue. Go to most maps and you will be unable to move south
+        owzers_src = [
             "CHECK_OWZERS",
             asm.A16(),                                  # set register A bit size to 16
             asm.LDA(CURRENT_MAP_BYTE, asm.ABS),         # if current map owzers mansion, disable the b-button
@@ -52,7 +47,9 @@ class Movement:
             asm.BEQ("STORE_DEFAULT"),
             asm.LDA(0x0000, asm.IMM16),                 # clear A, otherwise will cause issues in albrook/imperial base
             asm.A8(),
+        ]
 
+        src = [
             "B_BUTTON_CHECK",
             asm.LDA(CONTROLLER1_BYTE2, asm.ABS),
             asm.AND(B_BUTTON_MASK, asm.IMM8),
@@ -63,34 +60,38 @@ class Movement:
         if self.movement == MovementActions.AUTO_SPRINT:
             src += [
                 "ON_B_BUTTON",
-                asm.LDA(WALK_SPEED, asm.IMM8),
+                asm.LDA(MovementSpeed.WALK, asm.IMM8),
                 asm.BRA("STORE"),
             ]
         elif self.movement == MovementActions.B_DASH:
+            src += owzers_src
             src += [
                 "ON_B_BUTTON",
-                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.LDA(MovementSpeed.DASH, asm.IMM8),
                 asm.BRA("STORE"),
             ]
 
         elif self.movement == MovementActions.SPRINT_SHOES_B_DASH:
+            src += owzers_src
             src += [
                 "ON_B_BUTTON",
                 asm.LDA(SPRINT_SHOES_BYTE, asm.ABS),    # If sprint shoes equipped, store secondary movement speed
                 asm.AND(SPRINT_SHOES_MASK, asm.IMM8),
-                asm.BEQ("WALK"),
+                asm.BEQ("WALK")
+            ]
+            src += [
                 "DASH",
-                asm.LDA(DASH_SPEED, asm.IMM8),
+                asm.LDA(MovementSpeed.DASH, asm.IMM8),
                 asm.BRA("STORE"),
                 "WALK",
-                asm.LDA(WALK_SPEED, asm.IMM8),
+                asm.LDA(MovementSpeed.WALK, asm.IMM8),
                 asm.BRA("STORE"),
             ]
 
         src += [
             "STORE_DEFAULT",
             asm.A8(),
-            asm.LDA(SPRINT_SPEED, asm.IMM8),
+            asm.LDA(MovementSpeed.SPRINT, asm.IMM8),
 
             "STORE",
             asm.STA(FIELD_RAM_SPEED, asm.ABS_Y),        # store speed in ram
