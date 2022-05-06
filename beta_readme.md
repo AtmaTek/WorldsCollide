@@ -8,10 +8,10 @@ Adds the following flags for new features:
 5. Kielbasiago's movement options: 
 - `-noshoes` flag for "Removes Sprint Shoes from appearing in shops, chests, etc."
 - `--move og | as | bd | ssbd` for Movement Speed (MS) changes:
-        Original -- MS 3 by default, MS 4 with sprint shoes | 
-        Auto Sprint (new default, equivalent to deprecated `-as` flag) -- MS 4 by default, MS 3 when holding B | 
-        B Dash -- MS 4 by default, MS 5 when holding B | 
-        Sprint Shoes B Dash -- MS 4 by default, MS 3 when holding B, MS 5 when holding B with sprint shoes
+        Original -- MS 2 by default, MS 3 with sprint shoes | 
+        Auto Sprint (new default, equivalent to deprecated `-as` flag) -- MS 3 by default, MS 2 when holding B | 
+        B Dash -- MS 3 by default, MS 4 when holding B | 
+        Sprint Shoes B Dash -- MS 3 by default, MS 2 when holding B, MS 4 when holding B with sprint shoes
 6. `-rls` flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
 7. `-scis` flag for "Sketch & Control 100% accurate and use Sketcher/Controller's stats"
 8. `-scia` flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
