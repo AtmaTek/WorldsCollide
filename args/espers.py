@@ -30,7 +30,7 @@ def parse(parser):
     esper_mp.add_argument("-emps", "--esper-mp-shuffle", action = "store_true",
                           help = "Esper MP costs shuffled")
     esper_mp.add_argument("-emprv", "--esper-mp-random-value", default = None, type = int,
-                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(129),
+                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(256),
                           help = "Each esper's MP cost set to random value within given range")
     esper_mp.add_argument("-emprp", "--esper-mp-random-percent", default = None, type = int,
                           nargs = 2, metavar = ("MIN", "MAX"), choices = range(201),
