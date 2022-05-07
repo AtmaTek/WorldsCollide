@@ -53,9 +53,9 @@ class Spells:
         scan_id = name_id["Scan"]
         self.spells[scan_id].mp = 0
 
-    def ultima_255_mp(self):
+    def ultima_254_mp(self):
         ultima_id = name_id["Ultima"]
-        self.spells[ultima_id].mp = 255
+        self.spells[ultima_id].mp = 254
 
     def shuffle_mp(self):
         mp = []
@@ -92,9 +92,9 @@ class Spells:
         if self.args.scan_all:
             self.no_mp_scan()
 
-        # Apply Ultima 255 MP after any MP shuffle/rando
-        if self.args.ultima_255_mp:
-            self.ultima_255_mp()
+        # Apply Ultima 254 MP after any MP shuffle/rando
+        if self.args.ultima_254_mp:
+            self.ultima_254_mp()
 
     def write(self):
         if self.args.spoiler_log:
