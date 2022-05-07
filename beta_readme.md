@@ -7,16 +7,17 @@ Adds the following flags for new features:
 4. `-cc` flag for Controllable Coliseum
 5. Kielbasiago's movement options: 
 - `-noshoes` flag for "Removes Sprint Shoes from appearing in shops, chests, etc."
-- `--move og | as | bd | ssbd` for Movement Speed (MS) changes:
-        Original -- MS 2 by default, MS 3 with sprint shoes | 
-        Auto Sprint (new default, equivalent to deprecated `-as` flag) -- MS 3 by default, MS 2 when holding B | 
-        B Dash -- MS 3 by default, MS 4 when holding B | 
-        Sprint Shoes B Dash -- MS 3 by default, MS 2 when holding B, MS 4 when holding B with sprint shoes
+- `-move og | as | bd | ssbd` for Movement Speed (MS) changes:
+        **Original (`og`)** -- MS 2 by default, MS 3 with sprint shoes | 
+        **Auto Sprint (`as`)** -- MS 3 by default, MS 2 when holding B (new default, equivalent to deprecated `-as` flag)| 
+        **B Dash (`bd`)** -- MS 3 by default, MS 4 when holding B | 
+        **Sprint Shoes B Dash (`ssbd`)** -- MS 3 by default, MS 2 when holding B, MS 4 when holding B with sprint shoes
 6. `-rls` flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
 7. `-scis` flag for "Sketch & Control 100% accurate and use Sketcher/Controller's stats"
 8. `-scia` flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
 9. `-stesp <MIN> <MAX>` for "Give Player between MIN - MAX espers at the start of the seed
 10. `-wmhc` for "World Minimap High Contrast -- makes minimap opaque and increases contrast of location indicator"
+11. `-stl <level>` for "Set Starting Level
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
@@ -39,5 +40,6 @@ Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/34>
 - <https://github.com/AtmaTek/WorldsCollide/pull/36>
 - <https://github.com/AtmaTek/WorldsCollide/pull/37>
+- <https://github.com/AtmaTek/WorldsCollide/pull/39>
 
 
