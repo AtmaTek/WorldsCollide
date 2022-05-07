@@ -8,7 +8,7 @@ def parse(parser):
     magic_mp.add_argument("-mmps", "--magic-mp-shuffle", action = "store_true",
                           help = "Magic spells' MP costs shuffled")
     magic_mp.add_argument("-mmprv", "--magic-mp-random-value", default = None, type = int,
-                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(256),
+                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(255),
                           help = "Magic spells' MP costs randomized")
     magic_mp.add_argument("-mmprp", "--magic-mp-random-percent", default = None, type = int,
                           nargs = 2, metavar = ("MIN", "MAX"), choices = range(201),

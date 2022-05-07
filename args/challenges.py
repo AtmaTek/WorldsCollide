@@ -14,8 +14,8 @@ def parse(parser):
     ultima = challenges.add_mutually_exclusive_group()
     ultima.add_argument("-nu", "--no-ultima", action = "store_true",
                             help = "Ultima cannot be learned from espers/items/natural magic")
-    ultima.add_argument("-u255", "--ultima-255-mp", action = "store_true",
-                            help = "Ultima costs 255 MP")
+    ultima.add_argument("-u254", "--ultima-254-mp", action = "store_true",
+                            help = "Ultima costs 254 MP")
     challenges.add_argument("-nfps", "--no-free-paladin-shields", action = "store_true",
                             help = "Paladin/Cursed Shields will not appear in coliseum/auction/shops/chests/events (Narshe WOR exclusive)")
     challenges.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
@@ -78,8 +78,8 @@ def flags(args):
 
     if args.no_ultima:
         flags += " -nu"
-    elif args.ultima_255_mp:
-        flags += " -u255"
+    elif args.ultima_254_mp:
+        flags += " -u254"
 
     if args.no_free_paladin_shields:
         flags += " -nfps"
@@ -98,8 +98,8 @@ def options(args):
     ultima = "Original"
     if args.no_ultima:
         ultima = "No"
-    elif args.ultima_255_mp:
-        ultima = "255 MP"
+    elif args.ultima_254_mp:
+        ultima = "254 MP"
 
     return [
         ("No Moogle Charms", args.no_moogle_charms),
