@@ -11,8 +11,11 @@ def parse(parser):
                             help = "Illuminas will not appear in coliseum/auction/shops/chests/events")
     challenges.add_argument("-noshoes", "--no-sprint-shoes", action = "store_true",
                             help = "Sprint Shoes will not appear in coliseum/auction/shops/chests")
-    challenges.add_argument("-nu", "--no-ultima", action = "store_true",
+    ultima = challenges.add_mutually_exclusive_group()
+    ultima.add_argument("-nu", "--no-ultima", action = "store_true",
                             help = "Ultima cannot be learned from espers/items/natural magic")
+    ultima.add_argument("-u255", "--ultima-255-mp", action = "store_true",
+                            help = "Ultima costs 255 MP")
     challenges.add_argument("-nfps", "--no-free-paladin-shields", action = "store_true",
                             help = "Paladin/Cursed Shields will not appear in coliseum/auction/shops/chests/events (Narshe WOR exclusive)")
     challenges.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
@@ -75,6 +78,9 @@ def flags(args):
 
     if args.no_ultima:
         flags += " -nu"
+    elif args.ultima_255_mp:
+        flags += " -u255"
+
     if args.no_free_paladin_shields:
         flags += " -nfps"
     if args.no_free_characters_espers:
@@ -89,12 +95,18 @@ def flags(args):
     return flags
 
 def options(args):
+    ultima = "Original"
+    if args.no_ultima:
+        ultima = "No"
+    elif args.ultima_255_mp:
+        ultima = "255 MP"
+
     return [
         ("No Moogle Charms", args.no_moogle_charms),
         ("No Exp Eggs", args.no_exp_eggs),
         ("No Illuminas", args.no_illuminas),
         ("No Sprint Shoes", args.no_sprint_shoes),
-        ("No Ultima", args.no_ultima),
+        ("Ultima", ultima),
         ("No Free Paladin Shields", args.no_free_paladin_shields),
         ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
