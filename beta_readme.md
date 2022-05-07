@@ -18,6 +18,11 @@ Adds the following flags for new features:
 9. `-stesp <MIN> <MAX>` for "Give Player between MIN - MAX espers at the start of the seed
 10. `-wmhc` for "World Minimap High Contrast -- makes minimap opaque and increases contrast of location indicator"
 11. `-stl <level>` for "Set Starting Level
+12. Franklin's MP Randomization flags
+- `mmps` for Magic spells' MP costs shuffled
+- `mmprv <MIN> <MAX>` for Magic spells' MP costs randomized between given values (0-254)
+- `mmprp <MIN> <MAX>` for each Magic spell's MP cost set to random percent of original within given range (0 - 200)
+13. `u254` to make Ultima cost 254 MP
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
@@ -26,6 +31,7 @@ Other changes:
 - Bugfix: Learn Spells reward can no longer give Life spells during permadeath seeds.
 - Feature: Added Gau-Father Reunion as a Quest objective (objective string ends with `.12.10`). Hint: take Gau + Sabin to Gau's Father House in WoR.
 - Bugfix: Fixing bug that prevented learning Bum Rush if the Blitzer was recruited at level >= 42
+- Feature: Esper and Lore MP random value MP costs can now go to 254.
 
 Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/35>
@@ -41,5 +47,6 @@ Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/36>
 - <https://github.com/AtmaTek/WorldsCollide/pull/37>
 - <https://github.com/AtmaTek/WorldsCollide/pull/39>
+- <https://github.com/AtmaTek/WorldsCollide/pull/38>
 
 
