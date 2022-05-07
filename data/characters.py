@@ -78,10 +78,11 @@ class Characters():
         return self.character_paths[character]
 
     def mod_init_levels(self):
-        if self.args.start_average_level:
-            # characters recruited at average level, set everyone's initial level to 3
-            for character in self.characters:
-                character.init_level_factor = 0
+        # remove all variation in leveling, since we're controlling level directly
+        for character in self.characters:
+            character.init_level_factor = 0
+
+        characters_asm.set_starting_level(self.args.start_level)
 
     def stats_random_percent(self):
         import random

@@ -6,6 +6,8 @@ def parse(parser):
 
     characters.add_argument("-sal", "--start-average-level", action = "store_true",
                             help = "Recruited characters start at the average character level")
+    characters.add_argument("-stl", "--start-level", default = 3, type = int, choices = range(3, 100), metavar = "COUNT",
+                            help = "Start game at level %(metavar)s.")
     characters.add_argument("-sn", "--start-naked", action = "store_true",
                             help = "Recruited characters start with no equipment")
     characters.add_argument("-eu", "--equipable-umaro", action = "store_true",
@@ -22,6 +24,8 @@ def flags(args):
 
     if args.start_average_level:
         flags += " -sal"
+    if args.start_level != 3:
+        flags += f" -stl {args.start_level}"
     if args.start_naked:
         flags += " -sn"
     if args.equipable_umaro:
@@ -36,6 +40,7 @@ def options(args):
 
     return [
         ("Start Average Level", args.start_average_level),
+        ("Start Level", args.start_level),
         ("Start Naked", args.start_naked),
         ("Equipable Umaro", args.equipable_umaro),
         ("Character Stats", character_stats),
