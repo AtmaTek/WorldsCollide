@@ -78,7 +78,7 @@ class Spells:
             mp_percent = random.randint(self.args.magic_mp_random_percent_min,
                                         self.args.magic_mp_random_percent_max) / 100.0
             value = int(spell.mp * mp_percent)
-            spell.mp = max(min(value, 255), 0)
+            spell.mp = max(min(value, 254), 0)
 
     def mod(self):
         if self.args.magic_mp_shuffle:
