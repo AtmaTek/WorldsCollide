@@ -1,17 +1,17 @@
 Beta Branch for 1.1.x
 
 Adds the following flags for new features:
-1. `-stloc/-drloc <original | shuffle | mix>` for Kielbasigo's Status Boss Location, Dragon Boss Location shuffle or mix. Shuffle = shuffled amongst themselves, Mix = mixed boss pool
+1. `-stloc/-drloc <original | shuffle | mix>` for Kielbasigo's Status Boss Location/Dragon Boss Location shuffle or mix. Shuffle = shuffled amongst themselves, Mix = mixed boss pool
 2. `-fc` to Fix Capture Bugs (multi-steal not giving more than 1 item and weapon specials not proccing)
 3. `-np` flag for Sprites in peekable checks are left a mystery until reward
 4. `-cc` flag for Controllable Coliseum
 5. Kielbasiago's movement options: 
-- `-noshoes` flag for "Removes Sprint Shoes from appearing in shops, chests, etc."
-- `-move og | as | bd | ssbd` for Movement Speed (MS) changes:
-        **Original (`og`)** -- MS 2 by default, MS 3 with sprint shoes | 
-        **Auto Sprint (`as`)** -- MS 3 by default, MS 2 when holding B (new default, equivalent to deprecated `-as` flag)| 
-        **B Dash (`bd`)** -- MS 3 by default, MS 4 when holding B | 
-        **Sprint Shoes B Dash (`ssbd`)** -- MS 3 by default, MS 2 when holding B, MS 4 when holding B with sprint shoes
+    - `-noshoes` flag for "Removes Sprint Shoes from appearing in shops, chests, etc."
+    - `-move og | as | bd | ssbd` for Movement Speed (MS) changes:
+        - **Original (`og`)** -- MS 2 by default, MS 3 with sprint shoes | 
+        - **Auto Sprint (`as`)** -- MS 3 by default, MS 2 when holding B (new default, equivalent to deprecated `-as` flag)| 
+        - **B Dash (`bd`)** -- MS 3 by default, MS 4 when holding B | 
+        - **Sprint Shoes B Dash (`ssbd`)** -- MS 3 by default, MS 2 when holding B, MS 4 when holding B with sprint shoes
 6. `-rls` flag for "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives"
 7. `-scis` flag for "Sketch & Control 100% accurate and use Sketcher/Controller's stats"
 8. `-scia` flag for "Improves Sketch & Control abilities. Removes Battle from Sketch. Adds Rage as a Sketch/Control possibility for most monsters. Gives Sketch abilities to most bosses."
@@ -19,10 +19,10 @@ Adds the following flags for new features:
 10. `-wmhc` for "World Minimap High Contrast -- makes minimap opaque and increases contrast of location indicator"
 11. `-stl <level>` for "Set Starting Level
 12. Franklin's MP Randomization flags
-- `mmps` for Magic spells' MP costs shuffled
-- `mmprv <MIN> <MAX>` for Magic spells' MP costs randomized between given values (0-254)
-- `mmprp <MIN> <MAX>` for each Magic spell's MP cost set to random percent of original within given range (0 - 200)
-13. `u254` to make Ultima cost 254 MP
+    - `-mmps` for Magic spells' MP costs shuffled
+    - `-mmprv <MIN> <MAX>` for Magic spells' MP costs randomized between given values (0-254)
+    - `-mmprp <MIN> <MAX>` for each Magic spell's MP cost set to random percent of original within given range (0 - 200)
+13. `-u254` to make Ultima cost 254 MP
 
 Other changes:
 - QoL: Mt Kolts is peekable -- the shadowy figure will now represent the reward
