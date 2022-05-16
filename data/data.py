@@ -17,6 +17,7 @@ import data.magiteks as magiteks
 import data.espers as espers
 import data.shops as shops
 import data.coliseum as coliseum
+import data.title_graphics as title_graphics
 
 class Data:
     def __init__(self, rom, args):
@@ -76,6 +77,9 @@ class Data:
         self.coliseum = coliseum.Coliseum(rom, args, self.enemies, self.items)
         self.coliseum.mod()
 
+        self.title_graphics = title_graphics.TitleGraphics(rom, args)
+        self.title_graphics.mod()
+
     def write(self):
         self.dialogs.write()
         self.characters.write()
@@ -96,3 +100,4 @@ class Data:
         self.espers.write()
         self.shops.write()
         self.coliseum.write()
+        self.title_graphics.write()
