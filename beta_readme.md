@@ -32,6 +32,7 @@ Other changes:
 - Feature: Added Gau-Father Reunion as a Quest objective (objective string ends with `.12.10`). Hint: take Gau + Sabin to Gau's Father House in WoR.
 - Bugfix: Fixing bug that prevented learning Bum Rush if the Blitzer was recruited at level >= 42
 - Feature: Esper and Lore MP random value MP costs can now go to 254.
+- Feature: New Title Graphics from CDude
 
 Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/35>
