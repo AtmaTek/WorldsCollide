@@ -10,6 +10,7 @@ class RageMenu:
     def draw_ability_names_mod(self):
         import data.text as text
         from data.spell_names import name_id
+        from data.text import text2
 
         rage_data_address = self.rages.ATTACKS_DATA_START + 0xc00000
 
@@ -104,6 +105,9 @@ class RageMenu:
             asm.ASL(), # A *= 10
             asm.TAX(),
             asm.A8(),
+            # Write a ! to indicate it's a special attack
+            asm.LDA(text2.text_value['!'], asm.IMM8),
+            asm.STA(0x2180, asm.ABS),
             "SPECIAL_NAME_LOOP_START",
             # x = offset from start of special names (0fd0d0), y = length (10)
             asm.LDA(0x0fd0d0, asm.LNG_X),           # a = current char in special name
@@ -121,7 +125,15 @@ class RageMenu:
             asm.LDA(0x26f567, asm.LNG_X),           # a = current char in ability name
             asm.CMP(space_value, asm.IMM8),         # compare with character ' ' which pads end of ability names
             asm.BEQ("DRAW_ABILITY_NAME_RETURN"),    # branch if reached end of ability name
+            # skip over magic icons, which don't show up with the variable-width font used
+            asm.CMP(text2.text_value['<white magic icon>'], asm.IMM8),
+            asm.BEQ("NEXT_CHARACTER"),
+            asm.CMP(text2.text_value['<black magic icon>'], asm.IMM8),
+            asm.BEQ("NEXT_CHARACTER"),
+            asm.CMP(text2.text_value['<gray magic icon>'], asm.IMM8),
+            asm.BEQ("NEXT_CHARACTER"),
             asm.STA(0x2180, asm.ABS),               # add character to string
+            "NEXT_CHARACTER",
             asm.INX(),                              # next character in ability name
             asm.DEY(),                              # decrement ability name character index
             asm.BNE("ABILITY_NAME_LOOP_START"),     # branch if not zero
