@@ -6,7 +6,7 @@ class TitleGraphics:
 
     def mod(self):
         # Read in the title graphics bin and write it to 18f000 - 194e95
-        binFile = open('graphics/title/WC Title Data-CDude.bin', "rb")
+        binFile = open('graphics/title/WC Spartan Title Data-CDude.bin', "rb")
         bin = binFile.read(-1)
         space = Reserve(0x18f000, 0x194e95, "title graphics (compressed)")
 
