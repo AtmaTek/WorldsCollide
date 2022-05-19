@@ -36,7 +36,7 @@ legacy = [
 class FlagsForceItemRewardChecks(scroll_area.ScrollArea):
     MENU_NUMBER = 16
 
-    def __init__(self, item_checks, is_nfce, is_legacy):
+    def __init__(self, item_checks, is_nfce):
         self.number_items = len(item_checks)
         self.lines = []
 
@@ -51,21 +51,11 @@ class FlagsForceItemRewardChecks(scroll_area.ScrollArea):
 
             self.lines.append(scroll_area.Line("", f0.set_user_text_color))
 
-        if is_legacy:
-            self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
-            self.lines.append(scroll_area.Line("Classic Item Reward Checks", f0.set_user_text_color))
-            self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
-            for check in legacy:
-                self.lines.append(scroll_area.Line(f"{check.name}", f0.set_user_text_color))
-
-            self.lines.append(scroll_area.Line("", f0.set_user_text_color))
-
         # Someone set the check rewards
-        if not (is_nfce or is_legacy):
+        if not (is_nfce):
             check_lines = FlagsForceItemRewardChecks._format_check_list_menu(item_checks)
             for check in check_lines:
                 self.lines.append(scroll_area.Line(f"{check}", f0.set_user_text_color))
-
 
         super().__init__()
 

@@ -7,19 +7,19 @@ def parse(parser):
     check_rewards = advanced_checks.add_mutually_exclusive_group()
     check_rewards.name = "Check Rewards"
     check_rewards.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
-                help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
+                help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Mt. Zozo, Narshe Weapon Shop, Sealed Gate, South Figaro Basement, Tzen Thief, Zone Eater")
 
     check_rewards.add_argument("-fir", "--force-item-reward-checks", type = str,
                 help = "Forces list of checks to give an item reward. Maximum of 12 checks.")
 
+    check_rewards.add_argument("-fir", "--force-esper-reward-checks", type = str,
+                help = "Forces list of checks to give an esper reward. Maximum of 27 checks")
+
 def process(args):
     from constants.checks import (
-        AUCTION1, AUCTION2, COLLAPSING_HOUSE, FIGARO_CASTLE_THRONE, GAUS_FATHERS_HOUSE,
-        KOHLINGEN_CAFE, NARSHE_WEAPON_SHOP, SEALED_GATE, SOUTH_FIGARO_PRISONER,
-
-        LONE_WOLF_MOOGLE_ROOM,
-        FANATICS_TOWER_LEADER,
-        NARSHE_WEAPON_SHOP_MINES,
+        AUCTION1, AUCTION2, COLLAPSING_HOUSE, FIGARO_CASTLE_THRONE,
+        GAUS_FATHERS_HOUSE,KOHLINGEN_CAFE, MT_ZOZO, NARSHE_WEAPON_SHOP,
+        SEALED_GATE, SOUTH_FIGARO_PRISONER, TZEN_THIEF, ZONE_EATER
     )
 
     if args.force_item_reward_checks == 'none':
@@ -28,25 +28,18 @@ def process(args):
         args.item_reward_checks =  [int(check) for check in args.force_item_reward_checks.split(',')]
     elif args.no_free_characters_espers:
         args.item_reward_checks = [
-            FANATICS_TOWER_LEADER.bit,
-            LONE_WOLF_MOOGLE_ROOM.bit,
-            NARSHE_WEAPON_SHOP_MINES.bit,
             AUCTION1.bit,
             AUCTION2.bit,
             COLLAPSING_HOUSE.bit,
             FIGARO_CASTLE_THRONE.bit,
             GAUS_FATHERS_HOUSE.bit,
             KOHLINGEN_CAFE.bit,
+            MT_ZOZO.bit,
             NARSHE_WEAPON_SHOP.bit,
             SEALED_GATE.bit,
             SOUTH_FIGARO_PRISONER.bit,
-        ]
-    else:
-        # classic behavior
-        args.item_reward_checks = [
-            FANATICS_TOWER_LEADER.bit,
-            LONE_WOLF_MOOGLE_ROOM.bit,
-            NARSHE_WEAPON_SHOP_MINES.bit,
+            TZEN_THIEF.bit,
+            ZONE_EATER.bit,
         ]
 
     # assert that no items in item_reward_checks is CHAR | ESPER only reward
@@ -79,9 +72,8 @@ def menu(args):
     for index, entry in enumerate(entries):
         key, value = entry
         if key == "Forced Item Checks":
-            is_classic = not args.force_item_reward_checks
             if value:
-                entries[index] = ("Forced Item Checks", FlagsForceItemRewardChecks(value, args.no_free_characters_espers, is_classic)) # flags sub-menu
+                entries[index] = ("Forced Item Checks", FlagsForceItemRewardChecks(value, args.no_free_characters_espers)) # flags sub-menu
             else:
                  entries[index] = ("Forced Item Checks", "None") # flags sub-menu
 

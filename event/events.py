@@ -123,6 +123,10 @@ class Events():
                     unlocked_slots.append(slot)
                     unlocked_slot_iterations.append(slot_iterations[slot])
 
+            # this means an impossible start has occured.
+            # i.e. no character can be retrieved given the starting char + check availability
+            assert len(unlocked_slots) > 0
+
             # pick slot for the next character weighted by number of iterations each slot has been available
             slot_index = weighted_reward_choice(unlocked_slot_iterations, iteration)
             slot = unlocked_slots[slot_index]

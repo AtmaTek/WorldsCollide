@@ -139,6 +139,7 @@ class NarsheWOR(Event):
         src = [
             # add reward 1 based on item type
             add_esper(self.reward1.id) if reward1_esper else add_item(self.reward1.id),
+            field.SetEventBit(event_bit.GOT_RAGNAROK),
             field.SetEventBit(event_bit.CHOSE_RAGNAROK_ESPER),
             field.FinishCheck(),
             field.Return(),
