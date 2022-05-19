@@ -33,6 +33,7 @@ Other changes:
 - Bugfix: Fixing bug that prevented learning Bum Rush if the Blitzer was recruited at level >= 42
 - Feature: Esper and Lore MP random value MP costs can now go to 254.
 - Feature: New Title Graphics from CDude
+- QoL: Move Descriptions in Rage Menu
 
 Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/35>
@@ -49,5 +50,6 @@ Associated PRs:
 - <https://github.com/AtmaTek/WorldsCollide/pull/37>
 - <https://github.com/AtmaTek/WorldsCollide/pull/39>
 - <https://github.com/AtmaTek/WorldsCollide/pull/38>
+- <https://github.com/AtmaTek/WorldsCollide/pull/41>
 
 
