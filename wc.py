@@ -12,7 +12,7 @@ def main():
     events = Events(memory.rom, args, data)
 
     from menus.menus import Menus
-    menus = Menus(data.characters, data.dances)
+    menus = Menus(data.characters, data.dances, data.rages, data.enemies)
 
     from battle import Battle
     battle = Battle()
