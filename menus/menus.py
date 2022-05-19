@@ -9,16 +9,17 @@ import menus.coliseum as coliseum
 import menus.sell as sell
 
 class Menus:
-    def __init__(self, characters, dances, rages):
+    def __init__(self, characters, dances, rages, enemies):
         self.characters = characters
         self.dances = dances
         self.rages = rages
+        self.enemies = enemies
 
         self.pregame_track = pregame_track.PreGameTrack(self.characters)
         self.pregame_menu = pregame.PreGameMenu(self.pregame_track)
         self.track_menu = track.TrackMenu(self.pregame_track)
         self.dance_menu = dance.DanceMenu(self.dances)
-        self.rage_menu = rage.RageMenu(self.rages)
+        self.rage_menu = rage.RageMenu(self.rages, self.enemies)
         self.status_menu = status.StatusMenu(self.characters)
         self.final_lineup_menu = final_lineup.FinalLineupMenu(self.characters)
         self.coliseum_menu = coliseum.ColiseumMenu()
