@@ -152,8 +152,9 @@ class PreGameMenu:
 
             asm.LDA(0x08, asm.DIR),         # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),        # a pressed?
-            asm.BEQ("RETURN"),              # branch if not
-
+            asm.BNE("CONTINUE"),            # branch if so
+            asm.RTS(),
+            "CONTINUE",
             asm.TDC(),
             asm.JSR(0x0eb2, asm.ABS),       # click sound
             asm.LDA(0x4b, asm.DIR),         # a = cursor index

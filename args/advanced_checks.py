@@ -100,18 +100,21 @@ def menu(args):
         key, value = entry
         if key == esper_item_title:
             if value:
+                # entries[index] = (esper_item_title, len(value)) # flags sub-menu
                 entries[index] = (esper_item_title, FlagsForceEsperItemRewardChecks(esper_item_title, value, False)) # flags sub-menu
             else:
                  entries[index] = (esper_item_title, "None")
 
         if key == esper_title:
             if value:
+                # entries[index] = (esper_title, len(value)) # flags sub-menu
                 entries[index] = (esper_title, FlagsForceEsperRewardChecks(esper_title, value, False)) # flags sub-menu
             else:
                  entries[index] = (esper_title, "None")
 
         if key == item_title:
             if value:
+                # entries[index] = (item_title, len(value)) # flags sub-menu
                 entries[index] = (item_title, FlagsForceItemRewardChecks(item_title, value, args.no_free_characters_espers)) # flags sub-menu
             else:
                  entries[index] = (item_title, "None")

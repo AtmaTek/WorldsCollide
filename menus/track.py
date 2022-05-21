@@ -216,8 +216,8 @@ class TrackMenu:
             (self.common.invoke_progress & 0xffff).to_bytes(2, "little"),
             (self.common.invoke_flags & 0xffff).to_bytes(2, "little"),
         ]
-        space = Write(Bank.C3, src, "track option click table")
-        options_table = space.start_address
+        space = Write(Bank.F0, src, "track option click table")
+        options_table = space.start_address_snes
 
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
@@ -261,8 +261,9 @@ class TrackMenu:
             "HANDLE_B",
             asm.LDA(0x09, asm.DIR),     # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BEQ("RETURN"),          # return if not
-
+            asm.BNE("CONTINUE"),        # return if so
+            asm.RTS(),
+            "CONTINUE",
             asm.LDA(0x04, asm.IMM8),    # a = initialize main menu command
             asm.STA(0x27, asm.DIR),     # add initialize main menu to queue
             asm.LDA(self.common.FADE_OUT_COMMAND, asm.IMM8),

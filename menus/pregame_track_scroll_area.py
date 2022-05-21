@@ -221,7 +221,7 @@ class ScrollArea:
             asm.DEY(),                  # decrement count
             asm.BNE("LOOP_START"),      # branch if more characters in line
             asm.STZ(0x2180, asm.ABS),   # write end of string
-            asm.RTS(),
+            asm.RTL(),
 
             "WRITE_BLANK_LINE",
             asm.LDY(WIDTH, asm.IMM16),
@@ -231,14 +231,14 @@ class ScrollArea:
             asm.DEY(),
             asm.BNE("WRITE_BLANK_LINE_LOOP"),
             asm.STZ(0x2180, asm.ABS),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track scroll area write line")
-        write_line = space.start_address
+        space = Write(Bank.F0, src, "pregame track scroll area write line")
+        write_line = space.start_address_snes
 
         src = [
             asm.JSL(START_ADDRESS_SNES + self.initialize_line),
-            asm.JSR(write_line, asm.ABS),
+            asm.JSL(write_line),
             asm.JSR(0x37fd9, asm.ABS),  # draw line
             asm.RTS(),
         ]
