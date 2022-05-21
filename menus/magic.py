@@ -16,14 +16,14 @@ class MagicMenu:
             # displaced vanilla logic, from C3/51E9 - 51ED 
             asm.LDA(0xF8, asm.DIR),             # Tens digit
             asm.STA(STRING_DRAW_ADDR, asm.ABS), # Add to string
-            asm.RTS()
+            asm.RTL()
         ]
-        space = Write(Bank.C3, src, "Create MP Cost string")
-        create_string = space.start_address
+        space = Write(Bank.F0, src, "Create MP Cost string")
+        create_string = space.start_address_snes
 
         space = Reserve(0x351e9, 0x351ed, "Call create_string", asm.NOP())
         space.write(
-            asm.JSR(create_string, asm.ABS),
+            asm.JSL(create_string),
         )
 
         # Move where MP gets written 1 space to the left, 
