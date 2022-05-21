@@ -283,7 +283,7 @@ class ScrollArea:
             asm.JSL(self.remember_scrollbar + START_ADDRESS_SNES),
 
             c3.eggers_jump(draw),
-            asm.RTL(), 
+            asm.RTS(), 
         ]
         space = Write(Bank.F0, src, "pregame track scroll area remember draw")
         self.remember_draw = space.start_address

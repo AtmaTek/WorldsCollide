@@ -1,5 +1,6 @@
 from memory.space import START_ADDRESS_SNES, Bank, Write, Reserve, Allocate, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 
 class TrackMenu:
     MENU_NUMBER = 10
@@ -153,17 +154,17 @@ class TrackMenu:
             )
 
         src = [
-            asm.JSR(0xc2f2, asm.ABS),       # set text color to user config choice
+            c3.eggers_jump(0xc2f2),       # set text color to user config choice
         ]
         for option in options:
             src += [
                 asm.LDY(option, asm.IMM16),
-                asm.JSR(0x02f9, asm.ABS),   # draw text
+                c3.eggers_jump(0x02f9),   # draw text
             ]
         src += [
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "track draw options")
+        space = Write(Bank.F0, src, "track draw options")
         self.draw_options = space.start_address
 
     def invoke_mod(self):
@@ -192,9 +193,9 @@ class TrackMenu:
 
     def initialize_mod(self):
         src = [
-            asm.JSR(self.common.initialize, asm.ABS),
+            asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
-            asm.JSR(self.draw_options, asm.ABS),
+            asm.JSL(self.draw_options + START_ADDRESS_SNES),
             asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
@@ -206,6 +207,7 @@ class TrackMenu:
             asm.STA(0x26, asm.DIR),     # add fade in menu to queue
             asm.JMP(0x3541, asm.ABS),   # set brightness and refresh screen
         ]
+        # called by C3 JSR jump table
         space = Write(Bank.C3, src, "track initialize")
         self.initialize = space.start_address
 
@@ -286,6 +288,7 @@ class TrackMenu:
 
         src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.common.invoke_flags))
 
+        # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "track sustain")
         self.sustain = space.start_address
 
