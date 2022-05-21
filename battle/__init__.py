@@ -5,6 +5,7 @@ import battle.no_exp_party_divide
 import battle.suplex_train_check
 import battle.auto_status
 import battle.end_checks
+import battle.magitek_upgrade
 from battle.animations import Animations
 
 __all__ = ["Battle"]

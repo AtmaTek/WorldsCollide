@@ -1,3 +1,4 @@
+from constants.checks import KEFKAS_TOWER_CELL_BEAST
 from event.event import *
 import args
 
@@ -6,7 +7,7 @@ class KefkaTower(Event):
         return "Kefka's Tower"
 
     def init_rewards(self):
-        self.atma_reward = self.add_reward(RewardType.ITEM)
+        self.atma_reward = self.add_reward(KEFKAS_TOWER_CELL_BEAST)
 
     def init_event_bits(self, space):
         space.write(
@@ -28,6 +29,11 @@ class KefkaTower(Event):
         self.item = self.atma_reward.id
         self.atma_battle_mod()
         self.atma_mod()
+        self.inferno_mod()
+        self.guardian_mod()
+        self.doom_mod()
+        self.goddess_mod()
+        self.poltergeist_mod()
 
         self.inferno_battle_mod()
         if self.args.fix_boss_skip:
@@ -242,6 +248,17 @@ class KefkaTower(Event):
         space.write(
             field.InvokeBattle(boss_pack_id),
         )
+
+    def guardian_mod(self):
+        pass
+    def inferno_mod(self):
+        pass
+    def doom_mod(self):
+        pass
+    def goddess_mod(self):
+        pass
+    def poltergeist_mod(self):
+        pass
 
     def atma_mod(self):
         src = [

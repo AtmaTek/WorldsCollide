@@ -132,16 +132,16 @@ class PreGameMenu:
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
             # if in a scroll area, sustain it
-            asm.LDA(0x0200, asm.ABS), 
+            asm.LDA(0x0200, asm.ABS),
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
-        for submenu_idx in self.common.flags.submenus.keys():
+        for submenu_id in self.common.flags.submenus.keys():
             src += [
-                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.CMP(self.common.flags.submenus[submenu_id].MENU_NUMBER, asm.IMM8),
                 asm.BEQ("SUSTAIN_SCROLL_AREA"),
             ]
 
@@ -154,8 +154,9 @@ class PreGameMenu:
 
             asm.LDA(0x08, asm.DIR),         # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),        # a pressed?
-            asm.BEQ("RETURN"),              # branch if not
-
+            asm.BNE("CONTINUE"),            # branch if so
+            asm.RTS(),
+            "CONTINUE",
             asm.TDC(),
             asm.JSR(0x0eb2, asm.ABS),       # click sound
             asm.LDA(0x4b, asm.DIR),         # a = cursor index
@@ -179,7 +180,6 @@ class PreGameMenu:
             "EXIT_SCROLL_AREA",
         ]
         src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.invoke_flags))
-        
         # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address

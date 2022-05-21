@@ -1,14 +1,15 @@
 from event.event import *
+from constants.checks import DOMA_SIEGE
 
 class DomaWOB(Event):
     def name(self):
-        return "Doma WOB"
+        return DOMA_SIEGE.name
 
     def character_gate(self):
         return self.characters.CYAN
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(DOMA_SIEGE)
 
     def init_event_bits(self, space):
         space.write(

@@ -2,13 +2,14 @@ from event.event import *
 
 class OwzerMansion(Event):
     def name(self):
-        return "Owzer Mansion"
+        return "Owzer's Mansion"
 
     def character_gate(self):
         return self.characters.RELM
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import OWZERS_MANSION
+        self.reward = self.add_reward(OWZERS_MANSION)
 
     def mod(self):
         self.relm_npc_id = 0x13
@@ -42,7 +43,7 @@ class OwzerMansion(Event):
         self.log_reward(self.reward)
 
     def flash_mod(self):
-        space = Reserve(0xb4d10, 0xb4d11, "owzer mansion flash", field.NOP())
+        space = Reserve(0xb4d10, 0xb4d11, "owzer mansion flash", field.FlashScreen(field.Flash.NONE))
 
     def dialog_mod(self):
         space = Reserve(0xb4d0d, 0xb4d0f, "owzer mansion help that painting!!", field.NOP())
@@ -111,7 +112,9 @@ class OwzerMansion(Event):
 
     def character_mod(self, character):
         self.relm_npc.sprite = character
-        self.relm_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de1, 0xb4de7, "owzer mansion get startlet esper", field.NOP())
 
@@ -121,7 +124,10 @@ class OwzerMansion(Event):
         )
 
     def esper_mod(self, esper):
-        self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de3, 0xb4de7, "owzer mansion get esper", field.NOP())
@@ -133,7 +139,10 @@ class OwzerMansion(Event):
         space = Reserve(0xb4dfd, 0xb4e1c, "owzer mansion add relm", field.NOP())
 
     def item_mod(self, item):
-        self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.relm_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.relm_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.relm_npc.palette = self.characters.get_palette(self.relm_npc.sprite)
 
         space = Reserve(0xb4de3, 0xb4de7, "owzer mansion get item", field.NOP())

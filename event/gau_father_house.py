@@ -1,17 +1,15 @@
 from event.event import *
+from constants.checks import GAUS_FATHERS_HOUSE
 
 class GauFatherHouse(Event):
     def name(self):
-        return "Gau Father House"
+        return GAUS_FATHERS_HOUSE.name
 
     def character_gate(self):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(GAUS_FATHERS_HOUSE)
 
     def mod(self):
         self.shadow_npc_id = 0x10
@@ -22,6 +20,7 @@ class GauFatherHouse(Event):
 
         self.merchant_mod()
         self.entrance_event_mod()
+        self.reunion_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -59,8 +58,11 @@ class GauFatherHouse(Event):
         )
 
     def character_mod(self, character):
-        self.shadow_npc.sprite = character
-        self.shadow_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+        self.shadow_npc.sprite = sprite
+        self.shadow_npc.palette = self.characters.get_palette(sprite)
 
         space = Reserve(0xb0a5f, 0xb0aed, "gau father house wob recruit shadow", field.NOP())
         space.write(
@@ -69,7 +71,10 @@ class GauFatherHouse(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.shadow_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)
 
         space = Reserve(0xb0a5f, 0xb0af9, "gau father house wob esper item reward", field.NOP())
@@ -107,4 +112,18 @@ class GauFatherHouse(Event):
         space = Reserve(0xb0b02, 0xb0b05, "gau father house recruit shadow bit, fade in", field.NOP())
         space.write(
             field.Call(finish_check),
+        )
+
+    def reunion_mod(self):
+        src = [
+            Read(0xb6785, 0xb678a), # displaced code
+            field.CheckObjectives(),
+            field.Return(),
+        ]
+        space = Write(Bank.CB, src, "gau father reunion set event bit, check objectives")
+        check_objectives = space.start_address
+
+        space = Reserve(0xb6785, 0xb678a, "gau father reunion field bit set", field.NOP())
+        space.write(
+            field.Call(check_objectives),
         )

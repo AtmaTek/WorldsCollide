@@ -6,6 +6,7 @@ class RewardType(Flag):
     ESPER = auto()
     ITEM = auto()
 
+CHARACTER_ESPER_ONLY_REWARDS = 6
 class Reward:
     def __init__(self, event, possible_types):
         self.id = None
@@ -15,6 +16,21 @@ class Reward:
 
     def single_possible_type(self):
         return self.possible_types in RewardType
+
+    def is_type(self, type):
+        return self.type == type
+
+    def is_none(self):
+        return self.is_type(RewardType.NONE)
+
+    def is_character(self):
+        return self.is_type(RewardType.CHARACTER)
+
+    def is_esper(self):
+        return self.is_type(RewardType.ESPER)
+
+    def is_item(self):
+        return self.is_type(RewardType.ITEM)
 
     def __str__(self):
         result = f"{self.id} {self.type} {self.event.name()}"

@@ -1,3 +1,6 @@
+from constants.checks import FIGARO_CASTLE_THRONE, KOHLINGEN_CAFE
+from data.npc_bit import WEAPON_ELDER_NARSHE
+
 def name():
     return "Challenges"
 
@@ -9,14 +12,19 @@ def parse(parser):
                             help = "Exp. Eggs will not appear in coliseum/auction/shops/chests/events")
     challenges.add_argument("-nil", "--no-illuminas", action = "store_true",
                             help = "Illuminas will not appear in coliseum/auction/shops/chests/events")
-    challenges.add_argument("-nu", "--no-ultima", action = "store_true",
+    challenges.add_argument("-noshoes", "--no-sprint-shoes", action = "store_true",
+                            help = "Sprint Shoes will not appear in coliseum/auction/shops/chests")
+    ultima = challenges.add_mutually_exclusive_group()
+    ultima.add_argument("-nu", "--no-ultima", action = "store_true",
                             help = "Ultima cannot be learned from espers/items/natural magic")
+    ultima.add_argument("-u254", "--ultima-254-mp", action = "store_true",
+                            help = "Ultima costs 254 MP")
     challenges.add_argument("-nfps", "--no-free-paladin-shields", action = "store_true",
                             help = "Paladin/Cursed Shields will not appear in coliseum/auction/shops/chests/events (Narshe WOR exclusive)")
-    challenges.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
-                            help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
     challenges.add_argument("-pd", "--permadeath", action = "store_true",
                             help = "Life spells cannot be learned. Fenix Downs unavailable (except from starting items). Buckets/inns/tents/events do not revive characters. Phoenix casts Life 3 on party instead of Life")
+    challenges.add_argument("-np", "--no-peeking", action = "store_true",
+                            help = "Sprites in peekable checks are left a mystery until reward.")
     challenges.add_argument("-rls", "--remove-learnable-spells", type = str,
                             help = "Remove spells from learnable sources: Items, Espers, Natural Magic, and Objectives")
 
@@ -66,28 +74,41 @@ def flags(args):
         flags += " -nee"
     if args.no_illuminas:
         flags += " -nil"
+    if args.no_sprint_shoes:
+        flags += " -noshoes"
+
     if args.no_ultima:
         flags += " -nu"
+    elif args.ultima_254_mp:
+        flags += " -u254"
+
     if args.no_free_paladin_shields:
         flags += " -nfps"
-    if args.no_free_characters_espers:
-        flags += " -nfce"
     if args.permadeath:
         flags += " -pd"
+    if args.no_peeking:
+        flags += " -np"
     if args.remove_learnable_spells:
         flags += f" -rls {args.remove_learnable_spells}"
 
     return flags
 
 def options(args):
+    ultima = "Original"
+    if args.no_ultima:
+        ultima = "No"
+    elif args.ultima_254_mp:
+        ultima = "254 MP"
+
     return [
         ("No Moogle Charms", args.no_moogle_charms),
         ("No Exp Eggs", args.no_exp_eggs),
         ("No Illuminas", args.no_illuminas),
-        ("No Ultima", args.no_ultima),
+        ("No Sprint Shoes", args.no_sprint_shoes),
+        ("Ultima", ultima),
         ("No Free Paladin Shields", args.no_free_paladin_shields),
-        ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
+        ("No Peeking", args.no_peeking),
         ("Remove Learnable Spells", args.remove_learnable_spell_ids),
     ]
 

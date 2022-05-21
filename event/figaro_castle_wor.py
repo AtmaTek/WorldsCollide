@@ -1,14 +1,15 @@
 from event.event import *
+from constants.checks import FIGARO_CASTLE_ENGINE
 
 class FigaroCastleWOR(Event):
     def name(self):
-        return "Figaro Castle WOR"
+        return FIGARO_CASTLE_ENGINE.name
 
     def character_gate(self):
         return self.characters.EDGAR
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(FIGARO_CASTLE_ENGINE)
 
     def init_event_bits(self, space):
         if self.args.character_gating:
@@ -102,10 +103,14 @@ class FigaroCastleWOR(Event):
         )
 
     def character_mod(self, character):
-        self.gerad_figaro_cave_npc.sprite = character
-        self.gerad_figaro_cave_npc.palette = self.characters.get_palette(character)
-        self.gerad_engine_room_npc.sprite = character
-        self.gerad_engine_room_npc.palette = self.characters.get_palette(character)
+        sprite = character
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+
+        self.gerad_figaro_cave_npc.sprite = sprite
+        self.gerad_figaro_cave_npc.palette = self.characters.get_palette(sprite)
+        self.gerad_engine_room_npc.sprite = sprite
+        self.gerad_engine_room_npc.palette = self.characters.get_palette(sprite)
 
         space = Reserve(0xa6aed, 0xa6bdb, "figaro castle wor scenes after tentacles", field.NOP())
         space.write(
@@ -119,7 +124,11 @@ class FigaroCastleWOR(Event):
         )
 
     def gerad_npc_mod(self):
-        random_sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            random_sprite = self.characters.get_no_peeking_sprite()
+        else:
+            random_sprite = self.characters.get_random_esper_item_sprite()
+
         self.gerad_figaro_cave_npc.sprite = random_sprite
         self.gerad_figaro_cave_npc.palette = self.characters.get_palette(random_sprite)
         self.gerad_engine_room_npc.sprite = random_sprite

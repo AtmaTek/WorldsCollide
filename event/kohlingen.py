@@ -1,20 +1,18 @@
 from event.event import *
+from constants.checks import KOHLINGEN_CAFE
 
 # TODO use setzer npc instead of shadow's
 #      for character reward show the animations setzer does in wor before daryl's tomb
 
 class Kohlingen(Event):
     def name(self):
-        return "Kohlingen"
+        return KOHLINGEN_CAFE.name
 
     def character_gate(self):
         return self.characters.SETZER
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(KOHLINGEN_CAFE)
 
     def init_event_bits(self, space):
         space.write(
@@ -85,7 +83,9 @@ class Kohlingen(Event):
 
     def character_mod(self, character):
         self.shadow_npc.sprite = character
-        self.shadow_npc.palette = self.characters.get_palette(character)
+        if self.args.no_peeking:
+            self.shadow_npc.sprite = self.characters.get_no_peeking_sprite()
+        self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)
 
         space = Reserve(0xc6f84, 0xc6f8b, "kohlingen talk to shadow", field.NOP())
         space.add_label("RECEIVE_REWARD", 0xc704f)
@@ -101,7 +101,10 @@ class Kohlingen(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
+        if self.args.no_peeking:
+            self.shadow_npc.sprite = self.characters.get_no_peeking_sprite()
+        else:
+            self.shadow_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)
 
         space = Reserve(0xc6f84, 0xc6f8b, "kohlingen talk to shadow", field.NOP())

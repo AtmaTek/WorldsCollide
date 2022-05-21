@@ -8,7 +8,8 @@ class Whelk(Event):
         return self.characters.TERRA
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import WHELK_GATE
+        self.reward = self.add_reward(WHELK_GATE)
 
     def init_event_bits(self, space):
         space.write(
@@ -82,6 +83,10 @@ class Whelk(Event):
         return self.maps.append_npc(0x2b, new_npc)
 
     def add_guard_npc(self, sprite = 52, palette = 0):
+        if self.args.no_peeking:
+            sprite = self.characters.get_no_peeking_sprite()
+            palette = self.characters.get_palette(sprite)
+
         guard_npc_id = self.add_npc(sprite, palette)
 
         # change guard npc id to correct new npc id

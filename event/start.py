@@ -25,7 +25,7 @@ class Start(Event):
         # assign chosen character rewards
         for character_id in party:
             if character_id is not None:
-                reward = self.add_reward(RewardType.CHARACTER)
+                reward = self.add_character_reward()
                 reward.id = character_id
                 reward.type = RewardType.CHARACTER
 
@@ -63,6 +63,7 @@ class Start(Event):
         self.intro_loop_mod()
         self.init_characters_mod()
         self.start_party_mod()
+        self.start_esper_mod()
         self.start_gold_mod()
         self.start_items_mod()
         self.start_game_mod()
@@ -73,6 +74,7 @@ class Start(Event):
             field.Call(self.event_bit_init),
             field.Call(self.character_init),
             field.Call(self.start_party),
+            field.Call(self.start_esper),
             field.Call(self.start_gold),
             field.Call(self.start_items),
             field.Call(self.start_game),
@@ -142,6 +144,21 @@ class Start(Event):
         space = Write(Bank.CC, src, "start party")
         self.start_party = space.start_address
 
+    def start_esper_mod(self):
+        src = []
+
+        for esper_id in self.espers.starting_espers:
+            src += [
+                field.AddEsper(esper_id, sound_effect = False)
+            ]
+
+        src += [
+            field.Return()
+        ]
+
+        space = Write(Bank.CC, src, "start espers")
+        self.start_esper = space.start_address
+
     def start_gold_mod(self):
         gold = self.args.gold
         if self.args.debug:
@@ -170,7 +187,10 @@ class Start(Event):
             src += [
                 field.AddItem("Moogle Charm", sound_effect = False),
             ]
-
+        for mc in range(self.args.start_sprint_shoes):
+            src += [
+                field.AddItem("Sprint Shoes", sound_effect = False),
+            ]
         for ws in range(self.args.start_warp_stones):
             src += [
                 field.AddItem("Warp Stone", sound_effect = False),
@@ -189,14 +209,10 @@ class Start(Event):
             ]
 
         if self.args.debug:
-            src += [
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-            ]
+            from constants.items import name_id
+            for char in self.characters.characters:
+                char.init_relic1 = name_id["Moogle Charm"]
+
         src += [
             field.Return(),
         ]
@@ -211,7 +227,6 @@ class Start(Event):
             vehicle.SetPosition(84, 34),
             vehicle.LoadMap(0x06, direction.DOWN, default_music = True,
                             x = 16, y = 6, entrance_event = True),
-
             field.EntityAct(field_entity.PARTY0, True,
                 field_entity.CenterScreen(),
             ),
