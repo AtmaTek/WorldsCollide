@@ -1,17 +1,15 @@
 from event.event import *
+from constants.checks import GAUS_FATHERS_HOUSE
 
 class GauFatherHouse(Event):
     def name(self):
-        return "Gau Father House"
+        return GAUS_FATHERS_HOUSE.name
 
     def character_gate(self):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(GAUS_FATHERS_HOUSE)
 
     def mod(self):
         self.shadow_npc_id = 0x10

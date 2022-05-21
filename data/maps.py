@@ -109,6 +109,9 @@ class Maps():
     def set_chest_item(self, map_id, x, y, item_id):
         self.chests.set_item(map_id, x, y, item_id)
 
+    def get_chests(self, map_id):
+        return self.chests.map_chests[map_id]
+
     def get_event_count(self, map_id):
         return (self.maps[map_id + 1]["events_ptr"] - self.maps[map_id]["events_ptr"]) // MapEvent.DATA_SIZE
 

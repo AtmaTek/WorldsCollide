@@ -22,4 +22,5 @@ def log():
     _log_tab("Magic", ["espers", "misc_magic"], ["natural_magic"])
     _log_tab("Items", ["starting_gold_items", "items"], ["shops", "chests"])
     args.group_modules["graphics"].log(args)
-    _log_tab("Other", ["coliseum", "auction_house", "misc"], ["challenges", "bug_fixes"])
+    _log_tab("Other", ["coliseum", "misc", "challenges"], ["auction_house", "bug_fixes"])
+    _log_tab("Advanced", ["advanced_checks"], [])

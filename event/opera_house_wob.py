@@ -8,7 +8,8 @@ class OperaHouseWOB(Event):
         return self.characters.CELES
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import OPERA_HOUSE_DISRUPTION
+        self.reward = self.add_reward(OPERA_HOUSE_DISRUPTION)
 
     def init_event_bits(self, space):
         space.write(
@@ -298,7 +299,7 @@ class OperaHouseWOB(Event):
         space.write(
             field.Call(show_celes),
         )
-       
+
         # do not animate the now hidden party leader
         space = Reserve(0xac28a, 0xac28d, "opera house do not turn party leader up", field.NOP())
         space = Reserve(0xac30d, 0xac312, "opera house do not move party leader up", field.NOP())

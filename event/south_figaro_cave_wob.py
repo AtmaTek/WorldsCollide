@@ -1,3 +1,4 @@
+from constants.checks import SOUTH_FIGARO_CAVE
 from event.event import *
 
 class SouthFigaroCaveWOB(Event):
@@ -8,7 +9,7 @@ class SouthFigaroCaveWOB(Event):
         return self.characters.LOCKE
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(SOUTH_FIGARO_CAVE)
 
     def init_event_bits(self, space):
         space.write(

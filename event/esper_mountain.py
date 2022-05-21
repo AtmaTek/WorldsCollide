@@ -1,3 +1,4 @@
+from constants.checks import ESPER_MOUNTAIN
 from event.event import *
 
 class EsperMountain(Event):
@@ -8,7 +9,7 @@ class EsperMountain(Event):
         return self.characters.RELM
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(ESPER_MOUNTAIN)
 
     def init_event_bits(self, space):
         space.write(

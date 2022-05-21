@@ -2,13 +2,14 @@ from event.event import *
 
 class OwzerMansion(Event):
     def name(self):
-        return "Owzer Mansion"
+        return "Owzer's Mansion"
 
     def character_gate(self):
         return self.characters.RELM
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import OWZERS_MANSION
+        self.reward = self.add_reward(OWZERS_MANSION)
 
     def mod(self):
         self.relm_npc_id = 0x13

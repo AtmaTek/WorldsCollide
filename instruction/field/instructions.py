@@ -610,6 +610,12 @@ class SetEventBit(_Instruction):
     def __str__(self):
         return super().__str__(hex(self.event_bit))
 
+class ShowNPC(SetEventBit):
+    def __init__(self, npcbit):
+        from data.npc_bit import event_byte, event_bit
+        event_bit = event_byte(npcbit) + event_bit
+        super().__init__(event_bit)
+
 class ClearEventBit(_Instruction):
     def __init__(self, event_bit):
         self.event_bit = event_bit
@@ -621,6 +627,12 @@ class ClearEventBit(_Instruction):
 
     def __str__(self):
         return super().__str__(hex(self.event_bit))
+
+class HideNPC(ClearEventBit):
+    def __init__(self, npcbit):
+        from data.npc_bit import event_byte, event_bit
+        event_bit = event_byte(npcbit) + event_bit
+        super().__init__(event_bit)
 
 class BranchIfEventBitSet(_Branch):
     def __init__(self, event_bit, destination):

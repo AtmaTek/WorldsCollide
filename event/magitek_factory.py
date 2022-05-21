@@ -8,9 +8,10 @@ class MagitekFactory(Event):
         return self.characters.CELES
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward3 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        from constants.checks import MAGITEK_FACTORY_TRASH, MAGITEK_FACTORY_GUARD, MAGITEK_FACTORY_FINISH
+        self.reward1 = self.add_reward(MAGITEK_FACTORY_TRASH)
+        self.reward2 = self.add_reward(MAGITEK_FACTORY_GUARD)
+        self.reward3 = self.add_reward(MAGITEK_FACTORY_FINISH)
 
     def init_event_bits(self, space):
         space.write(
@@ -47,6 +48,8 @@ class MagitekFactory(Event):
             self.character_mod(self.reward3.id)
         elif self.reward3.type == RewardType.ESPER:
             self.esper_mod(self.reward3.id)
+        elif self.reward3.type == RewardType.ITEM:
+            self.item_mod(self.reward3.id)
 
         self.crane_battle_mod()
         self.after_cranes_mod()
@@ -317,6 +320,34 @@ class MagitekFactory(Event):
         space.write(
             field.AddEsper(esper),
             field.Dialog(self.espers.get_receive_esper_dialog(esper)),
+            field.FadeOutScreen(),
+            field.WaitForFade(),
+            field.Branch(space.end_address + 1), # skip nops
+        )
+
+    def esper_item_mod(self):
+        self.setzer_npc.sprite = self.characters.get_random_esper_item_sprite()
+        self.setzer_npc.palette = self.characters.get_palette(self.setzer_npc.sprite)
+
+        space = Reserve(0xc819b, 0xc8302, "magitek factory add char and kefka cranes scene", field.NOP())
+        return (space)
+
+
+    def esper_mod(self, esper):
+        (space) = self.esper_item_mod()
+        space.write(
+            field.AddEsper(esper),
+            field.Dialog(self.espers.get_receive_esper_dialog(esper)),
+            field.FadeOutScreen(),
+            field.WaitForFade(),
+            field.Branch(space.end_address + 1), # skip nops
+        )
+
+    def item_mod(self, item):
+        (space) = self.esper_item_mod()
+        space.write(
+            field.AddItem(item),
+            field.Dialog(self.items.get_receive_dialog(item)),
             field.FadeOutScreen(),
             field.WaitForFade(),
             field.Branch(space.end_address + 1), # skip nops

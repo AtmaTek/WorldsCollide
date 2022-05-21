@@ -1,3 +1,6 @@
+from email.policy import default
+from constants.checks import LONE_WOLF_CHASE, LONE_WOLF_MOOGLE_ROOM
+from data.map_event import MapEvent
 from event.event import *
 
 class LoneWolf(Event):
@@ -8,14 +11,23 @@ class LoneWolf(Event):
         return self.characters.MOG
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+        self.reward1 = self.add_reward(LONE_WOLF_CHASE)
+        self.reward2 = self.add_reward(LONE_WOLF_MOOGLE_ROOM)
 
     def init_event_bits(self, space):
         space.write(
             field.ClearEventBit(event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
             field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
         )
+
+        # Load into narshe cliffs and you can trigger lone wolf easily with these bits
+        # if self.args.debug:
+        #     space.write(
+        #         field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
+        #         field.ClearEventBit(573), # Haven't witnessed lone wolf event
+        #         field.SetEventBit(831),   # Visibility bits for lone wolf npcs
+        #         field.SetEventBit(832),
+        #     )
 
     def mod(self):
         self.mog_npc_id = 0x1c
@@ -35,15 +47,23 @@ class LoneWolf(Event):
 
         if self.reward1.type == RewardType.CHARACTER:
             self.character_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ESPER:
+        if self.reward1.type == RewardType.ESPER:
             self.esper_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ITEM:
             self.item_mod(self.reward1.id)
-        self.alternative_item_mod()
-        self.finish_check_mod()
+
+        if self.reward2.type == RewardType.ESPER:
+            self.alternative_esper_mod()
+            self.moogle_room_reward_mod([field.AddEsper(self.reward2.id)])
+        elif self.reward2.type == RewardType.ITEM:
+            self.alternative_item_mod()
+            self.moogle_room_reward_mod([field.AddItem(self.reward2.id)])
 
         self.moogle_room_entrance_event_mod()
-        self.moogle_room_reward_mod()
+        self.lone_wolf_hide_mod()
+
+        self.finish_check_mod()
+
 
         self.log_reward(self.reward1)
         self.log_reward(self.reward2)
@@ -144,19 +164,35 @@ class LoneWolf(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
+    def alternative_esper_mod(self):
+        # esper lone wolf will give as a reward for not picking self.reward1
+        self.lone_wolf_dialog_esper_mod()
+
+        esper_space = Allocate(Bank.CC, 50, "idk yet", field.NOP())
+        esper_space.write([
+            field.AddEsper(self.reward2.id, sound_effect=True),
+            field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
+            Read(0xcd59d, 0xcd59d), # Wait 30 frames
+            field.Return()
+        ])
+
+        space = Reserve(0xcd59a, 0xcd59f, "received item dialog; wait 0.5s; take item from lone wolf", field.NOP())
+        space.write([
+            field.Call(esper_space.start_address)
+        ])
+
+
     def alternative_item_mod(self):
+        self.lone_wolf_dialog_item_mod()
+
         # item lone wolf will give as a reward for not picking self.reward1
-        import data.text
-        item_name = data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
-
-        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + item_name + "”!<end>")
-        self.dialogs.set_text(1742, "<line><      >Got “" + item_name + "”!<end>")
-
         space = Reserve(0xcd59f, 0xcd59f, "lone wolf item received", field.NOP())
         space.write(
             self.reward2.id,
         )
 
+    # add pause after lone wolf jumps to wait for falling sound effect
+    def lone_wolf_hide_mod(self):
         space = Reserve(0xcd5be, 0xcd5c0, "item chosen dialog before lone wolf falls", field.NOP())
         space.write(
             field.SetEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
@@ -178,6 +214,20 @@ class LoneWolf(Event):
             field.Call(hide_npcs),
             field.Pause(1.5),
         )
+
+    def lone_wolf_dialog_esper_mod(self):
+        import data.text
+        esper_name = data.text.convert(self.espers.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+
+        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + esper_name + "”!<end>")
+        self.dialogs.set_text(1742, f" <line>     Received the Magicite<line>              “{esper_name}.”<end>")
+
+    def lone_wolf_dialog_item_mod(self):
+        import data.text
+        item_name = data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+
+        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + item_name + "”!<end>")
+        self.dialogs.set_text(1742, "<line><      >Got “" + item_name + "”!<end>")
 
     def finish_check_mod(self):
         src = [
@@ -242,7 +292,7 @@ class LoneWolf(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
-    def moogle_room_reward_mod(self):
+    def moogle_room_reward_mod(self, reward_instructions):
         receive_reward = field.RETURN
         if self.reward1.type == RewardType.CHARACTER:
             receive_reward = self.moogle_room_character_mod(self.reward1.id)
@@ -268,8 +318,12 @@ class LoneWolf(Event):
                 field_entity.Pause(8),
                 field_entity.SetSpeed(field_entity.Speed.FASTEST),
                 field_entity.Move(direction.DOWN, 8),
-            ),
-            field.AddItem(self.reward2.id),
+            )
+        ]
+
+        src += reward_instructions
+
+        src += [
             field.Dialog(1742),
             field.HideEntity(self.mog_moogle_room_npc_id),
             field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),

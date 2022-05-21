@@ -54,6 +54,8 @@ class Events():
 
             if self.args.spoiler_log and (event.rewards_log or event.changes_log):
                 log_strings.append(event.log_string())
+
+        log_strings.append("* = Esper/Magicite")
         space.write(field.Return())
 
         if self.args.spoiler_log:
@@ -124,6 +126,10 @@ class Events():
                         slot_iterations[slot] = 0
                     unlocked_slots.append(slot)
                     unlocked_slot_iterations.append(slot_iterations[slot])
+
+            # this means an impossible start has occured.
+            # i.e. no character can be retrieved given the starting char + check availability
+            assert len(unlocked_slots) > 0
 
             # pick slot for the next character weighted by number of iterations each slot has been available
             slot_index = weighted_reward_choice(unlocked_slot_iterations, iteration)

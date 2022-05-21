@@ -8,7 +8,8 @@ class MoblizWOR(Event):
         return self.characters.TERRA
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import MOBLIZ_ATTACK
+        self.reward = self.add_reward(MOBLIZ_ATTACK)
 
     def init_event_bits(self, space):
         space.write(

@@ -1,3 +1,4 @@
+from constants.checks import NARSHE_BATTLE
 from event.event import *
 
 class NarsheBattle(Event):
@@ -8,7 +9,7 @@ class NarsheBattle(Event):
         return 2
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(NARSHE_BATTLE)
 
     def init_event_bits(self, space):
         space.write(

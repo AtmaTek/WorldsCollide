@@ -223,7 +223,7 @@ class TrackMenu:
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
             # if in a scroll-area menu, sustain the scroll area
-            asm.LDA(0x0200, asm.ABS), 
+            asm.LDA(0x0200, asm.ABS),
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.checks.MENU_NUMBER, asm.IMM8),
@@ -234,9 +234,9 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
-        for submenu_idx in self.common.flags.submenus.keys():
+        for submenu_id in self.common.flags.submenus.keys():
             src += [
-                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.CMP(self.common.flags.submenus[submenu_id].MENU_NUMBER, asm.IMM8),
                 asm.BEQ("SUSTAIN_SCROLL_AREA"),
             ]
 
@@ -275,8 +275,8 @@ class TrackMenu:
             asm.BNE("EXIT_SCROLL_AREA"), # branch if so
         ]
 
-        for submenu_idx in self.common.flags.submenus.keys():
-            src.extend(self.common.get_submenu_src(submenu_idx, self.common.invoke_flags_submenu[submenu_idx]))
+        for submenu_id in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_id, self.common.invoke_flags_submenu[submenu_id]))
 
         src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
