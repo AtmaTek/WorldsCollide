@@ -28,7 +28,7 @@ FIGARO_CASTLE_THRONE = NameBit("Figaro Castle Throne", event_bit.NAMED_EDGAR, AN
 FIGARO_CASTLE_ENGINE = NameBit("Figaro Castle Engine", event_bit.DEFEATED_TENTACLES_FIGARO, ANY_REWARD)
 FLOATING_CONT_ARRIVE = NameBit("Floating Cont. Arrive", event_bit.RECRUITED_SHADOW_FLOATING_CONTINENT, CHAR_ESPER_REWARD)
 FLOATING_CONT_BEAST = NameBit("Floating Cont. Beast", event_bit.DEFEATED_ATMAWEAPON, ESPER_ITEM_REWARD)
-FLOATING_CONT_ESCAPE = NameBit("Floating Cont. Escape", event_bit.FINISHED_FLOATING_CONTINENT, ANY_REWARD)
+FLOATING_CONT_ESCAPE = NameBit("Floating Cont. Escape", event_bit.FINISHED_FLOATING_CONTINENT, CHAR_ESPER_REWARD)
 GAUS_FATHERS_HOUSE = NameBit("Gau's Father's House", event_bit.RECRUITED_SHADOW_GAU_FATHER_HOUSE, ANY_REWARD)
 IMPERIAL_CAMP = NameBit("Imperial Camp", event_bit.FINISHED_IMPERIAL_CAMP, ANY_REWARD)
 KEFKAS_TOWER_CELL_BEAST = NameBit("Kefka's Tower Cell Beast", event_bit.DEFEATED_ATMA, ITEM_REWARD)
@@ -127,7 +127,6 @@ all_checks = [
     ZONE_EATER,
     ZOZO_TOWER,
 
-
     # Dragons
     ANCIENT_CASTLE_DRAGON,
     FANATICS_TOWER_DRAGON,
@@ -206,6 +205,7 @@ STRAGO = [
     BURNING_HOUSE,
     EBOTS_ROCK,
     FANATICS_TOWER_FOLLOWER,
+    FANATICS_TOWER_LEADER, # allow getting the chest at top without getting strago
 ]
 TERRA = [
     LETE_RIVER,
@@ -226,7 +226,6 @@ UNGATED = [
     ## Ungated Boss battled
     NARSHE_BATTLE,
     TRITOCH_CLIFF,
-    FANATICS_TOWER_LEADER, # allow getting the chest at top without getting strago
 
     # KT
     KEFKAS_TOWER_CELL_BEAST,
