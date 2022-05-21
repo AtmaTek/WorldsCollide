@@ -6,6 +6,7 @@ import menus.status as status
 import menus.final_lineup as final_lineup
 import menus.coliseum as coliseum
 import menus.sell as sell
+import menus.magic as magic
 
 class Menus:
     def __init__(self, characters, dances):
@@ -20,6 +21,7 @@ class Menus:
         self.final_lineup_menu = final_lineup.FinalLineupMenu(self.characters)
         self.coliseum_menu = coliseum.ColiseumMenu()
         self.sell_menu = sell.SellMenu()
+        self.magic_menu = magic.MagicMenu()
 
         self.scrollbar_bugfix()
 

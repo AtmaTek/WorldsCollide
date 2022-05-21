@@ -202,7 +202,7 @@ class Espers():
             mp_percent = random.randint(self.args.esper_mp_random_percent_min,
                                         self.args.esper_mp_random_percent_max) / 100.0
             value = int(esper.mp * mp_percent)
-            esper.mp = max(min(value, 255), 1)
+            esper.mp = max(min(value, 254), 1)
 
     def equipable_random(self):
         from data.characters import Characters
