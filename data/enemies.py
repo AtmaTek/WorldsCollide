@@ -20,10 +20,6 @@ class Enemies():
     ITEMS_END = 0xf35ff
     ITEMS_SIZE = 4
 
-    SPECIAL_NAMES_START = 0xfd0d0
-    SPECIAL_NAMES_END = 0xfdfdf
-    SPECIAL_NAMES_SIZE = 10
-
     DRAGON_COUNT = 8
 
     SRBEHEMOTH2_ID = 127
@@ -36,12 +32,11 @@ class Enemies():
         self.enemy_data = DataArray(self.rom, self.DATA_START, self.DATA_END, self.DATA_SIZE)
         self.enemy_name_data = DataArray(self.rom, self.NAMES_START, self.NAMES_END, self.NAME_SIZE)
         self.enemy_item_data = DataArray(self.rom, self.ITEMS_START, self.ITEMS_END, self.ITEMS_SIZE)
-        self.enemy_special_name_data = DataArray(self.rom, self.SPECIAL_NAMES_START, self.SPECIAL_NAMES_END, self.SPECIAL_NAMES_SIZE)
 
         self.enemies = []
         self.bosses = []
         for enemy_index in range(len(self.enemy_data)):
-            enemy = Enemy(enemy_index, self.enemy_data[enemy_index], self.enemy_name_data[enemy_index], self.enemy_item_data[enemy_index], self.enemy_special_name_data[enemy_index])
+            enemy = Enemy(enemy_index, self.enemy_data[enemy_index], self.enemy_name_data[enemy_index], self.enemy_item_data[enemy_index])
             self.enemies.append(enemy)
 
             if enemy_index in bosses.enemy_name and enemy_index not in bosses.removed_enemy_name:
@@ -358,12 +353,10 @@ class Enemies():
             self.enemy_data[enemy_index] = self.enemies[enemy_index].data()
             self.enemy_name_data[enemy_index] = self.enemies[enemy_index].name_data()
             self.enemy_item_data[enemy_index] = self.enemies[enemy_index].item_data()
-            self.enemy_special_name_data[enemy_index] = self.enemies[enemy_index].special_name_data()
 
         self.enemy_data.write()
         self.enemy_name_data.write()
         self.enemy_item_data.write()
-        self.enemy_special_name_data.write()
 
         self.formations.write()
         self.packs.write()

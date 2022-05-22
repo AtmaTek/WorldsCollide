@@ -7,10 +7,6 @@ def equipable_umaro(character_count):
 
     space = Reserve(0x39ef4, 0x39ef7, "Reequip Umaro if genji glove/gauntlet/merit award equipped/removed", asm.NOP())
 
-def set_starting_level(start_level):
-    space = Reserve(0x09fc6, 0x09fc6, "Starting level")
-    space.write(start_level.to_bytes(1, 'little'))
-
 def update_morph_character(characters):
     from constants.commands import id_name
 

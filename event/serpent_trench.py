@@ -1,4 +1,3 @@
-from constants.checks import SERPENT_TRENCH
 from event.event import *
 
 class SerpentTrench(Event):
@@ -9,7 +8,7 @@ class SerpentTrench(Event):
         return self.characters.GAU
 
     def init_rewards(self):
-        self.reward = self.add_reward(SERPENT_TRENCH)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.cave_mod()

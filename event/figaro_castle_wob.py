@@ -1,15 +1,17 @@
 from event.event import *
-from constants.checks import FIGARO_CASTLE_THRONE
 
 class FigaroCastleWOB(Event):
     def name(self):
-        return FIGARO_CASTLE_THRONE.name
+        return "Figaro Castle WOB"
 
     def character_gate(self):
         return self.characters.EDGAR
 
     def init_rewards(self):
-        self.reward = self.add_reward(FIGARO_CASTLE_THRONE)
+        if self.args.no_free_characters_espers:
+            self.reward = self.add_reward(RewardType.ITEM)
+        else:
+            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -54,9 +56,7 @@ class FigaroCastleWOB(Event):
 
     def character_mod(self, character):
         self.edgar_npc.sprite = character
-        if self.args.no_peeking:
-            self.edgar_npc.sprite = self.characters.get_no_peeking_sprite()
-        self.edgar_npc.palette = self.characters.get_palette(self.edgar_npc.sprite)
+        self.edgar_npc.palette = self.characters.get_palette(character)
 
         src = [
             field.SetEventBit(event_bit.NAMED_EDGAR),
@@ -77,10 +77,7 @@ class FigaroCastleWOB(Event):
         )
 
     def esper_item_mod(self, esper_item_instructions):
-        if self.args.no_peeking:
-            self.edgar_npc.sprite = self.characters.get_no_peeking_sprite()
-        else:
-            self.edgar_npc.sprite = self.characters.get_random_esper_item_sprite()
+        self.edgar_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.edgar_npc.palette = self.characters.get_palette(self.edgar_npc.sprite)
 
         src = [

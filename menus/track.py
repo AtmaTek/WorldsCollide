@@ -218,14 +218,14 @@ class TrackMenu:
             (self.common.invoke_progress & 0xffff).to_bytes(2, "little"),
             (self.common.invoke_flags & 0xffff).to_bytes(2, "little"),
         ]
-        space = Write(Bank.F0, src, "track option click table")
-        options_table = space.start_address_snes
+        space = Write(Bank.C3, src, "track option click table")
+        options_table = space.start_address
 
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
             # if in a scroll-area menu, sustain the scroll area
-            asm.LDA(0x0200, asm.ABS),
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.checks.MENU_NUMBER, asm.IMM8),
@@ -236,9 +236,9 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
-        for submenu_id in self.common.flags.submenus.keys():
+        for submenu_idx in self.common.flags.submenus.keys():
             src += [
-                asm.CMP(self.common.flags.submenus[submenu_id].MENU_NUMBER, asm.IMM8),
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
                 asm.BEQ("SUSTAIN_SCROLL_AREA"),
             ]
 
@@ -263,9 +263,8 @@ class TrackMenu:
             "HANDLE_B",
             asm.LDA(0x09, asm.DIR),     # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BNE("CONTINUE"),        # return if so
-            asm.RTS(),
-            "CONTINUE",
+            asm.BEQ("RETURN"),          # return if not
+
             asm.LDA(0x04, asm.IMM8),    # a = initialize main menu command
             asm.STA(0x27, asm.DIR),     # add initialize main menu to queue
             asm.LDA(self.common.FADE_OUT_COMMAND, asm.IMM8),
@@ -278,8 +277,8 @@ class TrackMenu:
             asm.BNE("EXIT_SCROLL_AREA"), # branch if so
         ]
 
-        for submenu_id in self.common.flags.submenus.keys():
-            src.extend(self.common.get_submenu_src(submenu_id, self.common.invoke_flags_submenu[submenu_id]))
+        for submenu_idx in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_idx, self.common.invoke_flags_submenu[submenu_idx]))
 
         src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),

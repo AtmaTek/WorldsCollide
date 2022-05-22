@@ -11,10 +11,8 @@ class EnemyFormations():
     ENEMIES_END = 0xf83bf
     ENEMIES_SIZE = 15
 
-    PHUNBABA3 = bosses.name_formation["Phunbaba 3"]
-    DOOM_GAZE = bosses.name_formation["Doom Gaze"]
-    ALL_STATUES = list(bosses.statue_formation_name)
-    ALL_DRAGONS = list(bosses.dragon_formation_name)
+    PHUNBABA3 = 422
+    DOOM_GAZE = 463
     PRESENTER = 433
     COLISEUM = 575
 

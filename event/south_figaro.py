@@ -1,15 +1,17 @@
 from event.event import *
-from constants.checks import SOUTH_FIGARO_PRISONER
 
 class SouthFigaro(Event):
     def name(self):
-        return SOUTH_FIGARO_PRISONER.name
+        return "South Figaro"
 
     def character_gate(self):
         return self.characters.CELES
 
     def init_rewards(self):
-        self.reward = self.add_reward(SOUTH_FIGARO_PRISONER)
+        if self.args.no_free_characters_espers:
+            self.reward = self.add_reward(RewardType.ITEM)
+        else:
+            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -62,9 +64,7 @@ class SouthFigaro(Event):
 
     def character_mod(self, character):
         self.celes_npc.sprite = character
-        if self.args.no_peeking:
-            self.celes_npc.sprite = self.characters.get_no_peeking_sprite()
-        self.celes_npc.palette = self.characters.get_palette(self.celes_npc.sprite)
+        self.celes_npc.palette = self.characters.get_palette(character)
 
         src = [
             field.RecruitAndSelectParty(character),
@@ -87,10 +87,7 @@ class SouthFigaro(Event):
         self.celes_npc.set_event_address(celes_npc_event)
 
     def esper_item_mod(self, esper_item_instructions):
-        if self.args.no_peeking:
-            self.celes_npc.sprite = self.characters.get_no_peeking_sprite()
-        else:
-            self.celes_npc.sprite = self.characters.get_random_esper_item_sprite()
+        self.celes_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.celes_npc.palette = self.characters.get_palette(self.celes_npc.sprite)
 
         src = [

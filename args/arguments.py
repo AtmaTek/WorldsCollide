@@ -4,13 +4,12 @@ class Arguments:
         self.groups = [
             "settings",
             "objectives",
-            "starting_party", "characters", "swdtechs", "blitzes", "lores", "rages", "dances", "steal", "sketch_control", "commands",
+            "starting_party", "characters", "swdtechs", "blitzes", "lores", "rages", "dances", "steal", "commands",  
             "xpmpgp", "scaling", "bosses", "encounters", "boss_ai",
-            "espers", "natural_magic", "misc_magic",
+            "espers", "natural_magic",
             "starting_gold_items", "items", "shops", "chests",
             "graphics",
             "coliseum", "auction_house", "challenges", "bug_fixes", "misc",
-            "advanced_checks",
         ]
         self.group_modules = {}
         for group in self.groups:

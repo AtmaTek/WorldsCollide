@@ -158,7 +158,7 @@ class Lores:
             mp_percent = random.randint(self.args.lores_mp_random_percent_min,
                                         self.args.lores_mp_random_percent_max) / 100.0
             value = int(lore.mp * mp_percent)
-            lore.mp = max(min(value, 254), 0)
+            lore.mp = max(min(value, 255), 0)
 
     def mod(self):
         self.write_learners_table()

@@ -1,4 +1,3 @@
-from constants.checks import PHANTOM_TRAIN
 from event.event import *
 
 class PhantomTrain(Event):
@@ -9,7 +8,7 @@ class PhantomTrain(Event):
         return self.characters.SABIN
 
     def init_rewards(self):
-        self.reward = self.add_reward(PHANTOM_TRAIN)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -18,9 +17,6 @@ class PhantomTrain(Event):
         )
 
     def mod(self):
-        self.ghost_npc_id = 0x10
-        self.ghost_npc = self.maps.get_npc(0x98, self.ghost_npc_id)
-
         self._load_world_map()
         self.forest_spring_mod()
         self.ghost_shop_forest_mod()
@@ -80,14 +76,12 @@ class PhantomTrain(Event):
         self.load_world_map = space.start_address
 
     def esper_item_mod(self, esper_item_instructions):
-        if self.args.no_peeking:
-            self.ghost_npc.sprite = self.characters.get_no_peeking_sprite()
-            self.ghost_npc.palette = self.characters.get_palette(self.ghost_npc.sprite)
+        ghost_npc_id = 0x10
 
         src = [
             esper_item_instructions,
 
-            field.HideEntity(self.ghost_npc_id),
+            field.HideEntity(ghost_npc_id),
             field.SetEventBit(event_bit.GOT_PHANTOM_TRAIN_REWARD),
             field.FinishCheck(),
             field.Return(),
@@ -105,7 +99,7 @@ class PhantomTrain(Event):
         inside_last_car_entrance_event = space.next_address
         space.write(
             field.ReturnIfEventBitClear(event_bit.GOT_PHANTOM_TRAIN_REWARD),
-            field.HideEntity(self.ghost_npc_id),
+            field.HideEntity(ghost_npc_id),
             field.Return(),
         )
         self.maps.set_entrance_event(0x98, inside_last_car_entrance_event - EVENT_CODE_START)
@@ -123,17 +117,17 @@ class PhantomTrain(Event):
         ])
 
     def character_mod(self, character):
-        self.ghost_npc.sprite = character
-        if self.args.no_peeking:
-            self.ghost_npc.sprite = self.characters.get_no_peeking_sprite()
-        self.ghost_npc.palette = self.characters.get_palette(self.ghost_npc.sprite)
+        ghost_npc_id = 0x10
+        ghost_npc = self.maps.get_npc(0x98, ghost_npc_id)
+        ghost_npc.sprite = character
+        ghost_npc.palette = self.characters.get_palette(character)
 
         self.dialogs.set_text(716, "Bring it along?<line><choice>(Sure)<line><choice>(No way)<end>")
 
         space = Reserve(0xbaca0, 0xbacce, "phantom train add character", field.NOP())
         space.write(
             field.RecruitAndSelectParty(character),
-            field.HideEntity(self.ghost_npc_id),
+            field.HideEntity(ghost_npc_id),
             field.SetEventBit(event_bit.GOT_PHANTOM_TRAIN_REWARD),
             field.FadeInScreen(),
             field.FinishCheck(),
@@ -144,7 +138,7 @@ class PhantomTrain(Event):
         inside_last_car_entrance_event = space.next_address
         space.write(
             field.ReturnIfEventBitClear(event_bit.character_available(character)),
-            field.HideEntity(self.ghost_npc_id),
+            field.HideEntity(ghost_npc_id),
             field.Return(),
         )
         self.maps.set_entrance_event(0x98, inside_last_car_entrance_event - EVENT_CODE_START)

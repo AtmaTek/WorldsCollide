@@ -1,4 +1,3 @@
-from constants.checks import ZONE_EATER
 from event.event import *
 
 class ZoneEater(Event):
@@ -9,7 +8,7 @@ class ZoneEater(Event):
         return self.characters.GOGO
 
     def init_rewards(self):
-        self.reward = self.add_reward(ZONE_EATER)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.gogo_npc_id = 0x10
@@ -62,9 +61,7 @@ class ZoneEater(Event):
 
     def character_mod(self, character):
         self.gogo_npc.sprite = character
-        if self.args.no_peeking:
-            self.gogo_npc.sprite = self.characters.get_no_peeking_sprite()
-        self.gogo_npc.palette = self.characters.get_palette(self.gogo_npc.sprite)
+        self.gogo_npc.palette = self.characters.get_palette(character)
 
         space = Reserve(0xb81ce, 0xb81ff, "zone eater recruit gogo", field.NOP())
         space.write(
@@ -91,14 +88,10 @@ class ZoneEater(Event):
         )
 
     def esper_mod(self, esper):
-        if self.args.no_peeking:
-            self.gogo_npc.sprite = self.characters.get_no_peeking_sprite()
-            self.gogo_npc.palette = self.characters.get_palette(self.gogo_npc.sprite)
-        else:
-            self.gogo_npc.sprite = 91
-            self.gogo_npc.palette = 2
-            self.gogo_npc.split_sprite = 1
-            self.gogo_npc.direction = direction.UP
+        self.gogo_npc.sprite = 91
+        self.gogo_npc.palette = 2
+        self.gogo_npc.split_sprite = 1
+        self.gogo_npc.direction = direction.UP
 
         self.esper_item_mod([
             field.DisableEntityCollision(self.gogo_npc_id),
@@ -113,10 +106,7 @@ class ZoneEater(Event):
         ])
 
     def item_mod(self, item):
-        if self.args.no_peeking:
-            self.gogo_npc.sprite = self.characters.get_no_peeking_sprite()
-        else:
-            self.gogo_npc.sprite = self.characters.get_random_esper_item_sprite()
+        self.gogo_npc.sprite = self.characters.get_random_esper_item_sprite()
         self.gogo_npc.palette = self.characters.get_palette(self.gogo_npc.sprite)
 
         self.esper_item_mod([

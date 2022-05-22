@@ -1,4 +1,3 @@
-from constants.checks import DARYLS_TOMB
 from event.event import *
 
 class DarylTomb(Event):
@@ -9,7 +8,7 @@ class DarylTomb(Event):
         return self.characters.SETZER
 
     def init_rewards(self):
-        self.reward = self.add_reward(DARYLS_TOMB)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.entrance_mod()
@@ -74,9 +73,6 @@ class DarylTomb(Event):
         )
 
     def daryl_sleeps_here_mod(self, new_name):
-        if self.args.no_peeking:
-            new_name = self.characters.get_no_peeking_name()
-
         num_spaces = 15 - len(new_name) # try to center dialog
 
         daryl_sleeps_here_dialog_id = 2461 # previously 2464

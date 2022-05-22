@@ -63,70 +63,17 @@ class Spells:
         scan_id = name_id["Scan"]
         self.spells[scan_id].mp = 0
 
-    def ultima_254_mp(self):
-        ultima_id = name_id["Ultima"]
-        self.spells[ultima_id].mp = 254
-
-    def shuffle_mp(self):
-        mp = []
-        for spell in self.spells:
-            mp.append(spell.mp)
-
-        import random
-        random.shuffle(mp)
-        for spell in self.spells:
-            spell.mp = mp.pop()
-
-    def random_mp_value(self):
-        import random
-        for spell in self.spells:
-            spell.mp = random.randint(self.args.magic_mp_random_value_min, self.args.magic_mp_random_value_max)
-
-    def random_mp_percent(self):
-        import random
-        for spell in self.spells:
-            mp_percent = random.randint(self.args.magic_mp_random_percent_min,
-                                        self.args.magic_mp_random_percent_max) / 100.0
-            value = int(spell.mp * mp_percent)
-            spell.mp = max(min(value, 254), 0)
-
     def mod(self):
-        if self.args.magic_mp_shuffle:
-            self.shuffle_mp()
-        elif self.args.magic_mp_random_value:
-            self.random_mp_value()
-        elif self.args.magic_mp_random_percent:
-            self.random_mp_percent()
-
-        # Apply No MP Scan after any MP shuffle/rando
         if self.args.scan_all:
             self.no_mp_scan()
 
-        # Apply Ultima 254 MP after any MP shuffle/rando
-        if self.args.ultima_254_mp:
-            self.ultima_254_mp()
-
     def write(self):
-        if self.args.spoiler_log:
-            self.log()
-            
         for spell_index, spell in enumerate(self.spells):
             self.name_data[spell_index] = spell.name_data()
             self.ability_data[spell_index] = spell.ability_data()
 
         self.name_data.write()
         self.ability_data.write()
-
-    def log(self):
-        from log import section
-        
-        lcolumn = []
-        for spell in self.spells:
-            spell_name = spell.get_name()
-
-            lcolumn.append(f"{spell_name:<{self.NAME_SIZE}} {spell.mp:>3} MP")
-        
-        section("Spells", lcolumn, [])
 
     def print(self):
         for spell in self.spells:

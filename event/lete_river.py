@@ -1,4 +1,3 @@
-from constants.checks import LETE_RIVER
 from event.event import *
 
 class LeteRiver(Event):
@@ -9,7 +8,7 @@ class LeteRiver(Event):
         return self.characters.TERRA
 
     def init_rewards(self):
-        self.reward = self.add_reward(LETE_RIVER)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(

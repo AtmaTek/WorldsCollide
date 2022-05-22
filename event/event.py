@@ -1,4 +1,3 @@
-from data.item import Item
 from memory.space import Bank, Space, Reserve, Allocate, Free, Write, Read
 import data.direction as direction
 
@@ -42,39 +41,10 @@ class Event():
     def characters_required(self):
         return 1
 
-    def get_reward_type(self, check_info = None):
-        bit = check_info.bit
-
-        assert bit
-
-        if bit in self.args.esper_item_rewards:
-            return RewardType.ESPER | RewardType.ITEM
-
-        if bit in self.args.esper_rewards:
-            return RewardType.ESPER
-
-        if bit in self.args.item_rewards:
-            return RewardType.ITEM
-
-        return check_info.reward_types
-
-    def add_item_reward(self):
-        reward = Reward(self, RewardType.ITEM)
-        self.rewards.append(reward)
-        return reward
-
-    def add_character_reward(self):
-        reward = Reward(self, RewardType.CHARACTER)
-        self.rewards.append(reward)
-        return reward
-
-    def add_reward(self, check_info):
-        possible_types = self.get_reward_type(check_info)
-        assert possible_types
-
-        reward = Reward(self, possible_types)
-        self.rewards.append(reward)
-        return reward
+    def add_reward(self, possible_types):
+        new_reward = Reward(self, possible_types)
+        self.rewards.append(new_reward)
+        return new_reward
 
     def init_rewards(self):
         pass
@@ -95,7 +65,7 @@ class Event():
         if reward.type == RewardType.CHARACTER:
             reward_string += self.characters.get_name(reward.id)
         elif reward.type == RewardType.ESPER:
-            reward_string += "*" + self.espers.get_name(reward.id)
+            reward_string += self.espers.get_name(reward.id)
         elif reward.type == RewardType.ITEM:
             reward_string += self.items.get_name(reward.id)
         self.rewards_log.append(reward_string + suffix)
@@ -109,7 +79,6 @@ class Event():
             log_string += f" {', '.join(self.rewards_log)}"
         if self.changes_log:
             log_string += '\n' + '\n'.join(self.changes_log)
-
         return log_string
 
     def mod(self):

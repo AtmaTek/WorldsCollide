@@ -1,4 +1,3 @@
-from constants.checks import PHOENIX_CAVE
 from event.event import *
 
 class PhoenixCave(Event):
@@ -12,7 +11,7 @@ class PhoenixCave(Event):
         return 2
 
     def init_rewards(self):
-        self.reward = self.add_reward(PHOENIX_CAVE)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.locke_npc_id = 0x10

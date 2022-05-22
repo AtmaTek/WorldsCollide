@@ -15,11 +15,9 @@ class FloatingContinent(Event):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        from constants.checks import FLOATING_CONT_ARRIVE, FLOATING_CONT_BEAST, FLOATING_CONT_ESCAPE
-
-        self.reward1 = self.add_reward(FLOATING_CONT_ARRIVE)
-        self.reward2 = self.add_reward(FLOATING_CONT_BEAST)
-        self.reward3 = self.add_reward(FLOATING_CONT_ESCAPE)
+        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        self.reward3 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
 
     def mod(self):
         self.shadow_leaves_mod()
@@ -36,8 +34,6 @@ class FloatingContinent(Event):
         if self.reward1.type == RewardType.CHARACTER:
             self.ground_character_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ESPER:
-            self.ground_esper_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ITEM:
             self.ground_esper_mod(self.reward1.id)
         self.finish_ground_check()
 
@@ -58,8 +54,6 @@ class FloatingContinent(Event):
             self.escape_character_mod(self.reward3.id)
         elif self.reward3.type == RewardType.ESPER:
             self.escape_esper_mod(self.reward3.id)
-        elif self.reward3.type == RewardType.ITEM:
-            self.escape_item_mod(self.reward3.id)
 
         self.log_reward(self.reward1)
         self.log_reward(self.reward2)
@@ -149,13 +143,6 @@ class FloatingContinent(Event):
         )
 
     def air_force_battle_mod(self):
-        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
-            # Slow the scrolling background by modifying the ADC command.
-            space = Reserve(0x2b1b1, 0x2b1b3, "falling through clouds background movement")
-            space.write(
-                asm.ADC(0x0001, asm.IMM16) #default: 0x0006
-            )
-
         boss_pack_id = self.get_boss("Air Force")
         battle_background = 7 # sky, falling
 
@@ -196,7 +183,7 @@ class FloatingContinent(Event):
             field.FadeInScreen(),
         )
 
-    def ground_esper_mod(self, esper_id):
+    def ground_esper_mod(self, esper):
         self.ground_shadow_npc.sprite = 91
         self.ground_shadow_npc.palette = 2
         self.ground_shadow_npc.split_sprite = 1
@@ -204,26 +191,11 @@ class FloatingContinent(Event):
 
         space = Reserve(0xad9b1, 0xad9ed, "floating continent add esper on ground", field.NOP())
         space.write(
-            field.AddEsper(esper_id),
-            field.Dialog(self.espers.get_receive_esper_dialog(esper_id)),
+            field.AddEsper(esper),
+            field.Dialog(self.espers.get_receive_esper_dialog(esper)),
             field.DeleteEntity(self.ground_shadow_npc_id),
             field.Branch(space.end_address + 1),
         )
-
-    def ground_item_mod(self, item_id):
-        self.ground_shadow_npc.sprite = 106
-        self.ground_shadow_npc.palette = 6
-        self.ground_shadow_npc.split_sprite = 1
-        self.ground_shadow_npc.direction = direction.DOWN
-
-        space = Reserve(0xad9b1, 0xad9ed, "floating continent add item on ground", field.NOP())
-        space.write(
-            field.AddItem(item_id),
-            field.Dialog(self.items.get_receive_dialog(item_id)),
-            field.DeleteEntity(self.ground_shadow_npc_id),
-            field.Branch(space.end_address + 1),
-        )
-
 
     def finish_ground_check(self):
         src = [
@@ -477,10 +449,10 @@ class FloatingContinent(Event):
             field.FadeInScreen(),
         ])
 
-    def escape_esper_item_mod(self):
+    def escape_esper_mod(self, esper):
         # use guest character to give esper reward
         guest_char_id = 0x0f
-        guest_char = self.maps.get_npc(0x189, guest_char_id) # is this necessary?
+        guest_char = self.maps.get_npc(0x189, guest_char_id)
 
         random_sprite = self.characters.get_random_esper_item_sprite()
         random_sprite_palette = self.characters.get_palette(random_sprite)
@@ -492,26 +464,10 @@ class FloatingContinent(Event):
             field.RefreshEntities(),
         )
 
-        return (guest_char_id)
-
-    def escape_esper_mod(self, esper_id):
-        (guest_char_id) = self.escape_esper_item_mod()
-
         self.escape_mod(guest_char_id, [
             field.DeleteEntity(guest_char_id),
             field.RefreshEntities(),
             field.LoadMap(0x06, direction.DOWN, default_music = True, x = 16, y = 6, fade_in = True, entrance_event = True),
-            field.AddEsper(esper_id),
-            field.Dialog(self.espers.get_receive_esper_dialog(esper_id)),
-        ])
-
-    def escape_item_mod(self, item_id):
-        (guest_char_id) = self.escape_esper_item_mod()
-
-        self.escape_mod(guest_char_id, [
-            field.DeleteEntity(guest_char_id),
-            field.RefreshEntities(),
-            field.LoadMap(0x06, direction.DOWN, default_music = True, x = 16, y = 6, fade_in = True, entrance_event = True),
-            field.AddItem(item_id),
-            field.Dialog(self.espers.get_receive_dialog(item_id)),
+            field.AddEsper(esper),
+            field.Dialog(self.espers.get_receive_esper_dialog(esper)),
         ])

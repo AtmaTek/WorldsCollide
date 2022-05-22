@@ -235,7 +235,6 @@ class ScrollArea:
             asm.RTL(),
         ]
         space = Write(Bank.F0, src, "pregame track scroll area write line")
-
         write_line = space.start_address
 
         src = [

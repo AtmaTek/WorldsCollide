@@ -406,7 +406,6 @@ def TintSpritePalette(tint, palette, invert = False):
     return TintSpritePalette(tint, palette * 0x10, palette * 0x10 + 0x0f, invert)
 
 class Flash(IntFlag):
-    NONE        = 0x00
     RED         = 0x20
     GREEN       = 0x40
     BLUE        = 0x80
@@ -414,7 +413,7 @@ class Flash(IntFlag):
     WHITE       = RED | GREEN | BLUE
 class FlashScreen(_Instruction):
     def __init__(self, color):
-        if color != Flash.NONE and (not (color & Flash.RED) and not (color & Flash.GREEN) and not (color & Flash.BLUE)):
+        if not (color & Flash.RED) and not (color & Flash.GREEN) and not (color & Flash.BLUE):
             raise ValueError(f"FlashScreen: invalid color {hex(color)}")
         super().__init__(0x55, color)
 
@@ -610,12 +609,6 @@ class SetEventBit(_Instruction):
     def __str__(self):
         return super().__str__(hex(self.event_bit))
 
-class ShowNPC(SetEventBit):
-    def __init__(self, npcbit):
-        from data.npc_bit import event_byte, event_bit
-        event_bit = event_byte(npcbit) + event_bit
-        super().__init__(event_bit)
-
 class ClearEventBit(_Instruction):
     def __init__(self, event_bit):
         self.event_bit = event_bit
@@ -627,12 +620,6 @@ class ClearEventBit(_Instruction):
 
     def __str__(self):
         return super().__str__(hex(self.event_bit))
-
-class HideNPC(ClearEventBit):
-    def __init__(self, npcbit):
-        from data.npc_bit import event_byte, event_bit
-        event_bit = event_byte(npcbit) + event_bit
-        super().__init__(event_bit)
 
 class BranchIfEventBitSet(_Branch):
     def __init__(self, event_bit, destination):

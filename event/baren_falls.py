@@ -1,4 +1,3 @@
-from constants.checks import BAREN_FALLS
 from event.event import *
 
 class BarenFalls(Event):
@@ -9,7 +8,7 @@ class BarenFalls(Event):
         return self.characters.SABIN
 
     def init_rewards(self):
-        self.reward = self.add_reward(BAREN_FALLS)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         # delete row of events that trigger sabin/cyan dialog and shadow leaving (if in party)
@@ -22,9 +21,6 @@ class BarenFalls(Event):
         self.rizopas_battle_mod()
         self.after_battle_mod()
         self.already_complete_mod()
-
-        if self.args.flashes_remove_most:
-            self.background_scrolling_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -164,16 +160,3 @@ class BarenFalls(Event):
             field.AddItem(item),
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
-
-    def background_scrolling_mod(self):
-        # Slow the scrolling background by modifying the ADC command.
-        space = Reserve(0x2b1f7, 0x2b1f9, "waterfall background movement")
-        space.write(
-            asm.ADC(0x0001, asm.IMM16) #default: 0x0006
-        )
-
-        # Eliminate the palette swaps without reducing any cpu cycles by just writing back the value from the previous LDA
-        space = Reserve(0x2b20b, 0x2b20d, "waterfall palette change")
-        space.write(
-            asm.STA(0xEC71, asm.ABS_X)
-        )

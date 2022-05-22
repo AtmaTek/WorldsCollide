@@ -11,13 +11,10 @@ import data.lores as lores
 import data.rages as rages
 import data.dances as dances
 import data.steal as steal
-import data.sketches as sketches
-import data.controls as controls
 import data.magiteks as magiteks
 import data.espers as espers
 import data.shops as shops
 import data.coliseum as coliseum
-import data.title_graphics as title_graphics
 
 class Data:
     def __init__(self, rom, args):
@@ -58,13 +55,6 @@ class Data:
 
         self.steal = steal.Steal(rom, args)
         self.steal.mod()
-
-        self.sketches = sketches.Sketches(rom, args, self.enemies, self.rages)
-        self.sketches.mod()
-
-        self.controls = controls.Controls(rom, args, self.enemies, self.rages)
-        self.controls.mod()
-
         self.magiteks = magiteks.Magiteks(rom, args)
         self.magiteks.mod()
 
@@ -76,9 +66,6 @@ class Data:
 
         self.coliseum = coliseum.Coliseum(rom, args, self.enemies, self.items)
         self.coliseum.mod()
-
-        self.title_graphics = title_graphics.TitleGraphics(rom, args)
-        self.title_graphics.mod()
 
     def write(self):
         self.dialogs.write()
@@ -94,10 +81,7 @@ class Data:
         self.rages.write()
         self.dances.write()
         self.steal.write()
-        self.sketches.write()
-        self.controls.write()
         self.magiteks.write()
         self.espers.write()
         self.shops.write()
         self.coliseum.write()
-        self.title_graphics.write()

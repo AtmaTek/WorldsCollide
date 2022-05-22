@@ -1,4 +1,3 @@
-from constants.checks import DRAGONS
 from event.event import *
 
 class EightDragons(Event):
@@ -7,8 +6,8 @@ class EightDragons(Event):
 
     def init_rewards(self):
         self.item_rewards = []
-        for dragon_check in DRAGONS:
-            self.item_rewards.append(self.add_reward(dragon_check))
+        for dragon_index in range(self.enemies.DRAGON_COUNT):
+            self.item_rewards.append(self.add_reward(RewardType.ITEM))
 
     def init_event_bits(self, space):
         space.write(

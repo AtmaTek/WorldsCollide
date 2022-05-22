@@ -14,7 +14,7 @@ def parse(parser):
     lores_mp.add_argument("-lmps", "--lores-mp-shuffle", action = "store_true",
                           help = "Lore MP costs shuffled")
     lores_mp.add_argument("-lmprv", "--lores-mp-random-value", default = None, type = int,
-                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(255),
+                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(100),
                           help = "Lore MP costs randomized")
     lores_mp.add_argument("-lmprp", "--lores-mp-random-percent", default = None, type = int,
                           nargs = 2, metavar = ("MIN", "MAX"), choices = range(201),

@@ -1,5 +1,5 @@
 from memory.space import Bank, Allocate
-from event.event_reward import CHARACTER_ESPER_ONLY_REWARDS, RewardType, choose_reward, weighted_reward_choice
+from event.event_reward import RewardType, Reward, choose_reward, weighted_reward_choice
 import instruction.field as field
 
 class Events():
@@ -15,9 +15,7 @@ class Events():
         self.espers = data.espers
         self.shops = data.shops
 
-        events = self.mod()
-
-        self.validate(events)
+        self.mod()
 
     def mod(self):
         # generate list of events from files
@@ -54,15 +52,11 @@ class Events():
 
             if self.args.spoiler_log and (event.rewards_log or event.changes_log):
                 log_strings.append(event.log_string())
-
-        log_strings.append("* = Esper/Magicite")
         space.write(field.Return())
 
         if self.args.spoiler_log:
             from log import section
             section("Events", log_strings, [])
-
-        return events
 
     def init_reward_slots(self, events):
         import random
@@ -127,10 +121,6 @@ class Events():
                     unlocked_slots.append(slot)
                     unlocked_slot_iterations.append(slot_iterations[slot])
 
-            # this means an impossible start has occured.
-            # i.e. no character can be retrieved given the starting char + check availability
-            assert len(unlocked_slots) > 0
-
             # pick slot for the next character weighted by number of iterations each slot has been available
             slot_index = weighted_reward_choice(unlocked_slot_iterations, iteration)
             slot = unlocked_slots[slot_index]
@@ -171,10 +161,3 @@ class Events():
 
         # choose the rest of the rewards, items given to events after all characters/events assigned
         self.choose_item_possible_rewards(reward_slots)
-
-    def validate(self, events):
-        char_esper_checks = []
-        for event in events:
-            char_esper_checks += [r for r in event.rewards if r.possible_types == (RewardType.CHARACTER | RewardType.ESPER)]
-
-        # assert len(char_esper_checks) == CHARACTER_ESPER_ONLY_REWARDS, "Number of char/esper only checks changed - Check usages of CHARACTER_ESPER_ONLY_REWARDS and ensure no breaking changes"

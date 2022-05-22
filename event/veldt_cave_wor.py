@@ -8,8 +8,7 @@ class VeldtCaveWOR(Event):
         return self.characters.SHADOW
 
     def init_rewards(self):
-        from constants.checks import VELDT_CAVE
-        self.reward = self.add_reward(VELDT_CAVE)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.shadow_npc_id = 0x12
@@ -114,13 +113,10 @@ class VeldtCaveWOR(Event):
         )
 
     def character_mod(self, character):
-        sprite = character
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-        self.shadow_npc.sprite = sprite
-        self.shadow_npc.palette = self.characters.get_palette(sprite)
-        self.relm_npc.sprite = sprite
-        self.relm_npc.palette = self.characters.get_palette(sprite)
+        self.shadow_npc.sprite = character
+        self.shadow_npc.palette = self.characters.get_palette(character)
+        self.relm_npc.sprite = character
+        self.relm_npc.palette = self.characters.get_palette(character)
 
         self.move_to_thamasa([
             field.RecruitAndSelectParty(character),
@@ -134,22 +130,15 @@ class VeldtCaveWOR(Event):
         ])
 
     def esper_mod(self, esper):
-        sprite = 91
-        palette = 2
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-            palette = self.characters.get_palette(sprite)
-        else:
-            self.shadow_npc.split_sprite = 1
-            self.shadow_npc.direction = direction.UP
-            self.relm_npc.split_sprite = 1
-            self.relm_npc.direction = direction.UP
+        self.shadow_npc.sprite = 91
+        self.shadow_npc.palette = 2
+        self.shadow_npc.split_sprite = 1
+        self.shadow_npc.direction = direction.UP
 
-        self.shadow_npc.sprite = sprite
-        self.shadow_npc.palette = palette
-
-        self.relm_npc.sprite = sprite
-        self.relm_npc.palette = palette
+        self.relm_npc.sprite = 91
+        self.relm_npc.palette = 2
+        self.relm_npc.split_sprite = 1
+        self.relm_npc.direction = direction.UP
 
         self.esper_item_mod([
             field.AddEsper(esper),
@@ -157,10 +146,7 @@ class VeldtCaveWOR(Event):
         ])
 
     def item_mod(self, item):
-        if self.args.no_peeking:
-            random_sprite = self.characters.get_no_peeking_sprite()
-        else:
-            random_sprite = self.characters.get_random_esper_item_sprite()
+        random_sprite = self.characters.get_random_esper_item_sprite()
 
         self.shadow_npc.sprite = random_sprite
         self.shadow_npc.palette = self.characters.get_palette(self.shadow_npc.sprite)

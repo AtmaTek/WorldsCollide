@@ -1,4 +1,3 @@
-from constants.checks import BURNING_HOUSE
 from event.event import *
 
 # TODO: only trigger this event in wob
@@ -11,7 +10,7 @@ class BurningHouse(Event):
         return self.characters.STRAGO
 
     def init_rewards(self):
-        self.reward = self.add_reward(BURNING_HOUSE)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(

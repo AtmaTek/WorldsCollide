@@ -5,8 +5,7 @@ class Tritoch(Event):
         return "Tritoch"
 
     def init_rewards(self):
-        from constants.checks import TRITOCH_CLIFF
-        self.reward = self.add_reward(TRITOCH_CLIFF)
+        self.reward = self.add_reward(RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.dialog_mod()

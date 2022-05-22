@@ -1,4 +1,3 @@
-from constants.checks import IMPERIAL_CAMP
 from event.event import *
 
 class ImperialCamp(Event):
@@ -9,7 +8,7 @@ class ImperialCamp(Event):
         return self.characters.SABIN
 
     def init_rewards(self):
-        self.reward = self.add_reward(IMPERIAL_CAMP)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -128,10 +127,6 @@ class ImperialCamp(Event):
         space.write(field_entity.SetSpeed(field_entity.Speed.FAST))
 
     def cyan_battles_mod(self, sprite, palette):
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-            palette = self.characters.get_palette(sprite)
-
         cyan_npc_id = 0x12
         cyan_npc = self.maps.get_npc(0x077, cyan_npc_id)
         cyan_npc.sprite = sprite

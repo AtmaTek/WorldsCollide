@@ -2,16 +2,15 @@ from event.event import *
 
 class DomaWOR(Event):
     def name(self):
-        return "Doma Dream"
+        return "Doma WOR"
 
     def character_gate(self):
         return self.characters.CYAN
 
     def init_rewards(self):
-        from constants.checks import DOMA_DREAM_DOOR, DOMA_DREAM_AWAKEN, DOMA_DREAM_THRONE
-        self.reward1 = self.add_reward(DOMA_DREAM_AWAKEN)
-        self.reward2 = self.add_reward(DOMA_DREAM_THRONE)
-        self.reward3 = self.add_reward(DOMA_DREAM_DOOR)
+        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        self.reward3 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.cyan_phantom_train_npc_id = 0x10
@@ -46,8 +45,6 @@ class DomaWOR(Event):
             self.cyan_character_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ESPER:
             self.cyan_esper_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ITEM:
-            self.cyan_item_mod(self.reward1.id)
         self.finish_dream_awaken_mod()
 
         if self.reward2.type == RewardType.ESPER:
@@ -169,9 +166,9 @@ class DomaWOR(Event):
         )
 
         if(self.args.flashes_remove_most):
-            space = Reserve(0xb9952, 0xb9953, "doma wor sword appears flash 1", field.FlashScreen(field.Flash.NONE))
-            space = Reserve(0xb9975, 0xb9976, "doma wor sword appears flashes", field.FlashScreen(field.Flash.NONE))
-            space = Reserve(0xb99a9, 0xb99aa, "doma wor sword appears flash 3", field.FlashScreen(field.Flash.NONE))
+            space = Reserve(0xb9952, 0xb9953, "doma wor sword appears flash 1", field.NOP())
+            space = Reserve(0xb9975, 0xb9976, "doma wor sword appears flashes", field.NOP())
+            space = Reserve(0xb99a9, 0xb99aa, "doma wor sword appears flash 3", field.NOP())
 
         space = Reserve(0xb997d, 0xb9984, "doma wor cyan kneeling", field.NOP())
         space = Reserve(0xb99df, 0xb99e0, "doma wor pause before loading room slept in", field.NOP())
@@ -203,24 +200,20 @@ class DomaWOR(Event):
         )
 
     def cyan_character_mod(self, character):
-        sprite = character
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-
-        self.cyan_phantom_train_npc.sprite = sprite
-        self.cyan_phantom_train_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_mines_npc.sprite = sprite
-        self.cyan_mines_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_outside_mines_npc.sprite = sprite
-        self.cyan_outside_mines_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_fishing_npc.sprite = sprite
-        self.cyan_fishing_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_training_npc.sprite = sprite
-        self.cyan_training_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_bedroom_npc.sprite = sprite
-        self.cyan_bedroom_npc.palette = self.characters.get_palette(sprite)
-        self.cyan_throne_room_npc.sprite = sprite
-        self.cyan_throne_room_npc.palette = self.characters.get_palette(sprite)
+        self.cyan_phantom_train_npc.sprite = character
+        self.cyan_phantom_train_npc.palette = self.characters.get_palette(character)
+        self.cyan_mines_npc.sprite = character
+        self.cyan_mines_npc.palette = self.characters.get_palette(character)
+        self.cyan_outside_mines_npc.sprite = character
+        self.cyan_outside_mines_npc.palette = self.characters.get_palette(character)
+        self.cyan_fishing_npc.sprite = character
+        self.cyan_fishing_npc.palette = self.characters.get_palette(character)
+        self.cyan_training_npc.sprite = character
+        self.cyan_training_npc.palette = self.characters.get_palette(character)
+        self.cyan_bedroom_npc.sprite = character
+        self.cyan_bedroom_npc.palette = self.characters.get_palette(character)
+        self.cyan_throne_room_npc.sprite = character
+        self.cyan_throne_room_npc.palette = self.characters.get_palette(character)
 
         space = Reserve(0xb9818, 0xb982f, "doma wor split up party after wrexsoul battle", field.NOP())
         space.write(
@@ -235,10 +228,7 @@ class DomaWOR(Event):
         )
 
     def random_cyan_npc_mod(self):
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-        else:
-            sprite = self.characters.get_random_esper_item_sprite()
+        sprite = self.characters.get_random_esper_item_sprite()
         palette = self.characters.get_palette(sprite)
 
         self.cyan_phantom_train_npc.sprite = sprite
@@ -271,24 +261,9 @@ class DomaWOR(Event):
             field.Branch(space.end_address + 1), # skip nops
         )
 
-    def cyan_item_mod(self, item):
-        self.random_cyan_npc_mod()
-
-        space = Reserve(0xb9818, 0xb982f, "doma wor split up party after wrexsoul battle", field.NOP())
-        space.write(
-            field.Branch(space.end_address + 1), # skip nops
-        )
-
-        space = Reserve(0xb99b4, 0xb99d4, "doma wor cyan touches sword", field.NOP())
-        space.write(
-            field.AddItem(item),
-            field.Dialog(self.items.get_receive_dialog(item)),
-            field.Branch(space.end_address + 1), # skip nops
-        )
-
     def finish_dream_awaken_mod(self):
         if(self.args.flashes_remove_most):
-            space = Reserve(0xb9a47, 0xb9a48, "doma wor peak swordmanship flash", field.FlashScreen(field.Flash.NONE))
+            space = Reserve(0xb9a47, 0xb9a48, "doma wor peak swordmanship flash", field.NOP())
 
         src = [
             field.FinishCheck(),

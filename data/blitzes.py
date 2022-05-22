@@ -15,10 +15,6 @@ class Blitzes:
 
         self.levels = DataArray(self.rom, self.LEVELS_START, self.LEVELS_END, Blitz.LEVEL_SIZE)
 
-        import data.event_bit as event_bit
-        self.can_learn_byte = 0x1e80 + event_bit.byte(event_bit.CAN_LEARN_BUM_RUSH)
-        self.can_learn_bit = 2 ** event_bit.bit(event_bit.CAN_LEARN_BUM_RUSH)
-
         self.blitzes = []
         for blitz_index in range(len(self.levels)):
             blitz = Blitz(blitz_index, self.levels[blitz_index])
@@ -54,51 +50,28 @@ class Blitzes:
         learn_blitzes = 0x0a201
         character_recruited = c0.character_recruited + START_ADDRESS_SNES
 
-        src = [
+        space = Allocate(Bank.C0, 24, "blitz event check", asm.NOP())
+        space.write(
             asm.PHA(),
             asm.JSL(character_recruited),
             asm.CMP(0x00, asm.IMM8),        # compare result with 0
             asm.BEQ("RETURN"),              # branch if character not recruited
-        ]
+        )
         if not self.args.blitzes_everyone_learns:
-            src += [
+            space.write(
                 asm.PLA(),
                 asm.PHA(),
                 asm.JSL(self.is_learner_function),
                 asm.CMP(0x00, asm.IMM8),    # compare result with 0
                 asm.BEQ("RETURN"),          # branch if character not learner
-            ]
-        src += [
+            )
+        space.write(
             asm.JSR(learn_blitzes, asm.ABS),
-
-            # when a new blitz is learned, check if 7 total now learned and if so set event bit
-            asm.PHX(),
-            asm.PHP(),
-            asm.LDA(0x1d28, asm.ABS),           # a = known blitzes
-            asm.XY8(),
-            # Sets X to number of bits set in A. So, x = number known blitzes
-            # Logic Copied from C2/520e
-            asm.LDX(0x00, asm.IMM8),
-            "LOOP_START",
-            asm.LSR(),
-            asm.BCC("BIT_NOT_SET"),
-            asm.INX(),
-            "BIT_NOT_SET",
-            asm.BNE("LOOP_START"),              # repeat loop to count all bits set in A
-            asm.CPX(0x07, asm.IMM8),            # 7 blitzes known? (total learnable except bum rush)
-            asm.BLT("DONE_7_CHECK"),        # branch if < 7 blitzes known
-            asm.LDA(self.can_learn_bit, asm.IMM8),   # load can learn bum rush bit
-            asm.TSB(self.can_learn_byte, asm.ABS),   # set can learn bum rush event bit
-
-            "DONE_7_CHECK",
-            asm.PLP(),
-            asm.PLX(),
 
             "RETURN",
             asm.PLA(),
             asm.RTS(),
-        ]
-        space = Write(Bank.C0, src, "blitz event check")
+        )
         check_blitzes = space.start_address
 
         space = Reserve(0x0a18e, 0x0a194, "event check sabin learn blitzes", asm.NOP())
@@ -149,6 +122,11 @@ class Blitzes:
 
     def blitzes_learned_event_bit(self):
         # when a new blitz is learned, check if 7 total now learned and if so set event bit
+
+        import data.event_bit as event_bit
+        can_learn_byte = 0x1e80 + event_bit.byte(event_bit.CAN_LEARN_BUM_RUSH)
+        can_learn_bit = 2 ** event_bit.bit(event_bit.CAN_LEARN_BUM_RUSH)
+
         src = [
             asm.PHX(),
             asm.PHP(),
@@ -157,8 +135,8 @@ class Blitzes:
             asm.JSR(0x520e, asm.ABS),           # x = number known blitzes
             asm.CPX(0x07, asm.IMM8),            # 7 blitzes known? (total learnable except bum rush)
             asm.BLT("RETURN"),                  # branch if < 7 blitzes known
-            asm.LDA(self.can_learn_bit, asm.IMM8),   # load can learn bum rush bit
-            asm.TSB(self.can_learn_byte, asm.ABS),   # set can learn bum rush event bit
+            asm.LDA(can_learn_bit, asm.IMM8),   # load can learn bum rush bit
+            asm.TSB(can_learn_byte, asm.ABS),   # set can learn bum rush event bit
 
             "RETURN",
             asm.PLP(),

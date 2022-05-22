@@ -8,8 +8,7 @@ class MoblizWOR(Event):
         return self.characters.TERRA
 
     def init_rewards(self):
-        from constants.checks import MOBLIZ_ATTACK
-        self.reward = self.add_reward(MOBLIZ_ATTACK)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -104,15 +103,9 @@ class MoblizWOR(Event):
         self.terra_with_katarin_npc.palette = palette
 
     def character_mod(self, character):
-        sprite = character
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
-        self.terra_npc_mod(sprite, self.characters.get_palette(sprite))
+        self.terra_npc_mod(character, self.characters.get_palette(character))
 
-        if self.args.no_peeking:
-            char_default_name = self.characters.get_no_peeking_name()
-        else:
-            char_default_name = self.characters.get_default_name(character)
+        char_default_name = self.characters.get_default_name(character)
         self.dialogs.set_text(2307, "You're not gonna take <" + char_default_name + "> away, are you?<end>")
         self.dialogs.set_text(2315, "I'm not gonna cry.<line>If I do, <" + char_default_name + ">'ll feel sad…<end>")
 
@@ -145,11 +138,7 @@ class MoblizWOR(Event):
         )
 
     def esper_item_mod(self, esper_item_name, esper_item_instructions):
-        if self.args.no_peeking:
-            random_sprite = self.characters.get_no_peeking_sprite()
-            esper_item_name = self.characters.get_no_peeking_name()
-        else:
-            random_sprite = self.characters.get_random_esper_item_sprite()
+        random_sprite = self.characters.get_random_esper_item_sprite()
         self.terra_npc_mod(random_sprite, self.characters.get_palette(random_sprite))
 
         # change children's dialog to replace terra's name with the esper/item name for fun

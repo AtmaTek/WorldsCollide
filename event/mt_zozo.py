@@ -1,4 +1,3 @@
-from constants.checks import MT_ZOZO
 from event.event import *
 
 class MtZozo(Event):
@@ -9,7 +8,7 @@ class MtZozo(Event):
         return self.characters.CYAN
 
     def init_rewards(self):
-        self.reward = self.add_reward(MT_ZOZO)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -112,8 +111,6 @@ class MtZozo(Event):
         letter_text = "Dear Lola,<line>I am writing to beg for your forgiveness. I am guilty of perpetuating a terrible lie…<page>I have only now realized the error of my ways. I hope I can correct a great wrong.<page>Your boyfriend, who you thought was in Mobliz, passed away some time ago. I have been writing in his stead…<page>We humans tend to allow the past to destroy our lives.<line>I implore you not to let this happen.<page>It is time to look forward, to rediscover love, and embrace the beauty of life.<page>You have so much of life left to live…"
         if char_name != "":
             letter_text += "<line><            ><" + char_name + "><end>"
-        else:
-            letter_text += "<end>"
         self.dialogs.set_text(2568, letter_text)
 
     def character_mod(self, character):

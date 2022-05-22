@@ -54,9 +54,7 @@ class PreGameTrack:
             SUBMENU_END_LABEL,
         ]
         src += [HANDLE_SCROLLING_LABEL]
-
         return src
-
 
     def get_scroll_area_exit_src(self, destination_menu_number, invoke_flags_addr):
         # Get the ASM for sustain_mod that handles exit from a scroll area, either returning to flags if in

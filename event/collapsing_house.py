@@ -1,4 +1,3 @@
-from constants.checks import COLLAPSING_HOUSE
 from event.event import *
 
 class CollapsingHouse(Event):
@@ -9,7 +8,10 @@ class CollapsingHouse(Event):
         return self.characters.SABIN
 
     def init_rewards(self):
-        self.reward = self.add_reward(COLLAPSING_HOUSE)
+        if self.args.no_free_characters_espers:
+            self.reward = self.add_reward(RewardType.ITEM)
+        else:
+            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         pass
@@ -63,11 +65,11 @@ class CollapsingHouse(Event):
         space = Reserve(0xc5a79, 0xc5a7c, "collapsing house smash kefka dialog", field.NOP())
 
     def flash_mod(self):
-        space = Reserve(0xc5848, 0xc5849, "collapsing house initial flash 1", field.FlashScreen(field.Flash.NONE))
-        space = Reserve(0xc5863, 0xc5864, "collapsing house initial flash 2", field.FlashScreen(field.Flash.NONE))
-        space = Reserve(0xc5868, 0xc5869, "collapsing house initial flash 3", field.FlashScreen(field.Flash.NONE))
-        space = Reserve(0xc59ec, 0xc59ed, "collapsing house final flash 1", field.FlashScreen(field.Flash.NONE))
-        space = Reserve(0xc59f5, 0xc59f6, "collapsing house final flash 2", field.FlashScreen(field.Flash.NONE))
+        space = Reserve(0xc5848, 0xc5849, "collapsing house initial flash 1", field.NOP())
+        space = Reserve(0xc5863, 0xc5864, "collapsing house initial flash 2", field.NOP())
+        space = Reserve(0xc5868, 0xc5869, "collapsing house initial flash 3", field.NOP())
+        space = Reserve(0xc59ec, 0xc59ed, "collapsing house final flash 1", field.NOP())
+        space = Reserve(0xc59f5, 0xc59f6, "collapsing house final flash 2", field.NOP())
 
     def add_gating_condition(self):
         start_event = 0xc5844
@@ -155,9 +157,7 @@ class CollapsingHouse(Event):
         sabin_npc_id = 0x11
         sabin_npc = self.maps.get_npc(0x131, sabin_npc_id)
         sabin_npc.sprite = character
-        if self.args.no_peeking:
-            sabin_npc.sprite = self.characters.get_no_peeking_sprite()
-        sabin_npc.palette = self.characters.get_palette(sabin_npc.sprite)
+        sabin_npc.palette = self.characters.get_palette(character)
 
         space = Reserve(0xc5a9d, 0xc5aba, "collapsing house add char", field.NOP())
         space.write(
@@ -168,11 +168,7 @@ class CollapsingHouse(Event):
         sabin_npc_id = 0x11
         sabin_npc = self.maps.get_npc(0x131, sabin_npc_id)
 
-        if self.args.no_peeking:
-            sabin_npc.sprite = self.characters.get_no_peeking_sprite()
-        else:
-            sabin_npc.sprite = self.characters.get_random_esper_item_sprite()
-
+        sabin_npc.sprite = self.characters.get_random_esper_item_sprite()
         sabin_npc.palette = self.characters.get_palette(sabin_npc.sprite)
 
         # ovewrite adding sabin with fading out screen and updating event bits

@@ -92,25 +92,6 @@ normal_pack_name = {
     396 : "Guardian", # defeatable guardian in kefka's tower
     401 : "MagiMaster",
 }
-
-#  These ids are repeated in normal_pack_name as well
-#  This is intentional as they are used to iterate over ALL bosses for things like objective conditions
-statue_pack_name = {
-    354 : "Doom",
-    355 : "Goddess",
-    356 : "Poltrgeist",
-}
-statue_formation_name = {
-    468 : "Doom",
-    469 : "Goddess",
-    470 : "Poltrgeist",
-}
-statue_enemy_name = {
-    295 : "Doom",
-    296 : "Goddess",
-    297 : "Poltrgeist",
-}
-
 normal_formation_name = {
     79  : "Rizopas",
     354 : "MagiMaster",
@@ -161,9 +142,6 @@ normal_enemy_name = {
     364 : "Phunbaba 3",
     365 : "Phunbaba 4",
     256 : "Whelk",
-    257 : "Presenter",
-    361 : "Naughty",
-    292 : "KatanaSoul",
     308 : "Head",
     259 : "Vargas",
     333 : "Ipooh",
@@ -277,10 +255,3 @@ enemy_name.update(normal_enemy_name)
 enemy_name.update(removed_enemy_name)
 
 name_enemy = {v: k for k, v in enemy_name.items()}
-
-class BossLocations:
-    MIX = "mix"
-    ORIGINAL = "original"
-    SHUFFLE = "shuffle"
-
-    ALL = [MIX, ORIGINAL, SHUFFLE]

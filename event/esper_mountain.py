@@ -1,4 +1,3 @@
-from constants.checks import ESPER_MOUNTAIN
 from event.event import *
 
 class EsperMountain(Event):
@@ -9,7 +8,7 @@ class EsperMountain(Event):
         return self.characters.RELM
 
     def init_rewards(self):
-        self.reward = self.add_reward(ESPER_MOUNTAIN)
+        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
 
     def init_event_bits(self, space):
         space.write(
@@ -139,21 +138,17 @@ class EsperMountain(Event):
         self.maps.delete_event(0x177, 15, 17)
 
     def character_mod(self, character):
-        sprite = character
-        if self.args.no_peeking:
-            sprite = self.characters.get_no_peeking_sprite()
+        self.entrance_relm_npc.sprite = character
+        self.entrance_relm_npc.palette = self.characters.get_palette(character)
 
-        self.entrance_relm_npc.sprite = sprite
-        self.entrance_relm_npc.palette = self.characters.get_palette(sprite)
+        self.outside1_relm_npc.sprite = character
+        self.outside1_relm_npc.palette = self.characters.get_palette(character)
 
-        self.outside1_relm_npc.sprite = sprite
-        self.outside1_relm_npc.palette = self.characters.get_palette(sprite)
+        self.outside2_relm_npc.sprite = character
+        self.outside2_relm_npc.palette = self.characters.get_palette(character)
 
-        self.outside2_relm_npc.sprite = sprite
-        self.outside2_relm_npc.palette = self.characters.get_palette(sprite)
-
-        self.statue_room_relm_npc.sprite = sprite
-        self.statue_room_relm_npc.palette = self.characters.get_palette(sprite)
+        self.statue_room_relm_npc.sprite = character
+        self.statue_room_relm_npc.palette = self.characters.get_palette(character)
 
         space = Reserve(0xbf0d9, 0xbf167, "esper mountain finish ultros scene", field.NOP())
         space.write(
@@ -166,10 +161,7 @@ class EsperMountain(Event):
         )
 
     def relm_npc_mod(self):
-        if self.args.no_peeking:
-            random_sprite = self.characters.get_no_peeking_sprite()
-        else:
-            random_sprite = self.characters.get_random_esper_item_sprite()
+        random_sprite = self.characters.get_random_esper_item_sprite()
 
         self.entrance_relm_npc.sprite = random_sprite
         self.entrance_relm_npc.palette = self.characters.get_palette(random_sprite)
