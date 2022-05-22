@@ -263,8 +263,9 @@ class TrackMenu:
             "HANDLE_B",
             asm.LDA(0x09, asm.DIR),     # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BEQ("RETURN"),          # return if not
-
+            asm.BNE("B_PRESSED"),       # return if not
+            asm.RTS(),
+            "B_PRESSED",
             asm.LDA(0x04, asm.IMM8),    # a = initialize main menu command
             asm.STA(0x27, asm.DIR),     # add initialize main menu to queue
             asm.LDA(self.common.FADE_OUT_COMMAND, asm.IMM8),
