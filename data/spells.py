@@ -47,6 +47,7 @@ class Spells:
 
         import random
         possible_spell_ids = [spell.id for spell in self.spells if spell.id not in exclude]
+        count = min(len(possible_spell_ids), count)
         return random.sample(possible_spell_ids, count)
 
     def get_replacement(self, spell_id, exclude):
