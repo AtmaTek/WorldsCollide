@@ -161,14 +161,14 @@ class NaturalMagic:
             #linear search through Terra's spells
             for terra_spell in self.terra_spells:
                 if terra_spell.spell == a_spell_id:
-                    terra_spell.spell = 0
-                    terra_spell.level = 0
+                    terra_spell.spell = 0xFF
+                    terra_spell.level = 0xFF
 
             #linear search through Celes' spells
             for celes_spell in self.celes_spells:
                 if celes_spell.spell == a_spell_id:
-                    celes_spell.spell = 0
-                    celes_spell.level = 0
+                    celes_spell.spell = 0xFF
+                    celes_spell.level = 0xFF
 
     def randomize_levels1(self):
         import random
