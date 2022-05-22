@@ -31,7 +31,6 @@ def process(args):
     if args.permadeath:
         args.remove_learnable_spell_ids.append(spell_id["Life"])
         args.remove_learnable_spell_ids.append(spell_id["Life 2"])
-        args.remove_learnable_spell_ids.append(spell_id["Life 3"])
 
     if args.remove_learnable_spells:
         # Split the comma-separated string
