@@ -45,8 +45,8 @@ class PreGameTrack:
         src += [
             SUBMENU_LABEL,
             asm.LDA(0x4b, asm.DIR),         # a = cursor index
-            asm.CMP(submenu_id, asm.IMM8), # is the cursor index = this submenu?
-            asm.BNE(SUBMENU_END_LABEL),    # branch if not
+            asm.CMP(submenu_id, asm.IMM8),  # is the cursor index = this submenu?
+            asm.BNE(SUBMENU_END_LABEL),     # branch if not
             asm.TDC(),
             asm.JSR(0x0eb2, asm.ABS),       # click sound
             asm.JSL(self.exit_scroll_area + START_ADDRESS_SNES), # save current submenu position
