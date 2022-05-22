@@ -92,6 +92,23 @@ class Esper(AbilityData):
         for spell_index in range(spells_removed):
             self.spells.append(self.SpellEntry(self.NO_SPELL, 0))
 
+    def get_spell_ids(self):
+        return [spell.id for spell in self.spells if spell.id != self.NO_SPELL]
+
+    def replace_spell(self, old_spell, new_spell):
+        if(old_spell == self.NO_SPELL):
+            return
+
+        # get the old learn rate to reuse it
+        learn_rate = self.LEARN_RATES[0]
+        for spell_index in range(self.SPELL_COUNT):
+            if self.spells[spell_index].id == old_spell:
+                learn_rate = self.spells[spell_index].rate
+
+        self.remove_spell(old_spell)
+        if new_spell is not None:
+            self.add_spell(new_spell, learn_rate)
+
     def clear_spells(self):
         for spell_index in range(self.SPELL_COUNT):
             self.spells[spell_index].id = self.NO_SPELL
