@@ -154,17 +154,17 @@ class TrackMenu:
             )
 
         src = [
-            c3.eggers_jump(0xc2f2),       # set text color to user config choice
+            asm.JSR(0xc2f2, asm.ABS),       # set text color to user config choice
         ]
         for option in options:
             src += [
                 asm.LDY(option, asm.IMM16),
-                c3.eggers_jump(0x02f9),   # draw text
+                asm.JSR(0x02f9, asm.ABS),   # draw text
             ]
         src += [
-            asm.RTL(),
+            asm.RTS(),
         ]
-        space = Write(Bank.F0, src, "track draw options")
+        space = Write(Bank.C3, src, "track draw options")
         self.draw_options = space.start_address
 
     def invoke_mod(self):
@@ -195,7 +195,7 @@ class TrackMenu:
         src = [
             asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
-            asm.JSL(self.draw_options + START_ADDRESS_SNES),
+            asm.JSR(self.draw_options, asm.ABS),
             asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
