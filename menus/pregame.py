@@ -1,5 +1,6 @@
-from memory.space import Bank, Write, Reserve, Allocate, Read
+from memory.space import START_ADDRESS_SNES, Bank, Write, Reserve, Allocate, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 
 class PreGameMenu:
     MENU_NUMBER = 9
@@ -47,10 +48,10 @@ class PreGameMenu:
 
     def initialize_mod(self):
         src = [
-            asm.JSR(self.common.initialize, asm.ABS),
+            asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
             asm.JSR(self.draw_options, asm.ABS),
-            asm.JSR(self.common.upload_bg123ab, asm.ABS),
+            asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
             asm.STA(0x0200, asm.ABS),
@@ -61,6 +62,7 @@ class PreGameMenu:
             asm.STA(0x26, asm.DIR),         # add fade in pregame menu to queue
             asm.JMP(0x3541, asm.ABS),       # set brightness and refresh screen
         ]
+        # called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame initialize")
         self.initialize = space.start_address
 
@@ -137,9 +139,9 @@ class PreGameMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
-        for submenu_id in self.common.flags.submenus.keys():
+        for submenu_idx in self.common.flags.submenus.keys():
             src += [
-                asm.CMP(self.common.flags.submenus[submenu_id].MENU_NUMBER, asm.IMM8),
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
                 asm.BEQ("SUSTAIN_SCROLL_AREA"),
             ]
 
@@ -178,23 +180,24 @@ class PreGameMenu:
         ]
         src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.invoke_flags))
 
+        # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address
 
     def initialize_config_menu_mod(self):
         src = [
-            asm.JSR(0x352f, asm.ABS),       # reset
-
+            c3.eggers_jump(0x352f),         # displaced code: reset
+            asm.STZ(0x4A, asm.DIR),         # displaced code: screen 1st
             asm.LDA(0xc0, asm.IMM8),        # hdma channels 6 and 7
             asm.TRB(0x43, asm.DIR),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame initialize config menu reset uncondense")
+        space = Write(Bank.F0, src, "pregame initialize config menu reset uncondense")
         reset_uncondense = space.start_address
 
-        space = Reserve(0x31c7d, 0x31c7f, "pregame initialize config menu reset")
+        space = Reserve(0x31c7d, 0x31c81, "pregame initialize config menu reset", asm.NOP())
         space.write(
-            asm.JSR(reset_uncondense, asm.ABS),
+            asm.JSL(reset_uncondense + START_ADDRESS_SNES),
         )
 
     def exit_config_menu_mod(self):

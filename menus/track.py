@@ -1,5 +1,6 @@
-from memory.space import Bank, Write, Reserve, Allocate, Read
+from memory.space import START_ADDRESS_SNES, Bank, Write, Reserve, Allocate, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 
 class TrackMenu:
     MENU_NUMBER = 10
@@ -192,10 +193,10 @@ class TrackMenu:
 
     def initialize_mod(self):
         src = [
-            asm.JSR(self.common.initialize, asm.ABS),
+            asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
             asm.JSR(self.draw_options, asm.ABS),
-            asm.JSR(self.common.upload_bg123ab, asm.ABS),
+            asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
             asm.STA(0x0200, asm.ABS),
@@ -206,6 +207,7 @@ class TrackMenu:
             asm.STA(0x26, asm.DIR),     # add fade in menu to queue
             asm.JMP(0x3541, asm.ABS),   # set brightness and refresh screen
         ]
+        # called by C3 JSR jump table
         space = Write(Bank.C3, src, "track initialize")
         self.initialize = space.start_address
 
@@ -234,9 +236,9 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
         ]
 
-        for submenu_id in self.common.flags.submenus.keys():
+        for submenu_idx in self.common.flags.submenus.keys():
             src += [
-                asm.CMP(self.common.flags.submenus[submenu_id].MENU_NUMBER, asm.IMM8),
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
                 asm.BEQ("SUSTAIN_SCROLL_AREA"),
             ]
 
@@ -275,8 +277,8 @@ class TrackMenu:
             asm.BNE("EXIT_SCROLL_AREA"), # branch if so
         ]
 
-        for submenu_id in self.common.flags.submenus.keys():
-            src.extend(self.common.get_submenu_src(submenu_id, self.common.invoke_flags_submenu[submenu_id]))
+        for submenu_idx in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_idx, self.common.invoke_flags_submenu[submenu_idx]))
 
         src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
@@ -286,6 +288,7 @@ class TrackMenu:
 
         src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.common.invoke_flags))
 
+        # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "track sustain")
         self.sustain = space.start_address
 

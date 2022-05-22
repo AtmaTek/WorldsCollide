@@ -1,5 +1,6 @@
 from memory.space import Bank, START_ADDRESS_SNES, Reserve, Allocate, Write, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 import args
 
 import menus.pregame_track_scroll_area as scroll_area
@@ -41,7 +42,6 @@ class PreGameTrack:
             asm.BIT(0x80, asm.IMM8),        # a pressed?
             asm.BEQ(HANDLE_SCROLLING_LABEL),    # branch if not
         ]
-
         src += [
             SUBMENU_LABEL,
             asm.LDA(0x4b, asm.DIR),         # a = cursor index
@@ -49,21 +49,19 @@ class PreGameTrack:
             asm.BNE(SUBMENU_END_LABEL),    # branch if not
             asm.TDC(),
             asm.JSR(0x0eb2, asm.ABS),       # click sound
-            asm.JSR(self.exit_scroll_area, asm.ABS), # save current submenu position
+            asm.JSL(self.exit_scroll_area + START_ADDRESS_SNES), # save current submenu position
             asm.JMP(invoke_submenu_addr, asm.ABS), # load the flags submenu
             SUBMENU_END_LABEL,
         ]
         src += [HANDLE_SCROLLING_LABEL]
-
         return src
-
 
     def get_scroll_area_exit_src(self, destination_menu_number, invoke_flags_addr):
         # Get the ASM for sustain_mod that handles exit from a scroll area, either returning to flags if in
         # a flags submenu or to the given destination_menu_number otherwise.
         src = [
             asm.JSR(0x0EA9, asm.ABS),       # cursor sound
-            asm.JSR(self.exit_scroll_area, asm.ABS), # save current submenu position
+            asm.JSL(self.exit_scroll_area + START_ADDRESS_SNES), # save current submenu position
             asm.LDA(0x0200, asm.ABS),
         ]
 
@@ -94,6 +92,7 @@ class PreGameTrack:
             0x8b, 0x58, # top-left to top-right
             0x1c, 0x07, # 28x7
         ]
+        # Note: keep in C3 as this is then used by the C3/0341 subroutine called below
         space = Write(Bank.C3, src, "pregame track top window layout")
         top_window_layout = space.start_address
 
@@ -101,19 +100,20 @@ class PreGameTrack:
             0xcb, 0x5a, # x/y position
             0x1c, 0x0f, # width/height (excluding border)
         ]
+        # Note: keep in C3 as this is then used by the C3/0341 subroutine called below
         space = Write(Bank.C3, src, "pregame track bottom window layout")
         bottom_window_layout = space.start_address
 
         src = [
-            asm.JSR(0x6a15, asm.ABS), # clear BG1 A
-            asm.JSR(0x6a3c, asm.ABS), # clear BG3 A
+            c3.eggers_jump(0x6a15), # clear BG1 A
+            c3.eggers_jump(0x6a3c), # clear BG3 A
             asm.LDY(top_window_layout, asm.IMM16),
-            asm.JSR(0x0341, asm.ABS), # draw top window
+            c3.eggers_jump(0x0341), # draw top window
             asm.LDY(bottom_window_layout, asm.IMM16),
-            asm.JSR(0x0341, asm.ABS), # draw bottom window
+            c3.eggers_jump(0x0341), # draw bottom window
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track draw layout")
+        space = Write(Bank.F0, src, "pregame track draw layout")
         self.draw_layout = space.start_address
 
     def decrease_line_height_mod(self):
@@ -126,6 +126,7 @@ class PreGameTrack:
             0x0c, 0x14, 0x00, # config/flags
             0x00,             # end
         ]
+        # Keep in C3 as it's used by C3 subroutine called below
         space = Write(Bank.C3, src, "pregame track bg3 shift table")
         bg3_shift_table = space.start_address
 
@@ -158,17 +159,17 @@ class PreGameTrack:
             )
 
         src = [
-            asm.JSR(0xc2f7, asm.ABS),       # set text color to blue
+            c3.eggers_jump(0xc2f7),       # set text color to blue
         ]
         for label in labels:
             src += [
                 asm.LDY(label, asm.IMM16),
-                asm.JSR(0x02f9, asm.ABS),   # draw text
+                c3.eggers_jump(0x02f9),   # draw text
             ]
         src += [
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track draw labels")
+        space = Write(Bank.F0, src, "pregame track draw labels")
         self.draw_labels = space.start_address
 
     def draw_entry_mod(self):
@@ -226,12 +227,12 @@ class PreGameTrack:
 
     def upload_bg123ab_mod(self):
         src = [
-            asm.JSR(0x0e28, asm.ABS), # upload bg1 a+b
-            asm.JSR(0x0e52, asm.ABS), # upload bg2 a+b
-            asm.JSR(0x0e6e, asm.ABS), # upload bg3 a+b
-            asm.RTS(),
+            c3.eggers_jump(0x0e28), # upload bg1 a+b
+            c3.eggers_jump(0x0e52), # upload bg2 a+b
+            c3.eggers_jump(0x0e6e), # upload bg3 a+b
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track upload bg123ab")
+        space = Write(Bank.F0, src, "pregame track upload bg123ab")
         self.upload_bg123ab = space.start_address
 
     def initialize_cursor_mod(self):
@@ -241,6 +242,7 @@ class PreGameTrack:
             0x08, 0x35, # flags      / progress
             0x08, 0x41, # config     / flags
         ]
+        # Keep in C3 -- used by subroutines
         space = Write(Bank.C3, src, "pregame track cursor positions")
         self.cursor_positions = space.start_address
 
@@ -251,15 +253,16 @@ class PreGameTrack:
             0x01, # columns
             0x04, # rows
         ]
+        # Keep in C3 -- used by subroutines
         space = Write(Bank.C3, src, "pregame track navigation data")
         navigation_data = space.start_address
 
         src = [
             asm.LDY(navigation_data, asm.IMM16),
-            asm.JSR(0x05fe, asm.ABS),   # load navigation data
+            c3.eggers_jump(0x05fe),   # load navigation data
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track update navigation data")
+        space = Write(Bank.F0, src, "pregame track update navigation data")
         self.update_navigation_data = space.start_address
 
         src = [
@@ -267,16 +270,16 @@ class PreGameTrack:
             asm.STA(0x4e, asm.DIR),     # cursor row = saved row
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track remember cursor position")
+        space = Write(Bank.F0, src, "pregame track remember cursor position")
         self.remember_cursor_position = space.start_address
 
         src = [
             asm.LDY(self.cursor_positions, asm.IMM16),
-            asm.JSR(0x0640, asm.ABS),   # update cursor position
-            asm.JSR(0x07b0, asm.ABS),   # add cursor to animation queue
+            c3.eggers_jump(0x0640),   # update cursor position
+            c3.eggers_jump(0x07b0),   # add cursor to animation queue
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track update cursor position")
+        space = Write(Bank.F0, src, "pregame track update cursor position")
         self.update_cursor_position = space.start_address
 
         src = [
@@ -287,9 +290,10 @@ class PreGameTrack:
             asm.JSR(self.remember_cursor_position, asm.ABS),
 
             "UPDATE_CURSOR_POSITION",
-            asm.JMP(self.update_cursor_position, asm.ABS),
+            asm.JSR(self.update_cursor_position, asm.ABS),
+            asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track initialize cursor")
+        space = Write(Bank.F0, src, "pregame track initialize cursor")
         self.initialize_cursor = space.start_address
 
     def initialize_scroll_area_mod(self):
@@ -330,8 +334,8 @@ class PreGameTrack:
             asm.LDA(self.objectives.number_excess_lines, asm.IMM8),
             asm.STA(0x5c, asm.DIR),
 
-            asm.JSR(0x07b0, asm.ABS),   # queue scrollbar animation
-            asm.JSR(0x091f, asm.ABS),   # create scrollbar
+            c3.eggers_jump(0x07b0),   # queue scrollbar animation
+            c3.eggers_jump(0x091f),   # create scrollbar
             asm.A16(),
             asm.LDA(self.objectives.scrollbar_speed, asm.IMM16),
             asm.STA(0x7e354a, asm.LNG_X),
@@ -347,7 +351,7 @@ class PreGameTrack:
             asm.LDA(0x1d4e, asm.ABS),           # load game config
             asm.AND(0x40, asm.IMM8),            # cursor memory enabled?
             asm.BNE("REMEMBER_SCROLL_AREA"),    # branch if so
-            asm.JSR(scroll_area.draw, asm.ABS),
+            c3.eggers_jump(scroll_area.draw),
             asm.RTS(),
 
             "REMEMBER_SCROLL_AREA",
@@ -389,7 +393,7 @@ class PreGameTrack:
                 asm.JMP(self.flags.submenus[submenu_idx].remember_draw, asm.ABS),
             ]
 
-        space = Write(Bank.C3, src, "pregame track initialize scroll area")
+        space = Write(Bank.F0, src, "pregame track initialize scroll area")
         self.initialize_scroll_area = space.start_address
 
     def InvokeScrollArea(self, scroll_area_menu):
@@ -397,7 +401,7 @@ class PreGameTrack:
             asm.LDA(scroll_area_menu.MENU_NUMBER, asm.IMM8),
             asm.STA(self.MEMORY_SCROLL_AREA_NUMBER, asm.ABS),
             asm.JSR(scroll_area_menu.invoke, asm.ABS),
-            asm.JSR(self.refresh_sprites, asm.ABS),
+            asm.JSR(self.refresh_sprites, asm.ABS), # JSL
             asm.RTS(),
         ]
 
@@ -437,6 +441,7 @@ class PreGameTrack:
         self.invoke_flags_submenu[submenu_idx] = space.start_address
 
     def sustain_scroll_area_mod(self):
+        # Called via JMP
         src = [
             asm.TDC(),
             asm.STA(0x2a, asm.DIR),
@@ -477,9 +482,9 @@ class PreGameTrack:
             asm.JSR(self.remember_cursor_position, asm.ABS),
             asm.JSR(self.update_cursor_position, asm.ABS),
 
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track exit scroll area")
+        space = Write(Bank.F0, src, "pregame track exit scroll area")
         self.exit_scroll_area = space.start_address
 
     def load_sprite_palettes_mod(self):
@@ -487,7 +492,7 @@ class PreGameTrack:
         # copy the original palettes here so the sprite hash is not affected by custom palette changes
         palette_size = 16 * 2               # 16 colors, 2 bytes each
         palettes_size = palette_size * 6    # 6 palettes * 16 colors * 2 bytes
-        palette_space = Allocate(Bank.C3, palettes_size, "pregame track palettes")
+        palette_space = Allocate(Bank.F0, palettes_size, "pregame track palettes")
 
         palette0_address = palette_space.next_address
         palette_space.write(
@@ -555,7 +560,7 @@ class PreGameTrack:
 
             "LOAD_COLOR_LOOP_START",
             asm.A16(),
-            asm.LDA(palettes, asm.LNG_X),       # load current color
+            asm.LDA(palettes + START_ADDRESS_SNES, asm.LNG_X),       # load current color
             asm.STA(0x7e3149, asm.LNG_X),       # store in ram
             asm.A8(),
             asm.STA(0x2122, asm.ABS),           # store low byte in cgram
@@ -566,10 +571,10 @@ class PreGameTrack:
             asm.CPX(palettes_size, asm.IMM16),  # all colors loaded?
             asm.BNE("LOAD_COLOR_LOOP_START"),   # loop if not
 
-            asm.JSR(0x6ce9, asm.ABS),           # load single pose for characters terra, locke, ..., ghost, kefka
+            c3.eggers_jump(0x6ce9),           # load single pose for characters terra, locke, ..., ghost, kefka
             asm.RTS(),
         ]
-        space = Write(Bank.C3, src, "pregame track load sprite palettes")
+        space = Write(Bank.F0, src, "pregame track load sprite palettes")
         self.load_sprite_palettes = space.start_address
 
     def refresh_sprites_mod(self):
@@ -583,7 +588,7 @@ class PreGameTrack:
             src += [
                 x_start + x_spacing * index,
             ]
-        space = Write(Bank.C3, src, "pregame track refresh sprites x positions")
+        space = Write(Bank.F0, src, "pregame track refresh sprites x positions")
         x_positions_address = space.start_address
 
         y_start = 0x32 # higher is lower on screen
@@ -593,20 +598,20 @@ class PreGameTrack:
             src += [
                 y_start + entry.y_offset * 8,
             ]
-        space = Write(Bank.C3, src, "pregame track refresh sprites y positions")
+        space = Write(Bank.F0, src, "pregame track refresh sprites y positions")
         y_positions_address = space.start_address
 
         # if not zero, these palettes override sprite oam palettes (at 0xc31324)
         src = [
             0x00, 0x00, 0x00, 0x00,
         ]
-        space = Write(Bank.C3, src, "pregame track refresh sprites palettes address")
+        space = Write(Bank.F0, src, "pregame track refresh sprites palettes address")
         palettes_address = space.start_address
 
         src = [
             HASH_CHARACTERS,
         ]
-        space = Write(Bank.C3, src, "pregame track refresh sprites characters address")
+        space = Write(Bank.F0, src, "pregame track refresh sprites characters address")
         characters_address = space.start_address
 
         # modified version of c31903 used for save/load menus
@@ -649,6 +654,7 @@ class PreGameTrack:
 
             asm.RTS(),
         ]
+        # Keep in C3 -- called by JMP methods that are called from C3 JSR jump table
         space = Write(Bank.C3, src, "pregame track refresh sprites")
         self.refresh_sprites = space.start_address
 
@@ -679,8 +685,8 @@ class PreGameTrack:
             asm.LDA(menu_flags, asm.IMM8),
             asm.STA(0x46, asm.DIR),
 
-            asm.JSR(0x352f, asm.ABS),               # reset oam/queue/etc.. blank screen
-            asm.JSR(0x6904, asm.ABS),               # reset BG1-3 x/y
+            c3.eggers_jump(0x352f),               # reset oam/queue/etc.. blank screen
+            c3.eggers_jump(0x6904),               # reset BG1-3 x/y
             asm.LDA(bg1_size_position, asm.IMM8),   # a = BG1 size and position
             asm.STA(0x2107, asm.ABS),               # BG1 64x32 at $0000
 
@@ -688,24 +694,24 @@ class PreGameTrack:
             asm.STA(0x43, asm.DIR),     # set active hdma channels
 
             asm.JSR(self.draw_layout, asm.ABS),
-            asm.JSR(self.decrease_line_height, asm.ABS),
+            c3.eggers_jump(self.decrease_line_height),
             asm.JSR(self.initialize_scroll_area, asm.ABS),
 
-            asm.JSR(0x6a19, asm.ABS),   # clear BG1 b
-            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a
-            asm.JSR(0x6a41, asm.ABS),   # clear BG3 b
-            asm.JSR(0x6a46, asm.ABS),   # clear BG3 c
-            asm.JSR(0x6a4b, asm.ABS),   # clear BG3 d
+            c3.eggers_jump(0x6a19),   # clear BG1 b
+            c3.eggers_jump(0x6a3c),   # clear BG3 a
+            c3.eggers_jump(0x6a41),   # clear BG3 b
+            c3.eggers_jump(0x6a46),   # clear BG3 c
+            c3.eggers_jump(0x6a4b),   # clear BG3 d
 
             asm.JSR(self.draw_labels, asm.ABS),
 
-            asm.JSR(0x6ca5, asm.ABS),   # load cursor colors, skip loading status icon colors at 0x6c84
+            c3.eggers_jump(0x6ca5),   # load cursor colors, skip loading status icon colors at 0x6c84
             asm.JSR(self.load_sprite_palettes, asm.ABS),
 
             asm.JSR(self.initialize_cursor, asm.ABS),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track initialize")
+        space = Write(Bank.F0, src, "pregame track initialize")
         self.initialize = space.start_address
 
     def wait_for_fade_mod(self):
@@ -717,6 +723,7 @@ class PreGameTrack:
             "LOAD_SPRITE_DATA",
             asm.JMP(self.refresh_sprites, asm.ABS),
         ]
+        # Keep in C3 -- called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame track wait for fade")
         self.wait_for_fade = space.start_address
 
@@ -729,6 +736,7 @@ class PreGameTrack:
             asm.STA(0x26, asm.DIR),         # add wait for fade to queue
             asm.JMP(self.refresh_sprites, asm.ABS),
         ]
+         # Keep in C3 -- called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame track fade in")
         self.fade_in = space.start_address
 
@@ -741,6 +749,7 @@ class PreGameTrack:
             asm.STA(0x26, asm.DIR),       # add wait for fade to queue
             asm.JMP(self.refresh_sprites, asm.ABS),   # refresh sprites
         ]
+         # Keep in C3 -- called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame track fade out")
         self.fade_out = space.start_address
 
