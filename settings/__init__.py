@@ -1,5 +1,5 @@
 from settings.auto_sprint import AutoSprint
-from settings.scan_all import ScanAll
+from settings.initial_spells import InitialSpells
 from settings.random_rng import RandomRNG
 from settings.permadeath import Permadeath
 from settings.y_npc import YNPC
@@ -11,7 +11,7 @@ __all__ = ["Settings"]
 class Settings:
     def __init__(self):
         self.auto_sprint = AutoSprint()
-        self.scan_all = ScanAll()
+        self.initial_spells = InitialSpells()
         self.random_rng = RandomRNG()
         self.permadeath = Permadeath()
         self.y_npc = YNPC()
