@@ -257,6 +257,12 @@ class EnemyScripts():
         ]
         magic_urn_script.remove(life)
 
+    def chupon_sneeze_all(self):
+        # Make Chupon 64 (Coliseum) target all allies with initial sneeze
+        chupon_id = 64
+        chupon_script = self.scripts[chupon_id]
+        chupon_script.insert(0, ai_instr.SetTarget(0x43)) # Target: Allies
+
     def mod(self):
         # first free up some space for other mods
         self.cleanup_mod()
@@ -297,6 +303,9 @@ class EnemyScripts():
         if self.args.permadeath:
             self.hidon_no_chokesmoke()
             self.magic_urn_no_life()
+
+        if self.args.random_encounters_chupon:
+            self.chupon_sneeze_all()
 
         if self.args.ability_scaling:
             self.enemy_script_abilities.scale_abilities_mod()
