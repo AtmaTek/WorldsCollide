@@ -196,6 +196,7 @@ class Start(Event):
         junk += tiers[Item.SHIELD][0]
         junk += tiers[Item.HELMET][0]
         junk += tiers[Item.ARMOR][0]
+        junk += tiers[Item.RELIC][0]
 
         start_junk = random.sample(junk, self.args.start_junk)
 
