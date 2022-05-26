@@ -14,7 +14,9 @@ def parse(parser):
     starting_gold_items.add_argument("-sfd", "--start-fenix-downs", default = 0, type = int, choices = range(11), metavar = "COUNT",
                                      help = "Start game with %(metavar)s Fenix Downs")
     starting_gold_items.add_argument("-sto", "--start-tools", default = 0, type = int, choices = range(9), metavar = "COUNT",
-                                     help = "Start game with %(metavar)s different random tools")
+                                     help = "Start game with %(metavar)s different random tools"),
+    starting_gold_items.add_argument("-sj", "--start-junk", default = 0, type = int, choices = range(25), metavar = "COUNT",
+                                     help = "Start game with %(metavar)s unique low tier items. Includes weapons, armors, helmets, and shields"),
 
 def process(args):
     pass
@@ -32,6 +34,8 @@ def flags(args):
         flags += f" -sfd {args.start_fenix_downs}"
     if args.start_tools != 0:
         flags += f" -sto {args.start_tools}"
+    if args.start_junk != 0:
+        flags += f" -sj {args.start_junk}"
 
     return flags
 
@@ -42,6 +46,7 @@ def options(args):
         ("Start Warp Stones", args.start_warp_stones),
         ("Start Fenix Downs", args.start_fenix_downs),
         ("Start Tools", args.start_tools),
+        ("Start Junk", args.start_junk),
     ]
 
 def menu(args):
