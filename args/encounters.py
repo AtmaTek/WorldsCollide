@@ -10,6 +10,8 @@ def parse(parser):
     random.add_argument("-rer", "--random-encounters-random",
                         default = None, type = int, metavar = "PERCENT", choices = range(101),
                         help = "Random encounters are randomized")
+    random.add_argument("-rechu", "--random-encounters-chupon", action = "store_true",
+                        help = "All Random Encounters are replaced with Chupon (Coliseum)")
 
     fixed = encounters.add_mutually_exclusive_group()
     fixed.add_argument("-fer", "--fixed-encounters-random",
@@ -33,6 +35,8 @@ def flags(args):
         flags += " -res"
     elif args.random_encounters_random is not None:
         flags += f" -rer {args.random_encounters_random}"
+    elif args.random_encounters_chupon:
+        flags += " -rechu"
 
     if args.fixed_encounters_random is not None:
         flags += f" -fer {args.fixed_encounters_random}"
@@ -50,6 +54,8 @@ def options(args):
         random_encounters = "Shuffle"
     elif args.random_encounters_random is not None:
         random_encounters = "Random"
+    elif args.random_encounters_chupon:
+        random_encounters = "Chupon"
 
     result.append(("Random Encounters", random_encounters))
     if args.random_encounters_random is not None:

@@ -206,6 +206,12 @@ class EnemyPacks():
                 for formation_index in range(self.packs[pack_id].FORMATION_COUNT):
                     self.packs[pack_id].formations[formation_index] = self.formations.get_random_normal()
 
+    def chupon_packs(self, packs):
+        # Replace all packs with the CHUPON formation
+        for pack_id in packs:
+            for formation_index in range(self.packs[pack_id].FORMATION_COUNT):
+                self.packs[pack_id].formations[formation_index] = self.formations.CHUPON
+
     def randomize_fixed(self):
         lete_river = [263, 264] # nautiloid, exocite, pterodon
         imperial_camp = [272, 298, 300, 269, 270] # soldier, dogs, templar/soldier, final 3 battles
