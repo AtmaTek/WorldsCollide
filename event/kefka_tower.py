@@ -248,44 +248,66 @@ class KefkaTower(Event):
             field.InvokeBattle(boss_pack_id),
         )
 
-    def guardian_mod(self):
-        pass
-    def inferno_mod(self):
-        # CC/18AE Fade in screen
-        # CC/18AF Wait for fade
-        # CC/18B0 Set Inferno bit
-        src = Read(0xc18ae, 0xc18b1)
+    # Copy no less than 4 bytes between start_target and end_target
+    # This will be called after one of the kt encounters has completed, but just prior to finishing the check
+    def kt_encounter_objective_mod(self, boss_name, bit, start_target, end_target, description):
+        src = Read(start_target, end_target)
         src += [
+            field.SetEventBit(bit),
             field.FinishCheck(),
             field.Return(),
         ]
-        post_battle = Write(Bank['CC'], src, "Inferno post-battle, finish check")
+        post_battle = Write(Bank['CC'], src, f"{boss_name} post-battle. 1) Set event bit. 2) Finish check")
 
-        space = Reserve(0xc18ae, 0xc18b1, "Inferno battle post-script, fade in, wait, set bit", asm.NOP())
+        space = Reserve(start_target, end_target, description, asm.NOP())
         space.write([
             field.Call(post_battle.start_address)
         ])
+
+    def guardian_mod(self):
+        self.kt_encounter_objective_mod(
+            "Guardian",
+            event_bit.DEFEATED_GUARDIAN,
+            0xc186c,
+            0xc186f,
+            "Guardian battle post-script, wait for fade, set bit",
+        )
+
+    def inferno_mod(self):
+        self.kt_encounter_objective_mod(
+            "Inferno",
+            event_bit.DEFEATED_INFERNO,
+            0xc18ae,
+            0xc18b1,
+            "Inferno battle post-script, fade in, wait, set bit",
+        )
 
     def doom_mod(self):
-        pass
+        self.kt_encounter_objective_mod(
+            "Doom",
+            event_bit.DEFEATED_DOOM,
+            0xc16f0,
+            0xc16f3,
+            "Doom battle post-script, Hide NPC 5, set npc bit",
+        )
+
     def goddess_mod(self):
-        pass
+        self.kt_encounter_objective_mod(
+            "Goddess",
+            event_bit.DEFEATED_GODDESS,
+            0xc1730,
+            0xc1733,
+            "Goddess battle post-script, Hide NPC 2, set npc bit",
+        )
+
     def poltergeist_mod(self):
-        # CC/1786 Hide Map NPC 2
-        # CC/1788 Set poltergeist bit
-        src = Read(0xc1786, 0xc1789)
-        src += [
-            field.FinishCheck(),
-            field.Return(),
-        ]
-
-        post_battle = Write(Bank['CC'], src, "Poltergeist post-battle, finish check")
-
-        space = Reserve(0xc1786, 0xc1789, "Poltergeist battle post-script, Hide NPCs, set bit", asm.NOP())
-        space.write([
-            field.Call(post_battle.start_address)
-        ])
-
+        self.kt_encounter_objective_mod(
+            "Goddess",
+            event_bit.DEFEATED_POLTERGEIST,
+            0xc1786,
+            0xc1789,
+            "Poltergeist battle post-script, Hide NPCs, set npc bit",
+        )
 
     def atma_mod(self):
         src = [
