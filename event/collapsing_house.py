@@ -22,7 +22,7 @@ class CollapsingHouse(Event):
 
         if self.args.character_gating:
             self.add_gating_condition()
-        if self.args.flashes_remove_most:
+        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
             self.flash_mod()
 
         if self.reward.type == RewardType.CHARACTER:

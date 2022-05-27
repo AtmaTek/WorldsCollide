@@ -165,7 +165,7 @@ class DomaWOR(Event):
             field.Branch(space.end_address + 1), # skip nops
         )
 
-        if(self.args.flashes_remove_most):
+        if(self.args.flashes_remove_most or self.args.flashes_remove_worst):
             space = Reserve(0xb9952, 0xb9953, "doma wor sword appears flash 1", field.FlashScreen(field.Flash.NONE))
             space = Reserve(0xb9975, 0xb9976, "doma wor sword appears flashes", field.FlashScreen(field.Flash.NONE))
             space = Reserve(0xb99a9, 0xb99aa, "doma wor sword appears flash 3", field.FlashScreen(field.Flash.NONE))
@@ -262,7 +262,7 @@ class DomaWOR(Event):
         )
 
     def finish_dream_awaken_mod(self):
-        if(self.args.flashes_remove_most):
+        if(self.args.flashes_remove_most or self.args.flashes_remove_worst):
             space = Reserve(0xb9a47, 0xb9a48, "doma wor peak swordmanship flash", field.FlashScreen(field.Flash.NONE))
 
         src = [
