@@ -81,12 +81,6 @@ character_checks = {
         "Auction2",
         "Fanatic's Tower Dragon",
         "Fanatic's Tower Leader",
-        # Add these once events are working
-        # "KT Left Triad Statue",
-        # "KT Mid Triad Statue",
-        # "KT Right Triad Statue",
-        # "Kefka's Tower Ambush",
-        # "Kefka's Tower Guardian",
         "Kefka's Tower Cell Beast",
         "Kefka's Tower Dragon G",
         "Kefka's Tower Dragon S",
