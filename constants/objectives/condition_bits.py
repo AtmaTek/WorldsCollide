@@ -29,14 +29,9 @@ check_bit = [
     NameBit("Floating Cont. Escape", event_bit.FINISHED_FLOATING_CONTINENT),
     NameBit("Gau's Father's House", event_bit.RECRUITED_SHADOW_GAU_FATHER_HOUSE),
     NameBit("Imperial Camp", event_bit.FINISHED_IMPERIAL_CAMP),
-    # NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),
-    # NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),
     NameBit("Kefka's Tower Cell Beast", event_bit.DEFEATED_ATMA),
     NameBit("Kefka's Tower Dragon G", event_bit.DEFEATED_KEFKA_TOWER_DRAGON_G),
     NameBit("Kefka's Tower Dragon S", event_bit.DEFEATED_KEFKA_TOWER_DRAGON_S),
-    # NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),
-    # NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),
-    # NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),
     NameBit("Kohlingen Cafe", event_bit.RECRUITED_SHADOW_KOHLINGEN),
     NameBit("Lete River", event_bit.RODE_RAFT_LETE_RIVER),
     NameBit("Lone Wolf Chase", event_bit.CHASING_LONE_WOLF7),
@@ -71,6 +66,14 @@ check_bit = [
     NameBit("Whelk Gate", event_bit.DEFEATED_WHELK),
     NameBit("Zone Eater", event_bit.RECRUITED_GOGO_WOR),
     NameBit("Zozo Tower", event_bit.GOT_ZOZO_REWARD),
+]
+
+check_bit += [                                                          # Index
+    NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),        # 59
+    NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),     # 60
+    NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),           # 61
+    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),     # 62
+    NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),       # 63
 ]
 
 quest_bit = [

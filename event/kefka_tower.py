@@ -251,13 +251,41 @@ class KefkaTower(Event):
     def guardian_mod(self):
         pass
     def inferno_mod(self):
-        pass
+        # CC/18AE Fade in screen
+        # CC/18AF Wait for fade
+        # CC/18B0 Set Inferno bit
+        src = Read(0xc18ae, 0xc18b1)
+        src += [
+            field.FinishCheck(),
+            field.Return(),
+        ]
+        post_battle = Write(Bank['CC'], src, "Inferno post-battle, finish check")
+
+        space = Reserve(0xc18ae, 0xc18b1, "Inferno battle post-script, fade in, wait, set bit", asm.NOP())
+        space.write([
+            field.Call(post_battle.start_address)
+        ])
+
     def doom_mod(self):
         pass
     def goddess_mod(self):
         pass
     def poltergeist_mod(self):
-        pass
+        # CC/1786 Hide Map NPC 2
+        # CC/1788 Set poltergeist bit
+        src = Read(0xc1786, 0xc1789)
+        src += [
+            field.FinishCheck(),
+            field.Return(),
+        ]
+
+        post_battle = Write(Bank['CC'], src, "Poltergeist post-battle, finish check")
+
+        space = Reserve(0xc1786, 0xc1789, "Poltergeist battle post-script, Hide NPCs, set bit", asm.NOP())
+        space.write([
+            field.Call(post_battle.start_address)
+        ])
+
 
     def atma_mod(self):
         src = [
