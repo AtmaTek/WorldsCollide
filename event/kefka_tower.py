@@ -148,6 +148,7 @@ class KefkaTower(Event):
         space.add_label("ENTRANCE_LANDING", space.end_address + 1)
         space.write(
             field.BranchIfEventWordLess(event_word.CHARACTERS_AVAILABLE, 3, "NEED_MORE_ALLIES"),
+            field.BranchIfEventBitSet(event_bit.UNLOCKED_PERMA_KT_SKIP, "LANDING_MENU"),
             field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_SKIP, "LANDING_MENU"),
 
             field.Pause(2), # NOTE: load-bearing pause, without a pause or dialog before party select the game
