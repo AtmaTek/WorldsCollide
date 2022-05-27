@@ -254,7 +254,7 @@ class KefkaTower(Event):
         src = Read(start_target, end_target)
         src += [
             field.SetEventBit(bit),
-            field.FinishCheck(),
+            field.CheckObjectives(),
             field.Return(),
         ]
         post_battle = Write(Bank['CC'], src, f"{boss_name} post-battle. 1) Set event bit. 2) Finish check")
