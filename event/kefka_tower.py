@@ -1,6 +1,14 @@
 from event.event import *
 import args
 
+from constants.maps import name_id
+final_switch_map_id = name_id["KT Final Switch Room"]
+inferno_room_id =  name_id["Inferno Room"]
+guardian_room_id =  name_id["Guardian Room"]
+poltergeist_room_id =  name_id["Poltergeist Room"]
+doom_room_id =  name_id["Doom Room"]
+goddess_room_id =  name_id["Goddess Room"]
+
 class KefkaTower(Event):
     def name(self):
         return "Kefka's Tower"
@@ -21,7 +29,8 @@ class KefkaTower(Event):
             )
 
     def mod(self):
-        self.statue_landing_mod()
+        self.boss_rush_mod()
+        # self.statue_landing_mod()
         self.entrance_landing_mod()
         self.kefka_scene_mod()
 
@@ -139,6 +148,180 @@ class KefkaTower(Event):
         self.statue_landing = space.start_address
 
         space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
+
+    # Trigger five bosses back-to-back, with cutscenes playing for each one
+    def boss_rush_mod(self):
+        self.maps.disable_warp(final_switch_map_id)
+        from data.bosses import name_pack
+        change_party = lambda party : [
+            field.SetParty(party),
+            field.RefreshEntities(),
+            field.UpdatePartyLeader(),
+        ]
+
+        invoke_kt_battle = lambda party, pack_name : [
+            change_party(party),
+            field.InvokeBattle(name_pack[pack_name]),
+        ]
+
+        party1_x = 103
+        party1_y_dest = 45
+        party1_y_offset = 6
+        party1_y_start = party1_y_dest - party1_y_offset
+
+        party2_x = 109
+        party2_y_dest = 42
+        party2_y_offset = 9
+        party2_y_start = party2_y_dest - party2_y_offset
+
+        party3_x = 115
+        party3_y_dest = 44
+        party3_y_offset = 8
+        party3_y_start = party3_y_dest - party3_y_offset
+
+        src = [
+            Read(0xa02d6, 0xa030a),
+            field.ClearEventBit(event_bit.UNLOCKED_KT_SKIP),
+
+            field.SetEventBit(event_bit.LEFT_WEIGHT_PUSHED_KEFKA_TOWER),
+            field.SetEventBit(event_bit.RIGHT_WEIGHT_PUSHED_KEFKA_TOWER),
+            field.ClearEventBit(npc_bit.LEFT_UNPUSHED_WEIGHT_KEFKA_TOWER),
+            field.SetEventBit(npc_bit.LEFT_PUSHED_WEIGHT_KEFKA_TOWER),
+            field.ClearEventBit(npc_bit.RIGHT_UNPUSHED_WEIGHT_KEFKA_TOWER),
+            field.SetEventBit(npc_bit.RIGHT_PUSHED_WEIGHT_KEFKA_TOWER),
+            field.ClearEventBit(npc_bit.CENTER_DOOR_BLOCK_KEFKA_TOWER),
+
+            field.SetEventBit(event_bit.WEST_PATH_BLOCKED_KEFKA_TOWER),
+            field.SetEventBit(event_bit.EAST_PATH_BLOCKED_KEFKA_TOWER),
+            field.SetEventBit(event_bit.NORTH_PATH_OPEN_KEFKA_TOWER),
+            field.SetEventBit(event_bit.SOUTH_PATH_OPEN_KEFKA_TOWER),
+            field.SetEventBit(event_bit.CENTER_DOOR_KEFKA_TOWER),
+            field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
+
+            field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.HoldScreen(),
+            field.HideEntity(field_entity.PARTY0),
+            field.SetPartyMap(1, final_switch_map_id),
+            field.SetPartyMap(2, final_switch_map_id),
+            field.SetPartyMap(3, final_switch_map_id),
+            # Fight Inferno
+            [
+                field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(3, "Inferno"),
+            ],
+            # Fight Guardian
+            [
+                field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(3, "Guardian"),
+            ],
+            # Fight Poltergeist
+            [
+                field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(3, "Poltrgeist"),
+            ],
+            # Fight Goddess
+            [
+                field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(2, "Goddess"),
+            ],
+             # Fight Doom
+            [
+                field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(1, "Doom"),
+            ],
+            # post battle, move to final room
+            [
+                # Load final
+                field.LoadMap(final_switch_map_id, direction.DOWN, default_music = True,
+                            x = 109, y = 43, fade_in = False, entrance_event = True),
+
+                # Party 1 init position
+                [
+                    change_party(1),
+                    Read(0xa0334, 0xa033c),
+                    field.EntityAct(field_entity.PARTY0, True,
+                        field_entity.SetPosition(party1_x, party1_y_start),
+                        field_entity.AnimateFrontHandsUp(),
+                        field_entity.SetSpeed(field_entity.Speed.FAST),
+                    ),
+                ],
+                # Party 2 init position
+                [
+                    Read(0xa031e, 0xa0320),
+                    field.EntityAct(field_entity.PARTY0, True,
+                        field_entity.SetPosition(party2_x, party2_y_start),
+                        field_entity.SetSpeed(field_entity.Speed.FAST),
+                    ),
+                ],
+                # Party 3 init position
+                [
+                    Read(0xa0327, 0xa032d),
+                    field.EntityAct(field_entity.PARTY0, True,
+                        field_entity.SetPosition(party3_x, party3_y_start),
+                        field_entity.SetSpeed(field_entity.Speed.FAST),
+                    ),
+                ],
+                field.FadeInScreen(),
+            ],
+            # party 1 fall
+            [
+                change_party(1),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.DisableWalkingAnimation(),
+                    field_entity.AnimateSurprised(),
+                    field_entity.Move(direction.DOWN, party1_y_offset),
+                    field_entity.AnimateKneeling(),
+                    field_entity.EnableWalkingAnimation(),
+                ),
+            ],
+            # party 2 fall
+            [
+                change_party(2),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetSpriteLayer(2),
+                    field_entity.DisableWalkingAnimation(),
+                    field_entity.AnimateSurprised(),
+                    field_entity.Move(direction.DOWN, party2_y_offset - 1),
+                    field_entity.Move(direction.DOWN, 1),
+                    field_entity.AnimateKneeling(),
+                    field_entity.EnableWalkingAnimation(),
+                    field_entity.SetSpriteLayer(0),
+                ),
+            ],
+            # party 3 fall
+            [
+                change_party(3),
+                field.FadeOutSong(64),
+                field.Pause(0.75),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.DisableWalkingAnimation(),
+                    field_entity.AnimateSurprised(),
+                    field_entity.Move(direction.DOWN, party3_y_offset),
+                    field_entity.AnimateKneeling(),
+                ),
+            ],
+            field.Pause(0.75),
+
+            Read(0xa039c, 0xa039f),
+            field.LoadMap(final_switch_map_id, direction.DOWN, default_music = True,
+                          x = party1_x, y = party1_y_dest, fade_in = True, entrance_event = True),
+
+            field.FreeScreen(),
+            Read(0xa03b0, 0xa03b9),
+        ]
+        space = Write(Bank.CA, src, "kefka tower statue landing")
+        self.statue_landing = space.start_address
+
+        space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
+
+        self.maps.delete_short_exit(final_switch_map_id, 103, 49)
+        self.maps.delete_short_exit(final_switch_map_id, 109, 46)
+        self.maps.delete_short_exit(final_switch_map_id, 115, 48)
 
     def entrance_landing_mod(self):
         need_more_allies = 2982
