@@ -152,7 +152,6 @@ class KefkaTower(Event):
     # Trigger five bosses back-to-back, with cutscenes playing for each one
     def boss_rush_mod(self):
         self.maps.disable_warp(final_switch_map_id)
-        from data.bosses import name_pack
         change_party = lambda party : [
             field.SetParty(party),
             field.RefreshEntities(),
@@ -161,7 +160,7 @@ class KefkaTower(Event):
 
         invoke_kt_battle = lambda party, pack_name : [
             change_party(party),
-            field.InvokeBattle(name_pack[pack_name]),
+            field.InvokeBattle(self.get_boss(pack_name)),
         ]
 
         party1_x = 103
