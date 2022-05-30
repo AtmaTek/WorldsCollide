@@ -174,9 +174,9 @@ class KefkaTower(Event):
 
         disable_all("Inferno")
         disable_all("Guardian")
-        disable_all("Poltrgeist")
+        disable_all("Doom")
         disable_all("Goddess")
-        disable_battle_music("Doom") # Keep victory music for defeating the gauntlet
+        disable_battle_music("Poltrgeist") # Keep victory music for defeating the gauntlet
 
         def change_party(party):
             return [
@@ -187,9 +187,10 @@ class KefkaTower(Event):
 
         def invoke_kt_battle(party, original_pack_name, battle_sound = False):
             from data.bosses import pack_name
+            boss_id = self.get_boss(original_pack_name, False)
             return [
                 change_party(party),
-                field.InvokeBattle(self.get_boss(original_pack_name, False), battle_sound = battle_sound),
+                field.InvokeBattle(boss_id, battle_sound = battle_sound, battle_animation = True),
             ]
 
         party1_x = 103
@@ -251,17 +252,17 @@ class KefkaTower(Event):
                             x = 0, y = 0, fade_in = False, entrance_event = True),
                 invoke_kt_battle(1, "Doom"),
             ],
-            # Fight Poltergeist
-            [
-                field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(2, "Poltrgeist"),
-            ],
             # Fight Goddess
             [
                 field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
                             x = 0, y = 0, fade_in = False, entrance_event = True),
                 invoke_kt_battle(3, "Goddess"),
+            ],
+            # Fight Poltergeist
+            [
+                field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(2, "Poltrgeist"),
             ],
             # post battle, move to final room
             [
