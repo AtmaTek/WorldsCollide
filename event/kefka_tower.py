@@ -232,6 +232,7 @@ class KefkaTower(Event):
             field.SetPartyMap(1, final_switch_map_id),
             field.SetPartyMap(2, final_switch_map_id),
             field.SetPartyMap(3, final_switch_map_id),
+
             # Fight Inferno
             [
                 field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
@@ -242,25 +243,25 @@ class KefkaTower(Event):
             [
                 field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
                             x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(3, "Guardian"),
+                invoke_kt_battle(2, "Guardian"),
+            ],
+            # Fight Doom
+            [
+                field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                invoke_kt_battle(1, "Doom"),
             ],
             # Fight Poltergeist
             [
                 field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
                             x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(3, "Poltrgeist"),
+                invoke_kt_battle(2, "Poltrgeist"),
             ],
             # Fight Goddess
             [
                 field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
                             x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(2, "Goddess"),
-            ],
-             # Fight Doom
-            [
-                field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(1, "Doom"),
+                invoke_kt_battle(3, "Goddess"),
             ],
             # post battle, move to final room
             [
