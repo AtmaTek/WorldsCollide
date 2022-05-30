@@ -149,25 +149,34 @@ class KefkaTower(Event):
 
         space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
 
-    # Trigger five bosses back-to-back, with cutscenes playing for each one
+    # Trigger five bosses back-to-back
     def boss_rush_mod(self):
         self.maps.disable_warp(final_switch_map_id)
 
-        def disable_battle_music(boss_name):
+        def get_replacement_formation(boss_name):
             from data.bosses import pack_name
             replacement = self.get_boss(boss_name, False)
             location_boss = pack_name[replacement]
-
             formation_id = self.enemies.formations.get_id(location_boss)
-            formation = self.enemies.formations.formations[formation_id]
+            return self.enemies.formations.formations[formation_id]
+
+        def disable_victory_dance(original_encounter_name):
+            formation = get_replacement_formation(original_encounter_name)
+            formation.disable_victory_dance = 1
+
+        def disable_battle_music(original_encounter_name):
+            formation = get_replacement_formation(original_encounter_name)
             formation.disable_battle_music = 1
 
-        # disable
-        disable_battle_music("Inferno")
-        disable_battle_music("Doom")
-        disable_battle_music("Goddess")
-        disable_battle_music("Guardian")
-        disable_battle_music("Poltrgeist")
+        def disable_all(boss_name):
+            disable_victory_dance(boss_name)
+            disable_battle_music(boss_name)
+
+        disable_all("Inferno")
+        disable_all("Guardian")
+        disable_all("Poltrgeist")
+        disable_all("Goddess")
+        disable_battle_music("Doom") # Keep victory music for defeating the gauntlet
 
         def change_party(party):
             return [
@@ -348,7 +357,7 @@ class KefkaTower(Event):
 
         statues_entrance = 1287
         self.dialogs.set_text(statues_entrance,
-                              "<choice> (Statues)<line><choice> (Entrance)<line><choice> (Not just yet)<end>")
+                              "<choice> (Gauntlet)<line><choice> (Entrance)<line><choice> (Not just yet)<end>")
 
         space = Reserve(0xa01a2, 0xa02d5, "kefka tower first landing scene", field.NOP())
         space.add_label("STATUE_LANDING", self.statue_landing)
