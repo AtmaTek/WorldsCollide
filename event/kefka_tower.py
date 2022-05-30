@@ -152,16 +152,36 @@ class KefkaTower(Event):
     # Trigger five bosses back-to-back, with cutscenes playing for each one
     def boss_rush_mod(self):
         self.maps.disable_warp(final_switch_map_id)
-        change_party = lambda party : [
-            field.SetParty(party),
-            field.RefreshEntities(),
-            field.UpdatePartyLeader(),
-        ]
 
-        invoke_kt_battle = lambda party, pack_name : [
-            change_party(party),
-            field.InvokeBattle(self.get_boss(pack_name)),
-        ]
+        def disable_battle_music(boss_name):
+            from data.bosses import pack_name
+            replacement = self.get_boss(boss_name, False)
+            location_boss = pack_name[replacement]
+
+            formation_id = self.enemies.formations.get_id(location_boss)
+            formation = self.enemies.formations.formations[formation_id]
+            formation.disable_battle_music = 1
+
+        # disable
+        disable_battle_music("Inferno")
+        disable_battle_music("Doom")
+        disable_battle_music("Goddess")
+        disable_battle_music("Guardian")
+        disable_battle_music("Poltrgeist")
+
+        def change_party(party):
+            return [
+                field.SetParty(party),
+                field.RefreshEntities(),
+                field.UpdatePartyLeader(),
+            ]
+
+        def invoke_kt_battle(party, original_pack_name, battle_sound = False):
+            from data.bosses import pack_name
+            return [
+                change_party(party),
+                field.InvokeBattle(self.get_boss(original_pack_name, False), battle_sound = battle_sound),
+            ]
 
         party1_x = 103
         party1_y_dest = 45
@@ -207,7 +227,7 @@ class KefkaTower(Event):
             [
                 field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
                             x = 0, y = 0, fade_in = False, entrance_event = True),
-                invoke_kt_battle(3, "Inferno"),
+                invoke_kt_battle(3, "Inferno", True),
             ],
             # Fight Guardian
             [
