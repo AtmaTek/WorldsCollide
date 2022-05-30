@@ -176,7 +176,8 @@ class KefkaTower(Event):
         disable_all("Guardian")
         disable_all("Doom")
         disable_all("Goddess")
-        disable_battle_music("Poltrgeist") # Keep victory music for defeating the gauntlet
+        disable_all("Poltrgeist")
+        # disable_battle_music("Poltrgeist") # Keep victory music for defeating the gauntlet
 
         def change_party(party):
             return [
@@ -186,7 +187,6 @@ class KefkaTower(Event):
             ]
 
         def invoke_kt_battle(party, original_pack_name, battle_sound = False):
-            from data.bosses import pack_name
             boss_id = self.get_boss(original_pack_name, False)
             return [
                 change_party(party),
@@ -227,48 +227,46 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.CENTER_DOOR_KEFKA_TOWER),
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
 
-            field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
-            field.HoldScreen(),
-            field.HideEntity(field_entity.PARTY0),
-            field.SetPartyMap(1, final_switch_map_id),
-            field.SetPartyMap(2, final_switch_map_id),
-            field.SetPartyMap(3, final_switch_map_id),
-
+            # field.HoldScreen(),
+            field.StartSong(0x33), # Play "Battle to the Death" throughout the entirety of the gauntlet
+            field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
             # Fight Inferno
             [
                 field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                            x = 0, y = 0, fade_in = False, entrance_event = False),
                 invoke_kt_battle(3, "Inferno", True),
             ],
             # Fight Guardian
             [
                 field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                            x = 0, y = 0, fade_in = False, entrance_event = False),
                 invoke_kt_battle(2, "Guardian"),
             ],
             # Fight Doom
             [
                 field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                            x = 0, y = 0, fade_in = False, entrance_event = False),
                 invoke_kt_battle(1, "Doom"),
             ],
             # Fight Goddess
             [
                 field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                            x = 0, y = 0, fade_in = False, entrance_event = False),
                 invoke_kt_battle(3, "Goddess"),
             ],
             # Fight Poltergeist
             [
                 field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                            x = 0, y = 0, fade_in = False, entrance_event = False),
                 invoke_kt_battle(2, "Poltrgeist"),
             ],
             # post battle, move to final room
             [
                 # Load final
-                field.LoadMap(final_switch_map_id, direction.DOWN, default_music = True,
-                            x = 109, y = 43, fade_in = False, entrance_event = True),
+                field.LoadMap(final_switch_map_id, direction.DOWN, default_music = False,
+                            x = 109, y = 43, fade_in = False, entrance_event = False),
+
+                field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
 
                 # Party 1 init position
                 [
@@ -359,7 +357,7 @@ class KefkaTower(Event):
 
         statues_entrance = 1287
         self.dialogs.set_text(statues_entrance,
-                              "<choice> (Gauntlet)<line><choice> (Entrance)<line><choice> (Not just yet)<end>")
+                              "<choice> (Gauntlet)<line><choice> (Not just yet)<end>")
 
         space = Reserve(0xa01a2, 0xa02d5, "kefka tower first landing scene", field.NOP())
         space.add_label("STATUE_LANDING", self.statue_landing)
