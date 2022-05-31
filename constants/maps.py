@@ -1,7 +1,7 @@
 
 
 id_name = {
-    0x123   : "Guardian Room",        # 291
+    0x123   : "Guardian Room",       # 291
     0x14e   : "Poltergeist Room",    # 334
     0x162   : "Goddess Room",        # 354
     0x163   : "Doom Room",           # 355

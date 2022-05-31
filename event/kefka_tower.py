@@ -1,13 +1,22 @@
 from event.event import *
 import args
 
-from constants.maps import name_id
-final_switch_map_id = name_id["KT Final Switch Room"]
-inferno_room_id =  name_id["Inferno Room"]
-guardian_room_id =  name_id["Guardian Room"]
-poltergeist_room_id =  name_id["Poltergeist Room"]
-doom_room_id =  name_id["Doom Room"]
-goddess_room_id =  name_id["Goddess Room"]
+from constants.sound_effects import name_id as sfx_name_id
+from constants.maps import name_id as map_name_id
+final_switch_map_id = map_name_id["KT Final Switch Room"]
+inferno_room_id =  map_name_id["Inferno Room"]
+guardian_room_id =  map_name_id["Guardian Room"]
+poltergeist_room_id =  map_name_id["Poltergeist Room"]
+doom_room_id =  map_name_id["Doom Room"]
+goddess_room_id =  map_name_id["Goddess Room"]
+
+def change_party(party):
+    return [
+        field.SetParty(party),
+        field.RefreshEntities(),
+        field.UpdatePartyLeader(),
+    ]
+
 
 class KefkaTower(Event):
     def name(self):
@@ -184,27 +193,6 @@ class KefkaTower(Event):
         disable_all("Goddess")
         disable_all("Poltrgeist")
 
-        def change_party(party):
-            return [
-                field.SetParty(party),
-                field.RefreshEntities(),
-                field.UpdatePartyLeader(),
-            ]
-
-        party1_x = 103
-        party1_y_dest = 45
-        party1_y_offset = 6
-        party1_y_start = party1_y_dest - party1_y_offset
-
-        party2_x = 109
-        party2_y_dest = 42
-        party2_y_offset = 9
-        party2_y_start = party2_y_dest - party2_y_offset
-
-        party3_x = 115
-        party3_y_dest = 44
-        party3_y_offset = 8
-        party3_y_start = party3_y_dest - party3_y_offset
 
         src = [
             Read(0xa02d6, 0xa030a),
@@ -226,193 +214,12 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
             field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
 
-            # Fight Inferno
-            [
-                change_party(3),
-                field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
-                            x = 27, y = 18, fade_in = False, entrance_event = True),
-
-                # Move main party to east of inferno
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetPosition(39, 18),
-                ),
-                field.FadeInScreen(3),
-                field.EntityAct(field_entity.CAMERA, False,
-                    field_entity.SetSpeed(field_entity.Speed.SLOW),
-                    field_entity.Move(direction.RIGHT, 4),
-                ),
-
-                field.Pause(1),
-
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetSpeed(field_entity.Speed.FAST),
-                    field_entity.Move(direction.LEFT, 8),
-                ),
-                field.Call(0xc1872), # Inferno event tile address
-            ],
-
-            # # Fight Guardian
-            [
-                change_party(2),
-                field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
-                            x = 12, y = 8, fade_in = False, entrance_event = True),
-                field.EntityAct(field_entity.PARTY0, False,
-                    field_entity.SetPosition(0, 0)
-                ),
-                field.FadeInScreen(3),
-
-                field.EntityAct(field_entity.CAMERA, False,
-                    field_entity.SetSpeed(field_entity.Speed.SLOW),
-                    field_entity.Move(direction.DOWN, 6),
-                ),
-                field.Pause(1.5),
-                field.EntityAct(field_entity.PARTY0, False,
-                    field_entity.SetPosition(12, 17),
-                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                    field_entity.Move(direction.UP, 3),
-                ),
-                field.Call(0xc1827),
-            ],
-            # Fight Doom
-            [
-                change_party(1),
-                field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
-                    x = 0, y = 0, fade_in = False, entrance_event = True),
-
-                self.invoke_kt_battle(1, "Doom", True),
-            ],
-            # Fight Goddess
-            [
-                field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = True),
-                change_party(3),
-                self.invoke_kt_battle(3, "Goddess", True),
-            ],
-            # Fight Poltergeist
-            [
-                change_party(2),
-                field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
-                            x = 35, y = 25, fade_in = False, entrance_event = True),
-                field.FadeInScreen(3),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetPosition(27, 23)
-                ),
-
-                field.EntityAct(field_entity.CAMERA, False,
-                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                    field_entity.Move(direction.LEFT, 6),
-                    field_entity.Pause(20),
-                    field_entity.Move(direction.UP, 6),
-                    field_entity.SetSpeed(field_entity.Speed.FAST),
-                    field_entity.Move(direction.UP, 3),
-                ),
-                 field.EntityAct(field_entity.PARTY0, False,
-                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                    field_entity.Move(direction.DOWN, 2),
-                    field_entity.Move(direction.RIGHT, 2),
-                    field_entity.Move(direction.DOWN, 3),
-                    field_entity.Pause(10),
-                    field_entity.Move(direction.UP, 3),
-                    field_entity.Move(direction.RIGHT, 1),
-                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                    field_entity.Move(direction.UP, 3),
-                    field_entity.SetSpeed(field_entity.Speed.FAST),
-                    field_entity.Move(direction.UP, 6),
-                ),
-                field.Pause(4),
-                field.Pause(1.5),
-
-                field.Call(0xc174f),
-
-                field.HoldScreen(),
-                field.EntityAct(field_entity.PARTY0, False,
-                    field_entity.SetSpeed(field_entity.Speed.FAST),
-                    field_entity.Move(direction.UP, 8),
-                ),
-                field.FadeOutScreen(4),
-                field.Pause(1),
-            ],
-            # post battle, move to final room
-            [
-                # Load final
-                field.LoadMap(final_switch_map_id, direction.DOWN, default_music = False,
-                            x = 109, y = 43, fade_in = False, entrance_event = False),
-
-                field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
-
-                # Party 1 init position
-                [
-                    change_party(1),
-                    Read(0xa0334, 0xa033c),
-                    field.EntityAct(field_entity.PARTY0, True,
-                        field_entity.SetPosition(party1_x, party1_y_start),
-                        field_entity.AnimateFrontHandsUp(),
-                        field_entity.SetSpeed(field_entity.Speed.FAST),
-                    ),
-                ],
-                # Party 2 init position
-                [
-                    Read(0xa031e, 0xa0320),
-                    field.EntityAct(field_entity.PARTY0, True,
-                        field_entity.SetPosition(party2_x, party2_y_start),
-                        field_entity.SetSpeed(field_entity.Speed.FAST),
-                    ),
-                ],
-                # Party 3 init position
-                [
-                    Read(0xa0327, 0xa032d),
-                    field.EntityAct(field_entity.PARTY0, True,
-                        field_entity.SetPosition(party3_x, party3_y_start),
-                        field_entity.SetSpeed(field_entity.Speed.FAST),
-                    ),
-                ],
-                field.FadeInScreen(),
-            ],
-            # party 1 fall
-            [
-                change_party(1),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.DisableWalkingAnimation(),
-                    field_entity.AnimateSurprised(),
-                    field_entity.Move(direction.DOWN, party1_y_offset),
-                    field_entity.AnimateKneeling(),
-                    field_entity.EnableWalkingAnimation(),
-                ),
-            ],
-            # party 2 fall
-            [
-                change_party(2),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetSpriteLayer(2),
-                    field_entity.DisableWalkingAnimation(),
-                    field_entity.AnimateSurprised(),
-                    field_entity.Move(direction.DOWN, party2_y_offset - 1),
-                    field_entity.Move(direction.DOWN, 1),
-                    field_entity.AnimateKneeling(),
-                    field_entity.EnableWalkingAnimation(),
-                    field_entity.SetSpriteLayer(0),
-                ),
-            ],
-            # party 3 fall
-            [
-                change_party(3),
-                field.FadeOutSong(64),
-                field.Pause(0.75),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.DisableWalkingAnimation(),
-                    field_entity.AnimateSurprised(),
-                    field_entity.Move(direction.DOWN, party3_y_offset),
-                    field_entity.AnimateKneeling(),
-                ),
-            ],
-            field.Pause(0.75),
-
-            Read(0xa039c, 0xa039f),
-            field.LoadMap(final_switch_map_id, direction.DOWN, default_music = True,
-                          x = party1_x, y = party1_y_dest, fade_in = True, entrance_event = True),
-
-            field.FreeScreen(),
-            Read(0xa03b0, 0xa03b9),
+            inferno_cutscene_src(),
+            guardian_cutscene_src(),
+            doom_cutscene_src(),
+            goddess_cutscene_src(),
+            poltrgeist_cutscene_src(),
+            post_gauntlet_cutscene_src(),
         ]
         space = Write(Bank.CA, src, "kefka tower statue landing")
         self.statue_landing = space.start_address
@@ -558,7 +365,8 @@ class KefkaTower(Event):
         )
 
     def inferno_mod(self):
-        self.rom.set_bytes(0xc18ae, [asm.NOP(), asm.NOP()])
+        self.rom.set_byte(0xc18a2, 0xea)
+        self.rom.set_bytes(0xc18ae, [0xea, 0xea])
 
         self.kt_encounter_objective_mod(
             "Inferno",
@@ -804,3 +612,370 @@ class KefkaTower(Event):
         # leaving with crane or warp stone
         # warp stone call trace: c0c670 -> ca0039 -> ca0108 -> ca014f -> cc0ff6 -> cc0f7d
         space = Reserve(0xc0fbf, 0xc0fc0, "kefka tower exit clear poltrgeist statue bit", asm.NOP())
+
+def inferno_cutscene_src():
+    return [
+        change_party(3),
+        field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
+                    x = 27, y = 18, fade_in = False, entrance_event = True),
+
+        # Move main party to east of inferno
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetPosition(39, 18),
+        ),
+        field.FadeInScreen(3),
+        field.EntityAct(field_entity.CAMERA, False,
+            field_entity.SetSpeed(field_entity.Speed.SLOW),
+            field_entity.Move(direction.RIGHT, 4),
+        ),
+
+        field.Pause(1),
+
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.LEFT, 8),
+        ),
+        field.Call(0xc1872), # Inferno event tile address
+    ]
+
+
+# Fight Guardian
+def guardian_cutscene_src():
+    return             [
+        field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
+                    x = 12, y = 8, fade_in = False, entrance_event = True),
+        change_party(1),
+        field.EntityAct(0x10, False,
+            field_entity.SetPosition(11, 9)
+        ),
+            field.EntityAct(0x13, True,
+            field_entity.SetPosition(12, 9)
+        ),
+            field.EntityAct(0x16, False,
+            field_entity.SetPosition(13, 9)
+        ),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetPosition(6, 15),
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.UP, 3),
+            field_entity.Move(direction.LEFT, 1),
+            field_entity.AnimateKneeling(),
+            field_entity.Pause(20),
+
+            field_entity.Move(direction.RIGHT, 2),
+            field_entity.AnimateKneeling(),
+            field_entity.Pause(20),
+            field_entity.Move(direction.DOWN, 1),
+
+            field_entity.AnimateFrontRightHandUp(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingFront(),
+
+            field_entity.AnimateSurprised(),
+            field_entity.AnimateLowJump(),
+            field_entity.Pause(10),
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.LEFT, 1),
+            field_entity.Move(direction.DOWN, 3),
+            field_entity.SetPosition(0, 0)
+        ),
+
+        change_party(3),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.SLOW),
+            field_entity.SetPosition(18, 15),
+            field_entity.Move(direction.UP, 3),
+            field_entity.Move(direction.LEFT, 1),
+            field_entity.Pause(15),
+            field_entity.Move(direction.DOWN, 1),
+            field_entity.Turn(direction.LEFT),
+            field_entity.Pause(15),
+            field_entity.AnimateFrontRightHandUp(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingFront(),
+            field_entity.AnimateSurprised(),
+            field_entity.AnimateLowJump(),
+            field_entity.Pause(10),
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.RIGHT, 1),
+            field_entity.Move(direction.DOWN, 3),
+            field_entity.SetPosition(0, 0)
+        ),
+
+
+        field.FadeInScreen(3),
+
+        change_party(2),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetPosition(12, 17)
+        ),
+
+
+        field.EntityAct(field_entity.CAMERA, False,
+            field_entity.SetSpeed(field_entity.Speed.SLOW),
+            field_entity.Move(direction.DOWN, 6),
+        ),
+        field.Pause(2),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.UP, 3),
+            field_entity.AnimateFrontHandsUp(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingFront(),
+            field_entity.Pause(5),
+            field_entity.AnimateFrontHandsUp(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingFront(),
+        ),
+        field.Pause(1),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.AnimateAttack(),
+            field_entity.AnimateLowJump(),
+            field_entity.Pause(5),
+            field_entity.AnimateKnockedOut(),
+            field_entity.Pause(10),
+            field_entity.AnimateFrontHandsUp(),
+            field_entity.AnimateLowJump(),
+            field_entity.Pause(3),
+            field_entity.AnimateKneeling(),
+            field_entity.Pause(5),
+            field_entity.AnimateKneeling(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingHeadDown(),
+            field_entity.Pause(5),
+            field_entity.AnimateStandingFront(),
+            field_entity.Pause(5),
+            field_entity.AnimateAttack(),
+            field_entity.AnimateLowJump(),
+        ),
+        field.Call(0xc1827),
+    ]
+
+
+
+# Fight Doom
+def doom_cutscene_src():
+    return [
+        change_party(1),
+        field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
+            x = 64, y = 15, fade_in = False, entrance_event = True),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetPosition(64, 21),
+        ),
+        field.FadeInScreen(3),
+        field.EntityAct(field_entity.CAMERA, False,
+            field_entity.SetSpeed(field_entity.Speed.SLOWEST),
+            field_entity.Move(direction.UP, 3),
+        ),
+        field.Pause(2),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.UP, 8),
+            field_entity.Move(direction.UP, 1)
+        ),
+
+        field.Call(0xc16d6),
+
+        field.HoldScreen(),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.LEFT, 1),
+            field_entity.Move(direction.UP, 3),
+        ),
+        field.FadeOutScreen(3),
+        field.Pause(1),
+    ]
+
+
+# Fight Goddess
+def goddess_cutscene_src():
+    return [
+        change_party(3),
+        field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
+                    x = 12, y = 28, fade_in = False, entrance_event = True),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetPosition(12, 40)
+        ),
+        field.FadeInScreen(3),
+        field.EntityAct(field_entity.CAMERA, False,
+            field_entity.SetSpeed(field_entity.Speed.SLOW),
+            field_entity.Move(direction.DOWN, 5)
+        ),
+        field.Pause(1.5),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.UP, 8)
+        ),
+        field.Call(0xc1716),
+        field.HoldScreen(),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Pause(8),
+            field_entity.Move(direction.UP, 2),
+            field_entity.EnableWalkingAnimation(),
+            field_entity.AnimateLowJump(),
+        ),
+        field.FadeOutScreen(4),
+        field.Pause(1),
+    ]
+
+
+# Fight Poltrgeist
+def poltrgeist_cutscene_src():
+    return [
+        change_party(2),
+        field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
+                    x = 35, y = 25, fade_in = False, entrance_event = True),
+        field.FadeInScreen(3),
+        field.EntityAct(field_entity.PARTY0, True,
+            field_entity.SetPosition(27, 23)
+        ),
+
+        field.EntityAct(field_entity.CAMERA, False,
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.LEFT, 6),
+            field_entity.Pause(20),
+            field_entity.Move(direction.UP, 6),
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.UP, 3),
+        ),
+            field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.DOWN, 2),
+            field_entity.Move(direction.RIGHT, 2),
+            field_entity.Move(direction.DOWN, 3),
+            field_entity.AnimateKneeling(),
+            field_entity.Pause(10),
+            field_entity.AnimateStandingFront(),
+            field_entity.Pause(2),
+            field_entity.Move(direction.UP, 3),
+            field_entity.Move(direction.RIGHT, 1),
+            field_entity.SetSpeed(field_entity.Speed.NORMAL),
+            field_entity.Move(direction.UP, 3),
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.UP, 6),
+        ),
+        field.Pause(2),
+        field.PlaySoundEffect(sfx_name_id.get('Chest/Switch')),
+        field.Pause(2),
+        field.Pause(1.5),
+
+        field.Call(0xc174f),
+
+        field.HoldScreen(),
+        field.EntityAct(field_entity.PARTY0, False,
+            field_entity.SetSpeed(field_entity.Speed.FAST),
+            field_entity.Move(direction.UP, 8),
+        ),
+        field.FadeOutScreen(4),
+        field.Pause(1),
+    ]
+
+def post_gauntlet_cutscene_src():
+    party1_x = 103
+    party1_y_dest = 45
+    party1_y_offset = 8
+    party1_y_start = party1_y_dest - party1_y_offset
+
+    party2_x = 109
+    party2_y_dest = 42
+    party2_y_offset = 9
+    party2_y_start = party2_y_dest - party2_y_offset
+
+    party3_x = 115
+    party3_y_dest = 44
+    party3_y_offset = 8
+    party3_y_start = party3_y_dest - party3_y_offset
+    return [
+        [
+            # Load final
+            field.LoadMap(final_switch_map_id, direction.DOWN, default_music = False,
+                        x = 109, y = 43, fade_in = False, entrance_event = False),
+
+            field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
+
+            # Party 1 init position
+            [
+                change_party(1),
+                Read(0xa0334, 0xa033c),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(party1_x, party1_y_start),
+                    field_entity.AnimateFrontHandsUp(),
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                ),
+            ],
+            # Party 2 init position
+            [
+                Read(0xa031e, 0xa0320),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(party2_x, party2_y_start),
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                ),
+            ],
+            # Party 3 init position
+            [
+                Read(0xa0327, 0xa032d),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(party3_x, party3_y_start),
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                ),
+            ],
+            field.FadeInScreen(),
+        ],
+        # party 1 fall
+        [
+            change_party(1),
+            field.PlaySoundEffect(sfx_name_id.get('Falling')),
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.DisableWalkingAnimation(),
+                field_entity.AnimateSurprised(),
+                field_entity.Move(direction.DOWN, party1_y_offset),
+                field_entity.AnimateKneeling(),
+                field_entity.EnableWalkingAnimation(),
+            ),
+            field.PlaySoundEffect(sfx_name_id.get('Umaro Body Slam')),
+        ],
+        # party 2 fall
+        [
+            change_party(2),
+            field.Pause(0.25),
+            field.PlaySoundEffect(sfx_name_id.get('Falling')),
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                field_entity.SetSpriteLayer(2),
+                field_entity.DisableWalkingAnimation(),
+                field_entity.AnimateSurprised(),
+                field_entity.Move(direction.DOWN, party2_y_offset - 6),
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.Move(direction.DOWN, 6),
+                field_entity.AnimateKneeling(),
+                field_entity.EnableWalkingAnimation(),
+                field_entity.SetSpriteLayer(0),
+            ),
+            field.PlaySoundEffect(sfx_name_id.get('Umaro Body Slam')),
+        ],
+        # party 3 fall
+        [
+            change_party(3),
+            field.Pause(0.25),
+            field.PlaySoundEffect(sfx_name_id.get('Falling')),
+
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.DisableWalkingAnimation(),
+                field_entity.AnimateSurprised(),
+                field_entity.Move(direction.DOWN, party3_y_offset),
+                field_entity.AnimateKneeling(),
+            ),
+            field.PlaySoundEffect(sfx_name_id.get('Umaro Body Slam')),
+        ],
+        field.Pause(0.75),
+
+        Read(0xa039c, 0xa039f),
+        field.LoadMap(final_switch_map_id, direction.DOWN, default_music = True,
+                        x = party1_x, y = party1_y_dest, fade_in = True, entrance_event = True),
+
+        field.FreeScreen(),
+        Read(0xa03b0, 0xa03b9),
+    ]
