@@ -149,6 +149,12 @@ class KefkaTower(Event):
 
         space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
 
+    def invoke_kt_battle(self, party, original_pack_name, battle_sound = False):
+        boss_id = self.get_boss(original_pack_name, False)
+        return [
+            field.InvokeBattle(boss_id, battle_sound = True, battle_animation = True),
+        ]
+
     # Trigger five bosses back-to-back
     def boss_rush_mod(self):
         self.maps.disable_warp(final_switch_map_id)
@@ -177,20 +183,12 @@ class KefkaTower(Event):
         disable_all("Doom")
         disable_all("Goddess")
         disable_all("Poltrgeist")
-        # disable_battle_music("Poltrgeist") # Keep victory music for defeating the gauntlet
 
         def change_party(party):
             return [
                 field.SetParty(party),
                 field.RefreshEntities(),
                 field.UpdatePartyLeader(),
-            ]
-
-        def invoke_kt_battle(party, original_pack_name, battle_sound = False):
-            boss_id = self.get_boss(original_pack_name, False)
-            return [
-                change_party(party),
-                field.InvokeBattle(boss_id, battle_sound = battle_sound, battle_animation = True),
             ]
 
         party1_x = 103
@@ -226,39 +224,113 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.SOUTH_PATH_OPEN_KEFKA_TOWER),
             field.SetEventBit(event_bit.CENTER_DOOR_KEFKA_TOWER),
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
-
-            # field.HoldScreen(),
-            field.StartSong(0x33), # Play "Battle to the Death" throughout the entirety of the gauntlet
             field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
+
             # Fight Inferno
             [
+                change_party(3),
                 field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = False),
-                invoke_kt_battle(3, "Inferno", True),
+                            x = 27, y = 18, fade_in = False, entrance_event = True),
+
+                # Move main party to east of inferno
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(39, 18),
+                ),
+                field.FadeInScreen(3),
+                field.EntityAct(field_entity.CAMERA, False,
+                    field_entity.SetSpeed(field_entity.Speed.SLOW),
+                    field_entity.Move(direction.RIGHT, 4),
+                ),
+
+                field.Pause(1),
+
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                    field_entity.Move(direction.LEFT, 8),
+                ),
+                field.Call(0xc1872), # Inferno event tile address
             ],
-            # Fight Guardian
+
+            # # Fight Guardian
             [
+                change_party(2),
                 field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = False),
-                invoke_kt_battle(2, "Guardian"),
+                            x = 12, y = 8, fade_in = False, entrance_event = True),
+                field.EntityAct(field_entity.PARTY0, False,
+                    field_entity.SetPosition(0, 0)
+                ),
+                field.FadeInScreen(3),
+
+                field.EntityAct(field_entity.CAMERA, False,
+                    field_entity.SetSpeed(field_entity.Speed.SLOW),
+                    field_entity.Move(direction.DOWN, 6),
+                ),
+                field.Pause(1.5),
+                field.EntityAct(field_entity.PARTY0, False,
+                    field_entity.SetPosition(12, 17),
+                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                    field_entity.Move(direction.UP, 3),
+                ),
+                field.Call(0xc1827),
             ],
             # Fight Doom
             [
+                change_party(1),
                 field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = False),
-                invoke_kt_battle(1, "Doom"),
+                    x = 0, y = 0, fade_in = False, entrance_event = True),
+
+                self.invoke_kt_battle(1, "Doom", True),
             ],
             # Fight Goddess
             [
                 field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = False),
-                invoke_kt_battle(3, "Goddess"),
+                            x = 0, y = 0, fade_in = False, entrance_event = True),
+                change_party(3),
+                self.invoke_kt_battle(3, "Goddess", True),
             ],
             # Fight Poltergeist
             [
+                change_party(2),
                 field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
-                            x = 0, y = 0, fade_in = False, entrance_event = False),
-                invoke_kt_battle(2, "Poltrgeist"),
+                            x = 35, y = 25, fade_in = False, entrance_event = True),
+                field.FadeInScreen(3),
+                field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(27, 23)
+                ),
+
+                field.EntityAct(field_entity.CAMERA, False,
+                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                    field_entity.Move(direction.LEFT, 6),
+                    field_entity.Pause(20),
+                    field_entity.Move(direction.UP, 6),
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                    field_entity.Move(direction.UP, 3),
+                ),
+                 field.EntityAct(field_entity.PARTY0, False,
+                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                    field_entity.Move(direction.DOWN, 2),
+                    field_entity.Move(direction.RIGHT, 2),
+                    field_entity.Move(direction.DOWN, 3),
+                    field_entity.Pause(10),
+                    field_entity.Move(direction.UP, 3),
+                    field_entity.Move(direction.RIGHT, 1),
+                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                    field_entity.Move(direction.UP, 3),
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                    field_entity.Move(direction.UP, 6),
+                ),
+                field.Pause(4),
+                field.Pause(1.5),
+
+                field.Call(0xc174f),
+
+                field.HoldScreen(),
+                field.EntityAct(field_entity.PARTY0, False,
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
+                    field_entity.Move(direction.UP, 8),
+                ),
+                field.FadeOutScreen(4),
+                field.Pause(1),
             ],
             # post battle, move to final room
             [
@@ -476,6 +548,7 @@ class KefkaTower(Event):
         ])
 
     def guardian_mod(self):
+        self.rom.set_bytes(0xc186c, [asm.NOP(), asm.NOP()])
         self.kt_encounter_objective_mod(
             "Guardian",
             event_bit.DEFEATED_GUARDIAN,
@@ -485,6 +558,8 @@ class KefkaTower(Event):
         )
 
     def inferno_mod(self):
+        self.rom.set_bytes(0xc18ae, [asm.NOP(), asm.NOP()])
+
         self.kt_encounter_objective_mod(
             "Inferno",
             event_bit.DEFEATED_INFERNO,
@@ -539,12 +614,16 @@ class KefkaTower(Event):
         )
 
     def inferno_battle_mod(self):
-        boss_pack_id = self.get_boss("Inferno")
-
-        space = Reserve(0xc18a3, 0xc18a9, "kefka tower invoke battle inferno", field.NOP())
-        space.write(
-            field.InvokeBattle(boss_pack_id),
-        )
+        boss_src = [
+            field.StartSong(0x33),
+            self.invoke_kt_battle(3, 'Inferno', True),
+            field.Return(),
+        ]
+        boss_space = Write(Bank.CC, boss_src, "trigger inferno fight, ")
+        space = Reserve(0xc18a2, 0xc18a9, "call inferno fight subroutine", asm.NOP())
+        space.write([
+            field.Call(boss_space.start_address)
+        ])
 
     def inferno_skip_fix(self):
         # not sure why (stairs?) but this npc only blocks skipping the inferno event tile when entering from the east
