@@ -666,7 +666,7 @@ class KefkaTower(Event):
                     field_entity.Turn(direction.UP),
                 ),
                 change_party(2),
-                field.EntityAct(field_entity.PARTY0, False,
+                field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.FAST),
                     field_entity.SetPosition(12, 17),
                     field_entity.Turn(direction.UP),
@@ -690,6 +690,7 @@ class KefkaTower(Event):
                     field_entity.SetPosition(13, 9)
                 ),
             ],
+            field.Pause(0.25),
             # Camera position
             field.EntityAct(field_entity.CAMERA, False,
                 field_entity.SetSpeed(field_entity.Speed.SLOW),
