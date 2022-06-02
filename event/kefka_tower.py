@@ -170,8 +170,6 @@ class KefkaTower(Event):
 
     # Trigger five bosses back-to-back
     def boss_rush_mod(self):
-        self.maps.disable_warp(final_switch_map_id)
-
         def get_replacement_formation(boss_name):
             from data.bosses import pack_name
             replacement = self.get_boss(boss_name, False)
@@ -179,13 +177,14 @@ class KefkaTower(Event):
             formation_id = self.enemies.formations.get_id(location_boss)
             return self.enemies.formations.formations[formation_id]
 
+        # If encounters are random, it could be a tell when a fight loses its music/victory dance
         def disable_victory_dance(original_encounter_name):
             formation = get_replacement_formation(original_encounter_name)
-            formation.disable_victory_dance = 1
+            formation.disable_victory_dance = formation.disable_victory_dance if self.args.random_encounters_random else 1
 
         def disable_battle_music(original_encounter_name):
             formation = get_replacement_formation(original_encounter_name)
-            formation.disable_battle_music = 1
+            formation.disable_battle_music = formation.disable_battle_music if self.args.random_encounters_random else 1
 
         def disable_all(boss_name):
             disable_victory_dance(boss_name)
@@ -196,7 +195,6 @@ class KefkaTower(Event):
         disable_all("Doom")
         disable_all("Goddess")
         disable_all("Poltrgeist")
-
 
         src = [
             Read(0xa02d6, 0xa030a),
@@ -218,14 +216,24 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
             field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
 
-            self.gauntlet_inferno_cutscene_src(),
-            self.gauntlet_guardian_cutscene_src(),
-            self.gauntlet_doom_cutscene_src(),
-            self.gauntlet_goddess_cutscene_src(),
-            self.gauntlet_poltrgeist_cutscene_src(),
-            self.gauntlet_post_battle_cutscene_src(),
+            field.BranchIfEventBitSet(event_bit.DEFEATED_INFERNO, "GUARDIAN"),
+            field.Call(self.gauntlet_inferno_cutscene()),
+            "GUARDIAN",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_GUARDIAN, "DOOM"),
+            field.Call(self.gauntlet_guardian_cutscene()),
+            "DOOM",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_DOOM, "GODDESS"),
+            field.Call(self.gauntlet_doom_cutscene()),
+            "GODDESS",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_GODDESS, "POLTRGEIST"),
+            field.Call(self.gauntlet_goddess_cutscene()),
+            "POLTRGEIST",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_POLTRGEIST, "POST_GAUNTLET"),
+            field.Call(self.gauntlet_poltrgeist_cutscene_src()),
+            "POST_GAUNTLET",
+            field.Call(self.gauntlet_post_battle_cutscene_src()),
         ]
-        space = Write(Bank.CA, src, "kefka tower statue landing")
+        space = Write(Bank.F0, src, "kefka tower statue landing")
         self.statue_landing = space.start_address
 
         space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
@@ -401,7 +409,7 @@ class KefkaTower(Event):
     def poltergeist_mod(self):
         self.kt_encounter_objective_mod(
             "Goddess",
-            event_bit.DEFEATED_POLTERGEIST,
+            event_bit.DEFEATED_POLTRGEIST,
             0xc1786,
             0xc1789,
             "Poltergeist battle post-script, Hide NPCs, set npc bit",
@@ -628,8 +636,8 @@ class KefkaTower(Event):
         # warp stone call trace: c0c670 -> ca0039 -> ca0108 -> ca014f -> cc0ff6 -> cc0f7d
         space = Reserve(0xc0fbf, 0xc0fc0, "kefka tower exit clear poltrgeist statue bit", asm.NOP())
 
-    def gauntlet_inferno_cutscene_src(self):
-        return [
+    def gauntlet_inferno_cutscene(self):
+        src = [
             change_party(3),
             field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
                         x = 27, y = 18, fade_in = False, entrance_event = True),
@@ -653,8 +661,12 @@ class KefkaTower(Event):
             field.Call(0xc1872), # Inferno event tile address
         ]
 
-    def gauntlet_guardian_cutscene_src(self):
-        return             [
+        space = Write(Bank.F0, src, "Inferno Gauntlet Cutscene")
+        return space.start_address
+
+
+    def gauntlet_guardian_cutscene(self):
+        src = [
             field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
                         x = 12, y = 14, fade_in = False, entrance_event = True),
             # Initialize party positions
@@ -810,9 +822,12 @@ class KefkaTower(Event):
             ],
             field.Call(0xc1827),
         ]
+        space = Write(Bank.F0, src, "Guardian Gauntlet Cutscene")
+        return space.start_address
 
-    def gauntlet_doom_cutscene_src(self):
-        return [
+
+    def gauntlet_doom_cutscene(self):
+        src = [
             change_party(1),
             field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
                 x = 64, y = 15, fade_in = False, entrance_event = True),
@@ -841,10 +856,14 @@ class KefkaTower(Event):
             ),
             field.FadeOutScreen(3),
             field.Pause(1),
+            field.Return(),
         ]
 
-    def gauntlet_goddess_cutscene_src(self):
-        return [
+        space = Write(Bank.F0, src, "Doom Gauntlet Cutscene")
+        return space.start_address
+
+    def gauntlet_goddess_cutscene(self):
+        src = [
             change_party(3),
             field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
                         x = 12, y = 28, fade_in = False, entrance_event = True),
@@ -874,9 +893,11 @@ class KefkaTower(Event):
             field.Pause(1),
         ]
 
-    def gauntlet_poltrgeist_cutscene_src(self):
+        space = Write(Bank.F0, src, "Goddess Gauntlet Cutscene")
+        return space.start_address
 
-        return [
+    def gauntlet_poltrgeist_cutscene_src(self):
+        src = [
             change_party(2),
             field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
                     x = 35, y = 22, fade_in = False, entrance_event = True),
@@ -928,6 +949,9 @@ class KefkaTower(Event):
             field.Pause(1),
         ]
 
+        space = Write(Bank.F0, src, "Poltrgeist Gauntlet Cutscene")
+        return space.start_address
+
     def gauntlet_post_battle_cutscene_src(self):
         party1_x = 103
         party1_y_dest = 45
@@ -943,7 +967,7 @@ class KefkaTower(Event):
         party3_y_dest = 44
         party3_y_offset = 8
         party3_y_start = party3_y_dest - party3_y_offset
-        return [
+        src = [
             [
                 # Load final
                 field.LoadMap(final_switch_map_id, direction.DOWN, default_music = False,
@@ -1044,3 +1068,6 @@ class KefkaTower(Event):
 
             self.post_landing_src(final_switch_map_id, party1_x, party1_y_dest),
         ]
+
+        space = Write(Bank.F0, src, "Post-Gauntlet Cutscene")
+        return space.start_address
