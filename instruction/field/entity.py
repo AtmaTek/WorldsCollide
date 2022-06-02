@@ -95,21 +95,6 @@ class AnimateCastingMouthOpen(_Instruction):
     def __init__(self):
         super().__init__(0x11)
 
-class A12(_Instruction):
-    def __init__(self):
-        super().__init__(0x12)
-
-class A13(_Instruction):
-    def __init__(self):
-        super().__init__(0x13)
-
-class A14(_Instruction):
-    def __init__(self):
-        super().__init__(0x14)
-
-class A15(_Instruction):
-    def __init__(self):
-        super().__init__(0x15)
 class AnimateFrontHandsUp(_Instruction):
     def __init__(self):
         super().__init__(0x16)
