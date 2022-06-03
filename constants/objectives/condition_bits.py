@@ -72,7 +72,7 @@ check_bit += [                                                          # Index
     NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),        # 59
     NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),     # 60
     NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),           # 61
-    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTRGEIST),      # 62
+    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),      # 62
     NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),       # 63
 ]
 
