@@ -222,14 +222,11 @@ class EnemyPacks():
         self.phunbaba3_safety_check(bosses_possible)
 
     def randomize_packs(self, packs, boss_percent, no_phunbaba3 = False):
-        exclude_bosses = None
+        exclude_bosses = []
         if no_phunbaba3 or not self.args.shuffle_random_phunbaba3:
-            exclude_bosses = [self.formations.PHUNBABA3]
+            exclude_bosses += [self.formations.PHUNBABA3]
         if not self.args.doom_gaze_no_escape:
-            if exclude_bosses is None:
-                exclude_bosses = [self.formations.DOOM_GAZE]
-            else:
-                exclude_bosses.append(self.formations.DOOM_GAZE)
+            exclude_bosses += [self.formations.DOOM_GAZE]
 
         # We only want statues and dragons to show up when they are intentionally
         #   mixed into the general boss pool
