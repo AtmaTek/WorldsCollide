@@ -144,6 +144,16 @@ class Enemies():
         for enemy_id, exp in custom_exp.items():
             self.enemies[enemy_id].exp = exp * self.enemies[enemy_id].level
 
+    def stats_random_percent(self, stats, min_percent, max_percent):
+        import random
+        for enemy in self.enemies:
+            for stat in stats:
+                stat_value = getattr(enemy, stat)
+                if stat_value != 0:
+                    stat_percent = random.randint(min_percent, max_percent) / 100.0
+                    value = int(stat_value * stat_percent)
+                    setattr(enemy, stat, max(min(value, 255), 0))
+
     def boss_normalize_distort_stats(self):
         import random
 
@@ -309,6 +319,19 @@ class Enemies():
     def mod(self, maps):
         if self.args.boss_normalize_distort_stats:
             self.boss_normalize_distort_stats()
+
+        if self.args.enemy_offense_stat_random_percent:
+            self.stats_random_percent(["vigor", "magic"], 
+                                      self.args.enemy_offense_stat_random_percent_min,
+                                      self.args.enemy_offense_stat_random_percent_max)
+        if self.args.enemy_defense_stat_random_percent:
+            self.stats_random_percent(["defense", "magic_defense"],
+                                      self.args.enemy_defense_stat_random_percent_min,
+                                      self.args.enemy_defense_stat_random_percent_max)
+        if self.args.enemy_speed_stat_random_percent:
+            self.stats_random_percent(["speed"],
+                                      self.args.enemy_speed_stat_random_percent_min,
+                                      self.args.enemy_speed_stat_random_percent_max)
 
         if self.args.permadeath:
             self.remove_fenix_downs()
