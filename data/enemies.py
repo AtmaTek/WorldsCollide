@@ -5,6 +5,7 @@ from data.enemy_formations import EnemyFormations
 from data.enemy_packs import EnemyPacks
 from data.enemy_zones import EnemyZones
 from data.enemy_scripts import EnemyScripts
+from args.enemy_stats import ENEMY_STAT_ARGS
 import data.bosses as bosses
 
 class Enemies():
@@ -144,15 +145,20 @@ class Enemies():
         for enemy_id, exp in custom_exp.items():
             self.enemies[enemy_id].exp = exp * self.enemies[enemy_id].level
 
-    def stats_random_percent(self, stats, min_percent, max_percent):
+    def stats_random(self, enemy_stat_arg):
         import random
         for enemy in self.enemies:
-            for stat in stats:
-                stat_value = getattr(enemy, stat)
-                if stat_value != 0:
-                    stat_percent = random.randint(min_percent, max_percent) / 100.0
+                stat_value = getattr(enemy, enemy_stat_arg.name)
+                if enemy_stat_arg.percent:
+                    # Percent
+                    stat_percent = random.randint(enemy_stat_arg.get_min_attr(self.args), enemy_stat_arg.get_max_attr(self.args)) / 100.0
                     value = int(stat_value * stat_percent)
-                    setattr(enemy, stat, max(min(value, 255), 0))
+                else:
+                    # Delta
+                    stat_delta = random.randint(enemy_stat_arg.get_min_attr(self.args), enemy_stat_arg.get_max_attr(self.args))
+                    value = int(stat_value + stat_delta)
+                value = max(min(value, enemy_stat_arg.value_max), enemy_stat_arg.value_min)
+                setattr(enemy, enemy_stat_arg.name, value)
 
     def boss_normalize_distort_stats(self):
         import random
@@ -320,18 +326,9 @@ class Enemies():
         if self.args.boss_normalize_distort_stats:
             self.boss_normalize_distort_stats()
 
-        if self.args.enemy_offense_stat_random_percent:
-            self.stats_random_percent(["vigor", "magic"], 
-                                      self.args.enemy_offense_stat_random_percent_min,
-                                      self.args.enemy_offense_stat_random_percent_max)
-        if self.args.enemy_defense_stat_random_percent:
-            self.stats_random_percent(["defense", "magic_defense"],
-                                      self.args.enemy_defense_stat_random_percent_min,
-                                      self.args.enemy_defense_stat_random_percent_max)
-        if self.args.enemy_speed_stat_random_percent:
-            self.stats_random_percent(["speed"],
-                                      self.args.enemy_speed_stat_random_percent_min,
-                                      self.args.enemy_speed_stat_random_percent_max)
+        for stat_arg in ENEMY_STAT_ARGS:
+            if stat_arg.get_dest_attr(self.args):
+                self.stats_random(stat_arg)
 
         if self.args.permadeath:
             self.remove_fenix_downs()
