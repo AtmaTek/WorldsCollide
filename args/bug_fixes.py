@@ -17,6 +17,8 @@ def parse(parser):
                            help = "Poltergeist and Inferno in Kefka's Tower cannot be skipped")
     bug_fixes.add_argument("-fedc", "--fix-enemy-damage-counter", action = "store_true",
                            help = "Enemy damage counters only trigger if HP is reduced")
+    bug_fixes.add_argument("-fc", "--fix-capture", action = "store_true",
+                           help = "Fix Capture such that Weapon Special Effects are applied and Multi-Steals work")
 
 def process(args):
     pass
@@ -38,6 +40,8 @@ def flags(args):
         flags += " -fbs"
     if args.fix_enemy_damage_counter:
         flags += " -fedc"
+    if args.fix_capture:
+        flags += " -fc"
 
     return flags
 
@@ -50,6 +54,7 @@ def options(args):
         ("Jump", args.fix_jump),
         ("Boss Skip", args.fix_boss_skip),
         ("Enemy Damage Counter", args.fix_enemy_damage_counter),
+        ("Capture", args.fix_capture),
     ]
 
 def menu(args):

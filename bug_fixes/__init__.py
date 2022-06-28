@@ -4,6 +4,7 @@ from bug_fixes.vanish_doom import VanishDoom
 from bug_fixes.jump import Jump
 from bug_fixes.retort import Retort
 from bug_fixes.enemy_damage_counter import EnemyDamageCounter
+from bug_fixes.capture import Capture
 
 __all__ = ["BugFixes"]
 class BugFixes:
@@ -14,3 +15,4 @@ class BugFixes:
         self.jump = Jump()
         self.retort = Retort()
         self.enemy_damage_counter = EnemyDamageCounter()
+        self.capture = Capture()
