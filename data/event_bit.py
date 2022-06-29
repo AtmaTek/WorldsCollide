@@ -1,5 +1,5 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 DISABLE_SAVE_POINT_TUTORIAL = 0x133
@@ -201,6 +201,14 @@ DISABLE_MENU_ACCESS = 0x1c2
 TEMP_SONG_OVERRIDE = 0x1cc
 ENABLE_Y_PARTY_SWITCHING = 0x1ce
 ALWAYS_CLEAR = 0x176 # this event_bit is always clear, used for branching
+
+# Unused Bits
+# bits 0x200-0x22e Used for banquet soldiers
+# 2 bits 0x1bc-0x1bd Unused
+# 3 bits 0x1c7-0x1c9 Unused
+# 3 bits 0x2c1-0x2c3 Unused
+UNLOCKED_PERMA_KT_SKIP = 0x2c1
+# 8 bits 0x1e6-0x1ed Unused, as the SNES versions feature 20 rare item slots rather than 30
 
 from constants.objectives import MAX_OBJECTIVES
 for index in range(MAX_OBJECTIVES):
