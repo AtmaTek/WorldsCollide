@@ -85,6 +85,9 @@ category_types = {
     ],
 }
 
+category_types["Auto"].append(ResultType(61, "Auto Dog Block", "Auto Dog Block", None))
+category_types["Auto"].append(ResultType(62, "Auto Life 3", "Auto Life 3", None))
+
 categories = list(category_types.keys())
 
 id_type = {}
