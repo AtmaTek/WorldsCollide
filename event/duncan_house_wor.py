@@ -60,4 +60,4 @@ class DuncanHouseWOR(Event):
     def bum_rush_flash_mod(self):
         flash_addresses = [0xc0d12, 0xc0d5f, 0xc0d7f, 0xc0d9f, 0xc0df0, 0xc0e09, 0xc0e22, 0xc0e3b, 0xc0e65, 0xc0e74]
         for address in flash_addresses:
-            space = Reserve(address, address + 1, "duncan house wor bum rush flash", field.NOP())
+            space = Reserve(address, address + 1, "duncan house wor bum rush flash", field.FlashScreen(field.Flash.NONE))

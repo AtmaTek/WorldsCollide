@@ -406,6 +406,7 @@ def TintSpritePalette(tint, palette, invert = False):
     return TintSpritePalette(tint, palette * 0x10, palette * 0x10 + 0x0f, invert)
 
 class Flash(IntFlag):
+    NONE        = 0x00
     RED         = 0x20
     GREEN       = 0x40
     BLUE        = 0x80
@@ -413,7 +414,7 @@ class Flash(IntFlag):
     WHITE       = RED | GREEN | BLUE
 class FlashScreen(_Instruction):
     def __init__(self, color):
-        if not (color & Flash.RED) and not (color & Flash.GREEN) and not (color & Flash.BLUE):
+        if color != Flash.NONE and (not (color & Flash.RED) and not (color & Flash.GREEN) and not (color & Flash.BLUE)):
             raise ValueError(f"FlashScreen: invalid color {hex(color)}")
         super().__init__(0x55, color)
 

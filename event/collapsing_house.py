@@ -22,7 +22,7 @@ class CollapsingHouse(Event):
 
         if self.args.character_gating:
             self.add_gating_condition()
-        if self.args.flashes_remove_most:
+        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
             self.flash_mod()
 
         if self.reward.type == RewardType.CHARACTER:
@@ -65,11 +65,11 @@ class CollapsingHouse(Event):
         space = Reserve(0xc5a79, 0xc5a7c, "collapsing house smash kefka dialog", field.NOP())
 
     def flash_mod(self):
-        space = Reserve(0xc5848, 0xc5849, "collapsing house initial flash 1", field.NOP())
-        space = Reserve(0xc5863, 0xc5864, "collapsing house initial flash 2", field.NOP())
-        space = Reserve(0xc5868, 0xc5869, "collapsing house initial flash 3", field.NOP())
-        space = Reserve(0xc59ec, 0xc59ed, "collapsing house final flash 1", field.NOP())
-        space = Reserve(0xc59f5, 0xc59f6, "collapsing house final flash 2", field.NOP())
+        space = Reserve(0xc5848, 0xc5849, "collapsing house initial flash 1", field.FlashScreen(field.Flash.NONE))
+        space = Reserve(0xc5863, 0xc5864, "collapsing house initial flash 2", field.FlashScreen(field.Flash.NONE))
+        space = Reserve(0xc5868, 0xc5869, "collapsing house initial flash 3", field.FlashScreen(field.Flash.NONE))
+        space = Reserve(0xc59ec, 0xc59ed, "collapsing house final flash 1", field.FlashScreen(field.Flash.NONE))
+        space = Reserve(0xc59f5, 0xc59f6, "collapsing house final flash 2", field.FlashScreen(field.Flash.NONE))
 
     def add_gating_condition(self):
         start_event = 0xc5844

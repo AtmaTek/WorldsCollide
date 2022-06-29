@@ -12,6 +12,7 @@ import data.map_exits as exits
 from data.map_exit import ShortMapExit, LongMapExit
 
 import data.world_map_event_modifications as world_map_event_modifications
+from data.world_map import WorldMap
 
 class Maps():
     MAP_COUNT = 416
@@ -33,6 +34,7 @@ class Maps():
         self.events = events.MapEvents(rom)
         self.exits = exits.MapExits(rom)
         self.world_map_event_modifications = world_map_event_modifications.WorldMapEventModifications(rom)
+        self.world_map = WorldMap(rom, args)
         self.read()
 
     def read(self):
@@ -189,6 +191,7 @@ class Maps():
     def mod(self, characters):
         self.npcs.mod(characters)
         self.chests.mod()
+        self.world_map.mod()
 
         self._fix_imperial_camp_boxes()
 
