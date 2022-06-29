@@ -79,6 +79,7 @@ quest_bit = [
     NameBit("Suplex A Train", event_bit.SUPLEXED_TRAIN),
     NameBit("Win An Auction", event_bit.WON_AN_AUCTION),
     NameBit("Win A Coliseum Match", event_bit.WON_A_COLISEUM_MATCH),
+    NameBit("Reunite Gau and Father", event_bit.GAU_FATHER_REUNION),
 ]
 
 boss_bit = []

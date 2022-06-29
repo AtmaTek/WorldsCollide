@@ -172,6 +172,7 @@ GOT_RAIDEN = 0x2dd
 FOUND_ANCIENT_CASTLE = 0x2df
 GOT_ODIN = 0x0c8
 SUPLEXED_TRAIN = 0x2b0 # custom, previously unused but set in nikeah entrance event
+GAU_FATHER_REUNION = 0x247
 
 DEFEATED_NARSHE_DRAGON = 0x11a # custom
 DEFEATED_MT_ZOZO_DRAGON = 0x11b # custom
