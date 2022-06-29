@@ -1,6 +1,7 @@
 from memory.space import START_ADDRESS_SNES, Bank, Write
 import instruction.asm as asm
 import instruction.f0 as f0
+import instruction.c3 as c3
 
 from enum import IntEnum
 from collections import namedtuple
@@ -136,7 +137,7 @@ class ScrollArea:
             asm.AND(0x40, asm.IMM8),            # cursor memory enabled?
             asm.BEQ("UPDATE_CURSOR"),           # branch if not
 
-            asm.JSR(self.remember_cursor, asm.ABS),
+            asm.JSL(self.remember_cursor + START_ADDRESS_SNES),
 
             "UPDATE_CURSOR",
             asm.JSR(0x7d25, asm.ABS),           # update cursor
@@ -221,7 +222,7 @@ class ScrollArea:
             asm.DEY(),                  # decrement count
             asm.BNE("LOOP_START"),      # branch if more characters in line
             asm.STZ(0x2180, asm.ABS),   # write end of string
-            asm.RTS(),
+            asm.RTL(),
 
             "WRITE_BLANK_LINE",
             asm.LDY(WIDTH, asm.IMM16),
@@ -231,14 +232,14 @@ class ScrollArea:
             asm.DEY(),
             asm.BNE("WRITE_BLANK_LINE_LOOP"),
             asm.STZ(0x2180, asm.ABS),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track scroll area write line")
+        space = Write(Bank.F0, src, "pregame track scroll area write line")
         write_line = space.start_address
 
         src = [
             asm.JSL(START_ADDRESS_SNES + self.initialize_line),
-            asm.JSR(write_line, asm.ABS),
+            asm.JSL(START_ADDRESS_SNES + write_line),
             asm.JSR(0x37fd9, asm.ABS),  # draw line
             asm.RTS(),
         ]
@@ -252,10 +253,10 @@ class ScrollArea:
             asm.LDA(0x4f, asm.DIR),
             asm.STA(0x4d, asm.DIR),
             asm.LDA(self.memory_page_position, asm.ABS),
-            asm.JSR(0x0e1e, asm.ABS),
-            asm.RTS(),
+            c3.eggers_jump(0x0e1e),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track scroll area remember cursor")
+        space = Write(Bank.F0, src, "pregame track scroll area remember cursor")
         self.remember_cursor = space.start_address
 
     def remember_scrollbar_mod(self):
@@ -268,9 +269,9 @@ class ScrollArea:
             asm.STA(0x7e354a, asm.LNG_X),
             asm.A8(),
 
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame track scroll area remember scrollbar")
+        space = Write(Bank.F0, src, "pregame track scroll area remember scrollbar")
         self.remember_scrollbar = space.start_address
 
     def remember_draw_mod(self):
@@ -278,13 +279,13 @@ class ScrollArea:
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
             asm.STA(0x0200, asm.ABS),
 
-            asm.JSR(self.remember_cursor, asm.ABS),
-            asm.JSR(self.remember_scrollbar, asm.ABS),
+            asm.JSL(self.remember_cursor + START_ADDRESS_SNES),
+            asm.JSL(self.remember_scrollbar + START_ADDRESS_SNES),
 
-            asm.JSR(draw, asm.ABS),
-            asm.RTS(),
+            c3.eggers_jump(draw),
+            asm.RTS(), 
         ]
-        space = Write(Bank.C3, src, "pregame track scroll area remember draw")
+        space = Write(Bank.F0, src, "pregame track scroll area remember draw")
         self.remember_draw = space.start_address
 
     def mod(self):

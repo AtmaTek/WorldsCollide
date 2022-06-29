@@ -47,7 +47,18 @@ class Spells:
 
         import random
         possible_spell_ids = [spell.id for spell in self.spells if spell.id not in exclude]
+        count = min(len(possible_spell_ids), count)
         return random.sample(possible_spell_ids, count)
+
+    def get_replacement(self, spell_id, exclude):
+        ''' get a random spell from the same tier as the given spell_id '''
+        import random
+        from data.esper_spell_tiers import tiers
+
+        same_tier = next((tier for tier in tiers if spell_id in tier), [])
+        replacements = [i for i in same_tier if i not in exclude]
+        replacement = random.choice(replacements) if len(replacements) else None
+        return replacement
 
     def no_mp_scan(self):
         scan_id = name_id["Scan"]

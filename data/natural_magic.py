@@ -146,43 +146,29 @@ class NaturalMagic:
         self.after_battle_check_mod()
 
     def randomize_spells1(self):
-        exclude = []
-        if self.args.no_ultima:
-            exclude.append(self.spells.get_id("Ultima"))
-        if self.args.permadeath:
-            exclude.append(self.spells.get_id("Life"))
-            exclude.append(self.spells.get_id("Life 2"))
-            exclude.append(self.spells.get_id("Life 3"))
-
-        random_spells = self.spells.get_random(count = len(self.terra_spells), exclude = exclude)
+        random_spells = self.spells.get_random(count = len(self.terra_spells), exclude = self.args.remove_learnable_spell_ids)
         for index, spell in enumerate(random_spells):
             self.terra_spells[index].spell = spell
 
     def randomize_spells2(self):
-        exclude = []
-        if self.args.no_ultima:
-            exclude.append(self.spells.get_id("Ultima"))
-        if self.args.permadeath:
-            exclude.append(self.spells.get_id("Life"))
-            exclude.append(self.spells.get_id("Life 2"))
-            exclude.append(self.spells.get_id("Life 3"))
-
-        random_spells = self.spells.get_random(count = len(self.celes_spells), exclude = exclude)
+        random_spells = self.spells.get_random(count = len(self.celes_spells), exclude = self.args.remove_learnable_spell_ids)
         for index, spell in enumerate(random_spells):
             self.celes_spells[index].spell = spell
 
-    def remove_natural_life(self):
-        life1_index = 4
-        life2_index = 10
-        self.terra_spells[life1_index].spell = 0
-        self.terra_spells[life1_index].level = 0
+    def remove_excluded(self):
+        for a_spell_id in self.args.remove_learnable_spell_ids:
 
-        self.terra_spells[life2_index].spell = 0
-        self.terra_spells[life2_index].level = 0
+            #linear search through Terra's spells
+            for terra_spell in self.terra_spells:
+                if terra_spell.spell == a_spell_id:
+                    terra_spell.spell = 0xFF
+                    terra_spell.level = 0
 
-    def remove_natural_ultima(self):
-        self.terra_spells[-1].spell = 0
-        self.terra_spells[-1].level = 0
+            #linear search through Celes' spells
+            for celes_spell in self.celes_spells:
+                if celes_spell.spell == a_spell_id:
+                    celes_spell.spell = 0xFF
+                    celes_spell.level = 0
 
     def randomize_levels1(self):
         import random
@@ -208,19 +194,16 @@ class NaturalMagic:
                 self.randomize_levels1()
             if self.args.random_natural_spells1:
                 self.randomize_spells1()
-            else:
-                if self.args.no_ultima:
-                    # not randomizing spells terra normally learns but no ultima chosen so remove it
-                    self.remove_natural_ultima()
-                if self.args.permadeath:
-                    # not randomizing spells terra normally learns but permadeath chosen so remove life spells
-                    self.remove_natural_life()
 
         if self.args.natural_magic2:
             if self.args.random_natural_levels2:
                 self.randomize_levels2()
             if self.args.random_natural_spells2:
                 self.randomize_spells2()
+
+        # Remove any excluded spells remaining. 
+        # As randomize_spells respects the exclusion list, this should only have the effect of removing any excluded non-random spells.
+        self.remove_excluded()
 
     def log(self):
         from log import section, format_option
