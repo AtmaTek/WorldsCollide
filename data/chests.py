@@ -50,10 +50,14 @@ class Chests():
         from data.chest_item_tiers import tiers, tier_s_distribution
         self.item_tiers = tiers
 
-        # remove excluded items from tier s
-        # remaining item weights raised proportionally to their original weight
-        #   e.g. if original weights were [0.10, 0.50, 0.40] and 0.50 removed, the remaining ones become [0.20, 0.80]
+        # remove excluded items from tiers
         excluded_items = self.items.get_excluded()
+        for idx, tier in enumerate(self.item_tiers):
+            tier = [(item) for item in tier if item not in excluded_items]
+            self.item_tiers[idx] = tier
+
+        # for S-tier, remaining item weights raised proportionally to their original weight
+        #   e.g. if original weights were [0.10, 0.50, 0.40] and 0.50 removed, the remaining ones become [0.20, 0.80]
         self.item_tier_s_distribution = [(item_weight[0], item_weight[1]) for item_weight in tier_s_distribution
                                          if item_weight[0] not in excluded_items]
 
