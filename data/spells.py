@@ -53,9 +53,15 @@ class Spells:
         scan_id = name_id["Scan"]
         self.spells[scan_id].mp = 0
 
+    def no_mp_warp(self):
+        warp_id = name_id["Warp"]
+        self.spells[warp_id].mp = 0
+
     def mod(self):
         if self.args.scan_all:
             self.no_mp_scan()
+        if self.args.warp_all:
+            self.no_mp_warp()
 
     def write(self):
         for spell_index, spell in enumerate(self.spells):
