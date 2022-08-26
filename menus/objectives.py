@@ -20,21 +20,25 @@ class Objectives(scroll_area.ScrollArea):
             result_line = objective.letter + " " + str(objective.result)
             self.lines.append(scroll_area.Line(result_line, f0.set_blue_text_color))
 
-            conditions_required = "All " + str(objective.conditions_required)
-            if objective.conditions_required < len(objective.conditions):
-                conditions_required = "Any " + str(objective.conditions_required)
-            condition_fraction = " " + chr(self.special_characters_start + oi) + "/" + conditions_required
-            self.lines.append(scroll_area.Line(condition_fraction, f0.set_user_text_color))
+            if len(objective.conditions) == 0:
+                self.lines.append(scroll_area.Line(" " + chr(self.special_characters_start + oi) + " required", f0.set_user_text_color))
+            else:
+                conditions_required = " All " + str(objective.conditions_required) + " of"
+                if objective.conditions_required < len(objective.conditions):
+                    conditions_required = " Any " + str(objective.conditions_required) + " of"
+                self.lines.append(scroll_area.Line(conditions_required, f0.set_user_text_color))
 
-            for condition in objective.conditions:
-                condition_line = "  " + str(condition)
-                # When you finish a condition, gray it out
-                line_color_address = condition.menu(
-                    asm.JMP(f0.set_gray_text_color, asm.ABS),
-                    asm.JMP(f0.set_user_text_color, asm.ABS),
-                ).space.start_address
-                self.lines.append(scroll_area.Line(condition_line, line_color_address))
+                for condition in objective.conditions:
+                    condition_line = "  " + str(condition)
+                    # When you finish a condition, gray it out
+                    line_color_address = condition.menu(
+                        asm.JMP(f0.set_gray_text_color, asm.ABS),
+                        asm.JMP(f0.set_user_text_color, asm.ABS),
+                    ).space.start_address
+                    self.lines.append(scroll_area.Line(condition_line, line_color_address))
 
+                completed_line = " -- " + chr(self.special_characters_start + oi) + " completed --"
+                self.lines.append(scroll_area.Line(completed_line, f0.set_user_text_color))
             self.lines.append(scroll_area.Line("", f0.set_user_text_color))
 
         if len(self.lines) == 0:
