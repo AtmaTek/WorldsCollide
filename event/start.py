@@ -63,6 +63,7 @@ class Start(Event):
         self.intro_loop_mod()
         self.init_characters_mod()
         self.start_party_mod()
+        self.start_esper_mod()
         self.start_gold_mod()
         self.start_items_mod()
         self.start_game_mod()
@@ -73,6 +74,7 @@ class Start(Event):
             field.Call(self.event_bit_init),
             field.Call(self.character_init),
             field.Call(self.start_party),
+            field.Call(self.start_esper),
             field.Call(self.start_gold),
             field.Call(self.start_items),
             field.Call(self.start_game),
@@ -141,6 +143,21 @@ class Start(Event):
         ]
         space = Write(Bank.CC, src, "start party")
         self.start_party = space.start_address
+
+    def start_esper_mod(self):
+        src = []
+
+        for esper_id in self.espers.starting_espers:
+            src += [
+                field.AddEsper(esper_id, sound_effect = False)
+            ]
+
+        src += [
+            field.Return()
+        ]
+
+        space = Write(Bank.CC, src, "start espers")
+        self.start_esper = space.start_address
 
     def start_gold_mod(self):
         gold = self.args.gold
