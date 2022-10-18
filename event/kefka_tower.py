@@ -173,6 +173,8 @@ class KefkaTower(Event):
 
     # Trigger five bosses back-to-back
     def boss_rush_mod(self):
+        #  return the boss in place of the given boss_name
+        # e.g. bosses are shuffled, if Ultros is in Goddess spot, return Ultros
         def get_replacement_formation(boss_name):
             from data.bosses import pack_name
             replacement = self.get_boss(boss_name, False)
@@ -183,11 +185,11 @@ class KefkaTower(Event):
         # If encounters are random, it could be a tell when a fight loses its music/victory dance
         def disable_victory_dance(original_encounter_name):
             formation = get_replacement_formation(original_encounter_name)
-            formation.disable_victory_dance = formation.disable_victory_dance if self.args.random_encounters_random else 1
+            formation.disable_victory_dance = formation.disable_victory_dance if self.args.boss_battles_random else 1
 
         def disable_battle_music(original_encounter_name):
             formation = get_replacement_formation(original_encounter_name)
-            formation.disable_battle_music = formation.disable_battle_music if self.args.random_encounters_random else 1
+            formation.disable_battle_music = formation.disable_battle_music if self.args.boss_battles_random else 1
 
         def disable_all(boss_name):
             disable_victory_dance(boss_name)
@@ -217,34 +219,11 @@ class KefkaTower(Event):
         ] if self.args.debug else []
 
         src = [
-            field.BranchIfEventBitSet(event_bit.DEFEATED_INFERNO, "GUARDIAN"),
-            field.Call(self.inferno_cutscene),
-            "GUARDIAN",
-            field.BranchIfEventBitSet(event_bit.DEFEATED_GUARDIAN, "DOOM"),
-            field.Call(self.guardian_cutscene),
-            "DOOM",
-            field.BranchIfEventBitSet(event_bit.DEFEATED_DOOM, "GODDESS"),
-            "GODDESS",
-            field.Call(self.doom_cutscene),
-            field.BranchIfEventBitSet(event_bit.DEFEATED_GODDESS, "POLTERGEIST"),
-            field.Call(self.goddess_cutscene),
-            "POLTERGEIST",
-            field.BranchIfEventBitSet(event_bit.DEFEATED_POLTERGEIST, "POST_GAUNTLET"),
-            field.Call(self.poltergeist_cutscene),
-            "POST_GAUNTLET",
-            field.Call(self.post_gauntlet_cutscene),
-            self.post_landing_src(final_switch_map_id, 103, 45),
-        ]
-
-        self.next_gauntlet_event = Write(Bank.F0, src, "Eval bits to determine next fight")
-        next_event_address = self.next_gauntlet_event.start_address
-
-        src = [
             Read(0xa02d6, 0xa030a),
 
             debug_event_bits,
 
-            # field.ClearEventBit(event_bit.UNLOCKED_KT_SKIP),
+            field.ClearEventBit(event_bit.UNLOCKED_KT_SKIP),
 
             field.SetEventBit(event_bit.LEFT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.SetEventBit(event_bit.RIGHT_WEIGHT_PUSHED_KEFKA_TOWER),
@@ -261,11 +240,30 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.CENTER_DOOR_KEFKA_TOWER),
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
             field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
-
-            field.Call(next_event_address)
         ]
 
-        space = Write(Bank.F0, src, "kefka tower statue landing")
+        # Gauntlet execution code - Breaking this up for visibility
+        src += [
+            field.BranchIfEventBitSet(event_bit.DEFEATED_INFERNO, "GUARDIAN"),
+            field.Call(self.inferno_cutscene),
+            "GUARDIAN",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_GUARDIAN, "DOOM"),
+            field.Call(self.guardian_cutscene),
+            "DOOM",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_DOOM, "GODDESS"),
+            field.Call(self.doom_cutscene),
+            "GODDESS",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_GODDESS, "POLTERGEIST"),
+            field.Call(self.goddess_cutscene),
+            "POLTERGEIST",
+            field.BranchIfEventBitSet(event_bit.DEFEATED_POLTERGEIST, "POST_GAUNTLET"),
+            field.Call(self.poltergeist_cutscene),
+            "POST_GAUNTLET",
+            field.Call(self.post_gauntlet_cutscene),
+            self.post_landing_src(final_switch_map_id, 103, 45),
+        ]
+
+        space = Write(Bank.F0, src, "kefka tower gauntlet")
         self.gauntlet_event = space.start_address
 
         # Delete the three exits of the final room and add a save point
