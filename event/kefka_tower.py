@@ -271,6 +271,11 @@ class KefkaTower(Event):
         self.maps.delete_short_exit(final_switch_map_id, 109, 46)
         self.maps.delete_short_exit(final_switch_map_id, 115, 48)
 
+        self.maps.add_save_point(final_switch_map_id, 103, 45) # left lane
+        self.maps.add_save_point(final_switch_map_id, 109, 42) # mid lane
+        self.maps.add_save_point(final_switch_map_id, 115, 44) # right lane
+
+
     def entrance_landing_mod(self):
         need_more_allies = 2982
         self.dialogs.set_text(need_more_allies, "We need to find more allies.<end>")
