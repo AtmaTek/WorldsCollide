@@ -268,15 +268,6 @@ class KefkaTower(Event):
         space = Write(Bank.F0, src, "kefka tower gauntlet")
         self.gauntlet_event = space.start_address
 
-        # Delete the three exits of the final room and add a save point
-        self.maps.delete_short_exit(final_switch_map_id, 103, 49)
-        self.maps.delete_short_exit(final_switch_map_id, 109, 46)
-        self.maps.delete_short_exit(final_switch_map_id, 115, 48)
-
-        self.maps.add_save_point(final_switch_map_id, 103, 45) # left lane
-        self.maps.add_save_point(final_switch_map_id, 109, 42) # mid lane
-        self.maps.add_save_point(final_switch_map_id, 115, 44) # right lane
-
 
     def entrance_landing_mod(self):
         need_more_allies = 2982
