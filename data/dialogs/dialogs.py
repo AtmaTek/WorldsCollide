@@ -106,10 +106,10 @@ class Dialogs():
             self.multi_line_battle_dialogs.append(dialog)
 
     def free(self):
-        import data.dialogs.free as free
+        from data.dialogs.free import multi_line_battle_dialogs
 
         self.free_multi_line_battle_dialogs = []
-        for dialog_id in free.multi_line_battle_dialogs:
+        for dialog_id in multi_line_battle_dialogs:
             self.multi_line_battle_dialogs[dialog_id].text = ""
             self.free_multi_line_battle_dialogs.append(dialog_id)
 
@@ -180,7 +180,7 @@ class Dialogs():
             self.multi_line_battle_objectives.append(mlid)
 
     def create_dialog(self, text):
-        from dialogs.free import dialogs
+        from data.dialogs.free import dialogs
         id = dialogs.pop()
         self.set_text(id, text)
         return id
