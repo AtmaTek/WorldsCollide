@@ -179,6 +179,12 @@ class Dialogs():
             mlid = self.allocate_multi_line_battle(line1 + "<line>" + line2 + "<wait for key><end>")
             self.multi_line_battle_objectives.append(mlid)
 
+    def create_dialog(self, text):
+        from dialogs.free import dialogs
+        id = dialogs.pop()
+        self.set_text(id, text)
+        return id
+
     def mod(self):
         self.move_battle_messages()
         self.objectives_mod()

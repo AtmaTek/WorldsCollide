@@ -7,7 +7,9 @@ import args
 from constants.maps import name_id as map_name_id
 from constants.songs import name_id as song_name_id
 from constants.sound_effects import name_id as sfx_name_id
-
+import data.event_bit as event_bits
+from instruction.field.instructions import BranchIfEventBitSet
+from instruction.vehicle import Branch
 final_switch_map_id = map_name_id["KT Final Switch Room"]
 inferno_room_id =  map_name_id["Inferno Room"]
 guardian_room_id =  map_name_id["Guardian Room"]
@@ -280,9 +282,9 @@ class KefkaTower(Event):
         need_more_allies = 2982
         self.dialogs.set_text(need_more_allies, "We need to find more allies.<end>")
 
-        statues_entrance = 1287
-        self.dialogs.set_text(statues_entrance,
-                              "<choice> (Gauntlet)<line><choice> (Statues)<line><choice> (Entrance)<line><choice> (Not just yet)<end>")
+        statues_entrance = self.dialogs.create_dialog("<choice> (Statues)<line><choice> (Not just yet)<end>")
+        gauntlet_entrance = self.dialogs.create_dialog("<choice> (Gauntlet)<line><choice> (Not just yet)<end>")
+        both_entrance = self.dialogs.create_dialog("<choice> (Gauntlet)<line><choice> (Statues)<choice> (Not just yet)<end>")
 
         space = Reserve(0xa01a2, 0xa02d5, "kefka tower first landing scene", field.NOP())
         space.add_label("GAUNTLET", self.gauntlet_event)
@@ -290,7 +292,8 @@ class KefkaTower(Event):
         space.add_label("ENTRANCE_LANDING", space.end_address + 1)
         space.write(
             field.BranchIfEventWordLess(event_word.CHARACTERS_AVAILABLE, 3, "NEED_MORE_ALLIES"),
-            field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_SKIP, "LANDING_MENU"),
+            field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_SKIP, "STATUE_MENU_EVAL"),
+            field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_GAUNTLET, "GAUNTLET_DIALOG"),
 
             field.Pause(2), # NOTE: load-bearing pause, without a pause or dialog before party select the game
                             #       enters an infinite loop. it seems like the game needs time to finish
@@ -307,9 +310,19 @@ class KefkaTower(Event):
             vehicle.End(),
             field.Return(),
 
-            "LANDING_MENU",
+            "STATUE_MENU_EVAL",
+            field.BranchIfEventBitSet(event_bit.event_bits.UNLOCKED_KT_GAUNTLET, "GAUNTLET_STATUES_DIALOG"),
+            field.Branch("STATUES_DIALOG"),
+
+            "GAUNTLET_DIALOG",
+            field.DialogBranch(gauntlet_entrance,
+                            dest1 = "GAUNTLET",  dest2 = "CANCEL_LANDING"),
+            "STATUES_DIALOG",
             field.DialogBranch(statues_entrance,
-                            dest1 = "GAUNTLET",  dest2 = "STATUE_LANDING", dest3 = "ENTRANCE_LANDING",  dest4 = "CANCEL_LANDING"),
+                            dest1 = "STATUES",  dest2 = "CANCEL_LANDING"),
+            "GAUNTLET_STATUES_DIALOG",
+            field.DialogBranch(both_entrance,
+                            dest1 = "GAUNTLET",  dest2 = "STATUES", dest3 = "CANCEL_LANDING"),
         )
 
     def kefka_scene_mod(self):
@@ -711,7 +724,7 @@ class KefkaTower(Event):
             # Initialize party positions
             [
                 change_party(1),
-                field.EntityAct(field_entity.PARTY0, False,
+                field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.NORMAL),
                     field_entity.SetPosition(6, 15),
                     field_entity.Turn(direction.UP),
@@ -724,7 +737,7 @@ class KefkaTower(Event):
                 ),
 
                 change_party(3),
-                field.EntityAct(field_entity.PARTY0, False,
+                field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.SLOW),
                     field_entity.SetPosition(18, 15),
                     field_entity.Turn(direction.UP),
@@ -819,6 +832,7 @@ class KefkaTower(Event):
                 change_party(2),
 
                 field.Pause(2),
+                # getting in position
                 field.EntityAct(field_entity.PARTY0, True,
                     field_entity.Move(direction.UP, 3),
                     field_entity.AnimateFrontHandsUp(),
@@ -829,6 +843,7 @@ class KefkaTower(Event):
                     field_entity.Pause(5),
                     field_entity.AnimateStandingFront(),
                 ),
+                # grabbing other party attention
                 field.EntityAct(field_entity.PARTY0, False,
                     field_entity.Pause(5),
                     field_entity.AnimateFrontHandsUp(),
@@ -859,7 +874,7 @@ class KefkaTower(Event):
                     field_entity.Move(direction.UP, 1),
                 ),
             ],
-            field.Call(0xc1827),
+            field.Call(0xc1827), # original guardian event code
             field.Return(),
         ]
         space = Write(Bank.F0, src, "Guardian Gauntlet Cutscene")
