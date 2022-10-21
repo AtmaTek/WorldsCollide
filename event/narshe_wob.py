@@ -1,3 +1,6 @@
+from constants.entities import IMP
+from data.map_event import MapEvent
+from data.npc import NPC
 from event.event import *
 
 class NarsheWOB(Event):
@@ -20,6 +23,7 @@ class NarsheWOB(Event):
         self.terra_elder_scene_mod()
         self.security_checkpoint_mod()
         self.shop_mod()
+        self.doot_mod()
 
     def end_terra_scenario(self):
         # delete the end of terra's scenario event in arvis' house
@@ -86,3 +90,40 @@ class NarsheWOB(Event):
         space.write(
             field.Branch("INVOKE_SHOP"),
         )
+
+    def doot_mod(self):
+        map_id = 104
+        chests = self.maps.get_chests(107)
+        chest0 = chests[0]
+        chest1 = chests[1]
+
+
+
+        src = [
+            field.CollectChest(77),
+        ]
+
+        loot_chest_two = Write(Bank.CA, src, "Loot chest 2")
+
+        src = [
+            field.CollectChest(76),
+        ]
+        loot_chest_one = Write(Bank.CA, src, "Loot chest 1")
+
+        # Place next to school in narshe WOB npc
+
+        # Locke MIAB
+        # new_npc = NPC()
+        # new_npc.x = 32
+        # new_npc.y = 56
+        # new_npc.sprite = 1
+        # new_npc.set_event_address(loot_chest_one.start_address)
+        # self.maps.append_npc(20, new_npc)
+
+        # Terra Tincture
+        new_npc = NPC()
+        new_npc.x = 34
+        new_npc.y = 56
+        new_npc.sprite = 0
+        new_npc.set_event_address(loot_chest_two.start_address)
+        self.maps.append_npc(20, new_npc)

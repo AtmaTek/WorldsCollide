@@ -7,7 +7,7 @@ from enum import IntEnum
 def _set_opcode_address(opcode, address):
     FIRST_OPCODE = 0x35
     opcode_table_address = 0x098c4 + (opcode - FIRST_OPCODE) * 2
-    space = Reserve(opcode_table_address, opcode_table_address + 1, "field opcode table, {opcode} {hex(address)}")
+    space = Reserve(opcode_table_address, opcode_table_address + 1, f"field opcode table, {opcode} {hex(address)}")
     space.write(
         (address & 0xffff).to_bytes(2, "little"),
     )
@@ -231,3 +231,71 @@ class LongCall(_Instruction):
         LongCall.__init__ = (lambda self, function_address, arg = 0 :
                              super().__init__(opcode, function_address.to_bytes(3, "little"), arg))
         self.__init__(function_address, arg)
+
+CHEST_BLOCK_SIZE = 5
+class CollectChest(_Instruction):
+    def __init__(self, chest_id):
+        loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
+        chest_index_offset = (chest_id) * CHEST_BLOCK_SIZE
+        chest_bit = chest_id // 8
+
+        src = [
+            asm.PHY(),
+            asm.PHX(),
+            asm.LDX(0x0000, asm.IMM16),
+            asm.LDY(0x0000, asm.IMM16),
+            asm.LDX(chest_index_offset, asm.IMM16),
+            asm.LDY(chest_bit, asm.IMM16),
+            asm.JSR(loot_treasure_chest_function, asm.ABS),
+            asm.PLY(),
+            asm.PLX(),
+            asm.RTS(),
+        ]
+        space = Write(Bank.C0, src, "custom loot_chest command")
+        address = space.start_address
+
+        opcode = 0xec
+        _set_opcode_address(opcode, address)
+
+        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, chest_id.to_bytes(2, "little"))
+        self.__init__(chest_id)
+
+    def __str__(self):
+        return super().__str__(self.args[0])
+
+
+# C0/4C08:	BF3886ED	LDA $ED8638,X
+# C0/4C0C:	851A    	STA $1A        (now the contents of the chest)
+# C0/4C0E:	BF3686ED	LDA $ED8636,X
+# C0/4C12:	851E    	STA $1E        (the bit of this chest)
+class BranchIfChestCollected(_Branch):
+    def __init__(self, chest_id, destination):
+
+        chest_offset = chest_id * CHEST_BLOCK_SIZE
+
+        src = [
+            asm.PHA(),
+            asm.PHX(),
+            asm.PHY(),
+            asm.LDX(chest_offset, asm.IMM16),
+            asm.LDA(0xed8636, asm.ABS_X),       # Load
+            asm.LDA(0x1a, asm.DIR),
+            asm.AND(0x1a, asm.DIR),
+            asm.BRA(destination),
+            asm.PLA(),
+            asm.PLX(),
+            asm.PLY(),
+            asm.RTS(),
+        ]
+        space = Write(Bank.C0, src, "custom loot_chest command")
+        address = space.start_address
+
+        opcode = 0xa4
+        _set_opcode_address(opcode, address)
+        args = [chest_id.to_bytes(2, "little")]
+
+        BranchIfChestCollected.__init__ = lambda self, chest_id, destination : super().__init__(opcode, args, destination)
+        self.__init__(chest_id, destination)
+
+    def __str__(self):
+        return super().__str__(self.args[0])

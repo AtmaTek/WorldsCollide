@@ -27,4 +27,8 @@ def main():
     memory.write()
 
 if __name__ == '__main__':
+    import debugpy
+    debugpy.listen(5678)
+    debugpy.wait_for_client()  # blocks execution until client is attached
+
     main()
