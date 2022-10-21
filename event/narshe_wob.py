@@ -1,3 +1,4 @@
+from constants.chests import NARSHE_SCHOOL_MIAB
 from constants.entities import IMP
 from data.map_event import MapEvent
 from data.npc import NPC
@@ -23,7 +24,7 @@ class NarsheWOB(Event):
         self.terra_elder_scene_mod()
         self.security_checkpoint_mod()
         self.shop_mod()
-        self.doot_mod()
+        self.chest_test_mod()
 
     def end_terra_scenario(self):
         # delete the end of terra's scenario event in arvis' house
@@ -91,39 +92,33 @@ class NarsheWOB(Event):
             field.Branch("INVOKE_SHOP"),
         )
 
-    def doot_mod(self):
-        map_id = 104
-        chests = self.maps.get_chests(107)
-        chest0 = chests[0]
-        chest1 = chests[1]
+    def chest_test_mod(self):
+        NARSHE_SCHOOL_MIAB = 76
+        NARSHE_SCHOOL_CHEST = 77
 
-
-
-        src = [
-            field.CollectChest(77),
+        miab_src = [
+            field.CollectChest(NARSHE_SCHOOL_MIAB),
         ]
 
-        loot_chest_two = Write(Bank.CA, src, "Loot chest 2")
+        miab_chest = Write(Bank.CA, miab_src, "Trigger MIAB chest")
 
-        src = [
-            field.CollectChest(76),
+        tincture_src = [
+            field.CollectChest(NARSHE_SCHOOL_CHEST),
         ]
-        loot_chest_one = Write(Bank.CA, src, "Loot chest 1")
+        tincture_chest = Write(Bank.CA, tincture_src, "Trigger tincture chest")
 
-        # Place next to school in narshe WOB npc
+        # Locke outside of narshe school (on left) should trigger the school MIAB lobo fight
+        new_npc = NPC()
+        new_npc.x = 32
+        new_npc.y = 56
+        new_npc.sprite = 1
+        new_npc.set_event_address(miab_chest.start_address)
+        self.maps.append_npc(20, new_npc)
 
-        # Locke MIAB
-        # new_npc = NPC()
-        # new_npc.x = 32
-        # new_npc.y = 56
-        # new_npc.sprite = 1
-        # new_npc.set_event_address(loot_chest_one.start_address)
-        # self.maps.append_npc(20, new_npc)
-
-        # Terra Tincture
+        # Terra outside of narshe school (on right) should trigger school chest opposite of the MIAB
         new_npc = NPC()
         new_npc.x = 34
         new_npc.y = 56
         new_npc.sprite = 0
-        new_npc.set_event_address(loot_chest_two.start_address)
+        new_npc.set_event_address(tincture_chest.start_address)
         self.maps.append_npc(20, new_npc)

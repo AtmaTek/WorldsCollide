@@ -335,8 +335,8 @@ def _add_item_mod():
     return space.start_address
 add_item = _add_item_mod()
 
-# X must be set as the treasure chest offset to the register
-# Y must be set as the treasure chest bit
+# X must be set as the treasure chest offset to the register (id * 5)
+# Y must be set as the treasure chest bit (id // 8)
 def _loot_chest_mod():
     src = [
         # Treasure subroutine

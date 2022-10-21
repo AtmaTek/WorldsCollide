@@ -236,7 +236,7 @@ CHEST_BLOCK_SIZE = 5
 class CollectChest(_Instruction):
     def __init__(self, chest_id):
         loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
-        chest_index_offset = (chest_id) * CHEST_BLOCK_SIZE
+        chest_offset = chest_id * CHEST_BLOCK_SIZE
         chest_bit = chest_id // 8
 
         src = [
@@ -244,7 +244,7 @@ class CollectChest(_Instruction):
             asm.PHX(),
             asm.LDX(0x0000, asm.IMM16),
             asm.LDY(0x0000, asm.IMM16),
-            asm.LDX(chest_index_offset, asm.IMM16),
+            asm.LDX(chest_offset, asm.IMM16),
             asm.LDY(chest_bit, asm.IMM16),
             asm.JSR(loot_treasure_chest_function, asm.ABS),
             asm.PLY(),
@@ -257,7 +257,7 @@ class CollectChest(_Instruction):
         opcode = 0xec
         _set_opcode_address(opcode, address)
 
-        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, chest_id.to_bytes(2, "little"))
+        CollectChest.__init__ = lambda self, chest : super().__init__(opcode, chest.to_bytes(2, "little"))
         self.__init__(chest_id)
 
     def __str__(self):
@@ -294,7 +294,7 @@ class BranchIfChestCollected(_Branch):
         _set_opcode_address(opcode, address)
         args = [chest_id.to_bytes(2, "little")]
 
-        BranchIfChestCollected.__init__ = lambda self, chest_id, destination : super().__init__(opcode, args, destination)
+        BranchIfChestCollected.__init__ = lambda self, chest_id, destination : super().__init__(opcode, chest_id.to_bytes(2, "little"), destination)
         self.__init__(chest_id, destination)
 
     def __str__(self):
