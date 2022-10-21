@@ -236,16 +236,14 @@ CHEST_BLOCK_SIZE = 5
 class CollectChest(_Instruction):
     def __init__(self, chest_id):
         loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
-        chest_offset = chest_id * CHEST_BLOCK_SIZE
-        chest_bit = chest_id // 8
 
         src = [
             asm.PHY(),
             asm.PHX(),
             asm.LDX(0x0000, asm.IMM16),
             asm.LDY(0x0000, asm.IMM16),
-            asm.LDX(chest_offset, asm.IMM16),
-            asm.LDY(chest_bit, asm.IMM16),
+            asm.LDX(0xeb, asm.DIR), # chest byte
+            asm.LDY(0xec, asm.DIR), # chest bit
             asm.JSR(loot_treasure_chest_function, asm.ABS),
             asm.PLY(),
             asm.PLX(),
@@ -257,7 +255,7 @@ class CollectChest(_Instruction):
         opcode = 0xec
         _set_opcode_address(opcode, address)
 
-        CollectChest.__init__ = lambda self, chest : super().__init__(opcode, chest.to_bytes(2, "little"))
+        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, (chest_id * CHEST_BLOCK_SIZE).to_bytes(2, "little"), (chest_id // 8).to_bytes(2, "little"))
         self.__init__(chest_id)
 
     def __str__(self):
