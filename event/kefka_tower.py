@@ -225,8 +225,6 @@ class KefkaTower(Event):
 
             debug_event_bits,
 
-            field.ClearEventBit(event_bit.UNLOCKED_KT_SKIP),
-
             field.SetEventBit(event_bit.LEFT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.SetEventBit(event_bit.RIGHT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.ClearEventBit(npc_bit.LEFT_UNPUSHED_WEIGHT_KEFKA_TOWER),
@@ -664,7 +662,8 @@ class KefkaTower(Event):
             Read(0xa039c, 0xa039f),
             field.LoadMap(map_id, direction.DOWN, default_music = True,
                 x = map_x, y = map_y, fade_in = True, entrance_event = True),
-
+            field.SetEventBit(event_bit.COMPLETED_KT_GAUNTLET),
+            field.CheckObjectives(),
             field.FreeScreen(),
             Read(0xa03b0, 0xa03b9),
         ]
@@ -948,6 +947,8 @@ class KefkaTower(Event):
         return space.start_address
 
     def gauntlet_poltergeist_cutscene(self):
+        chests = self.maps.get_chests(poltergeist_room_id)
+        chest = chests[7]
         src = [
             change_party(2),
             field.HoldScreen(),
@@ -986,7 +987,11 @@ class KefkaTower(Event):
                 field_entity.Move(direction.UP, 6),
             ),
             field.Pause(2),
-            field.PlaySoundEffect(sfx_name_id.get('Chest/Switch')),
+            [
+                field.Dialog(self.items.add_receive_dialog(chest.contents), wait_for_input=False),
+                field.CollectChest(poltergeist_room_id, chest.x, chest.y),
+                field.PlaySoundEffect(sfx_name_id.get('Chest/Switch')),
+            ],
             field.Pause(2),
             field.Pause(1.5),
 

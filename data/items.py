@@ -318,6 +318,8 @@ class Items():
 
         self.dialogs.set_text(dialog_id, '<line><     >Received “' + item_name + '”!<end>')
 
+        return dialog_id
+
     def print(self):
         for item in self.items:
             item.print()
