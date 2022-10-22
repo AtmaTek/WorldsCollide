@@ -38,7 +38,7 @@ class FloatingContinent(Event):
         elif self.reward1.type == RewardType.ESPER:
             self.ground_esper_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ITEM:
-            self.ground_esper_mod(self.reward1.id)
+            self.ground_item_mod(self.reward1.id)
         self.finish_ground_check()
 
         self.save_point_hole_mod()
@@ -506,5 +506,5 @@ class FloatingContinent(Event):
             field.RefreshEntities(),
             field.LoadMap(0x06, direction.DOWN, default_music = True, x = 16, y = 6, fade_in = True, entrance_event = True),
             field.AddItem(item_id),
-            field.Dialog(self.espers.get_receive_dialog(item_id)),
+            field.Dialog(self.items.get_receive_dialog(item_id)),
         ])
