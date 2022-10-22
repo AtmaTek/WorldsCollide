@@ -1,4 +1,3 @@
-from constants.chests import NARSHE_SCHOOL_MIAB
 from constants.entities import IMP
 from data.map_event import MapEvent
 from data.npc import NPC
@@ -93,32 +92,18 @@ class NarsheWOB(Event):
         )
 
     def chest_test_mod(self):
-        NARSHE_SCHOOL_MIAB = 76
-        NARSHE_SCHOOL_CHEST = 77
+        NARSHE_SCHOOL_MIAB = 76  # MIAB
+        NARSHE_SCHOOL_CHEST = 77 # Tincture
 
-        miab_src = [
-            field.CollectChest(NARSHE_SCHOOL_MIAB),
-        ]
-
-        miab_chest = Write(Bank.CA, miab_src, "Trigger MIAB chest")
-
-        tincture_src = [
+        chest_src = [
             field.CollectChest(NARSHE_SCHOOL_CHEST),
         ]
-        tincture_chest = Write(Bank.CA, tincture_src, "Trigger tincture chest")
+        chest = Write(Bank.CA, chest_src, "Trigger treasure chest")
 
-        # Locke outside of narshe school (on left) should trigger the school MIAB lobo fight
-        new_npc = NPC()
-        new_npc.x = 32
-        new_npc.y = 56
-        new_npc.sprite = 1
-        new_npc.set_event_address(miab_chest.start_address)
-        self.maps.append_npc(20, new_npc)
-
-        # Terra outside of narshe school (on right) should trigger school chest opposite of the MIAB
+        # Terra outside of narshe school, triggers
         new_npc = NPC()
         new_npc.x = 34
         new_npc.y = 56
         new_npc.sprite = 0
-        new_npc.set_event_address(tincture_chest.start_address)
+        new_npc.set_event_address(chest.start_address)
         self.maps.append_npc(20, new_npc)
