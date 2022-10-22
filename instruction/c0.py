@@ -334,16 +334,3 @@ def _add_item_mod():
     space = Write(Bank.C0, src, "c0 add item")
     return space.start_address
 add_item = _add_item_mod()
-
-# X must be set as the treasure chest offset to the register (id * 5)
-# Y must be set as the treasure chest bit (id // 8)
-def _loot_chest_mod():
-    src = [
-        # Treasure subroutine
-        asm.JSR(0x4c06, asm.ABS),
-        asm.RTS(),
-    ]
-    space = Write(Bank.C0, src, "c0 loot chest")
-    return space.start_address
-
-loot_chest = _loot_chest_mod()

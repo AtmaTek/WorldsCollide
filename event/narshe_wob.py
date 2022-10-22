@@ -1,6 +1,5 @@
 from constants.entities import IMP
 from data.map_event import MapEvent
-from data.npc import NPC
 from event.event import *
 
 class NarsheWOB(Event):
@@ -23,7 +22,6 @@ class NarsheWOB(Event):
         self.terra_elder_scene_mod()
         self.security_checkpoint_mod()
         self.shop_mod()
-        self.chest_test_mod()
 
     def end_terra_scenario(self):
         # delete the end of terra's scenario event in arvis' house
@@ -91,19 +89,3 @@ class NarsheWOB(Event):
             field.Branch("INVOKE_SHOP"),
         )
 
-    def chest_test_mod(self):
-        NARSHE_SCHOOL_MIAB = 76  # MIAB
-        NARSHE_SCHOOL_CHEST = 77 # Tincture
-
-        chest_src = [
-            field.CollectChest(NARSHE_SCHOOL_CHEST),
-        ]
-        chest = Write(Bank.CA, chest_src, "Trigger treasure chest")
-
-        # Terra outside of narshe school, triggers
-        new_npc = NPC()
-        new_npc.x = 34
-        new_npc.y = 56
-        new_npc.sprite = 0
-        new_npc.set_event_address(chest.start_address)
-        self.maps.append_npc(20, new_npc)

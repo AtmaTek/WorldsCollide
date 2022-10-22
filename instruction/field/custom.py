@@ -2,7 +2,6 @@ from memory.space import Bank, START_ADDRESS_SNES, Reserve, Write, Read
 from instruction.event import _Instruction, _Branch
 import instruction.asm as asm
 import instruction.c0 as c0
-import instruction.c2 as c2
 from enum import IntEnum
 
 def _set_opcode_address(opcode, address):
@@ -235,55 +234,120 @@ class LongCall(_Instruction):
 
 CHEST_BLOCK_SIZE = 5
 class CollectChest(_Instruction):
-    def __init__(self, chest_id):
-        loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
-
-        # how i thought it'd work
-        # src = [
-        #     asm.PHA(),
-        #     asm.PHY(),
-        #     asm.PHX(),
-        #     asm.A16(),
-        #     asm.LDA(0x0000, asm.IMM16),
-        #     asm.LDX(0x0000, asm.IMM16),
-        #     asm.LDY(0x0000, asm.IMM16),
-        #     asm.LDX(0xeb, asm.DIR),                     # x = chest_id
-        #     asm.LDA(0x1e40, asm.ABS_X),    # 1e40 + absolute chest bit = 1 if collected, else 0
-        #     asm.BEQ("END"),
-        #     asm.LDA(0x0005, asm.IMM16),                 # a = 5
-        #     asm.STA(0xe8, asm.DIR),                     # (overwriting value address for multiplication)
-        #     asm.TXA(),                                  # a = stat / level
-        #     asm.JSR(c2.multiply_max_65535, asm.ABS),    # a = 5 * chest id
-        #     asm.TAX(),                                  # x = 5 * chest id (indext for loot function)
-        #     asm.JSR(loot_treasure_chest_function, asm.ABS),
-        #     "END",
-        #     asm.A8(),
-        #     asm.PLA(),
-        #     asm.PLY(),
-        #     asm.PLX(),
-        #     asm.RTS(),
-        # ]
-
-        # working, but attempting to loot an already looted chest will soft lock the game
+    def __init__(self, map_id, x, y):
         src = [
-            asm.PHY(),
-            asm.PHX(),
-            asm.LDX(0x0000, asm.IMM16),
-            asm.LDY(0x0000, asm.IMM16),
-            asm.LDX(0xeb, asm.DIR),                             # x = chest byte * 5 (index for loot table, used in chest fn)
-            asm.JSR(loot_treasure_chest_function, asm.ABS),
-            asm.PLY(),
-            asm.PLX(),
-            asm.RTS(),
+            "REMOTE_TREASURE",
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xeb, asm.DIR),         # LDA $EB ; load map
+            asm.ASL(),                      # ASL A
+            asm.TAX(),                      # TAX
+            asm.LDA(0xed82f6, asm.LNG_X),   # LDA $ED82F6,X  ; load the pointer for the *next room*
+            asm.STA(0x1e, asm.DIR),         # STA $1E   $1e = next room pointer
+            asm.LDA(0xed82f4, asm.LNG_X),   # LDA $ED82F4,X  ; load the pointer for our current room
+            asm.TAX(),                      # TAX       x = current room pointer
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.CPX(0x1e, asm.DIR),         # CPX $1E  ; do the two pointers match? if they do, this map has no treasure
+            asm.BEQ("NO_CHEST_FOUND"),      # BEQ no_chest
+
+            "TREASURE_LOOP_AGAIN",           # treasure_loop_again:
+            asm.LDA(0xed8634, asm.LNG_X),   # LDA $ED8634,X  ; load X coordinate of chest
+            asm.CMP(0xed, asm.DIR),         # CMP $ED  ; does it match?
+            asm.BNE("NO_CHEST"),            # BNE no_chest  ; we do have to have some kind of fail-safe in place
+            asm.LDA(0xed8635, asm.LNG_X),   # LDA $ED8635,X  ; load Y coordinate of chest
+            asm.CMP(0xee, asm.DIR),         # CMP $EE  ; does it match?
+            asm.BEQ("TREASURE_FOUND"),      # BEQ treasure_found  ; we have matched X and Y, let's get the contents
+
+            "NO_CHEST",                     # no_chest:
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.CPX(0x1e, asm.DIR),         # CPX $1E
+            asm.BNE("TREASURE_LOOP_AGAIN"), # BNE treasure_loop_again
+                                            # ; coming in, upper A is already 00
+
+            "NO_CHEST_FOUND",               # Fix for infinite loop
+            asm.TDC(),                      # TDC
+            asm.LDA(0x05, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
+
+            "TREASURE_FOUND",               # treasure_found:
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xed8638, asm.LNG_X),   # LDA $ED8638,X  ; load contents
+            asm.STA(0x1a, asm.DIR),         # STA $1A
+            asm.LDA(0xed8636, asm.LNG_X),   # LDA $ED8636,X  ; load the byte and bit
+            asm.STA(0x1e, asm.DIR),         # STA $1E
+            asm.AND(0x0007, asm.IMM16),     # AND #$0007
+            asm.TAX(),                      # TAX
+            asm.LDA(0x1e, asm.DIR),         # LDA $1E
+            asm.AND(0x01f8, asm.IMM16),     # AND #$01F8
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.TAY(),                      # TAY
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
+            asm.AND(0xc0bafc, asm.LNG_X),   # AND $C0BAFC,X  ; is this bit set?
+            asm.BNE("NO_CHEST"),            # BNE no_chest  ; branch and exit if so
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
+            asm.ORA(0xc0bafc, asm.LNG_X),   # ORA $C0BAFC,X  ; set this bit, meaning we have now opened this box
+            asm.STA(0x1e40, asm.ABS_Y),     # STA $1E40,Y
+            asm.LDA(0x1f, asm.DIR),         # LDA $1F
+            asm.BPL("NOT_GIL_TREASURE"),    # BPL not_gil_treasure
+            asm.LDA(0x1a, asm.DIR),         # LDA $1A  ; load amount
+            asm.STA(0x4202, asm.ABS),       # STA $4202
+            asm.LDA(0x64, asm.IMM8),        # LDA #$64
+            asm.STA(0x4203, asm.ABS),       # STA $4203  ; multiply it by 100
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.REP(0x21),                  # REP #$21
+            asm.LDA(0x4216, asm.ABS),       # LDA $4216  ; load product
+            asm.ADC(0x1860, asm.ABS),       # ADC $1860
+            asm.STA(0x1860, asm.ABS),       # STA $1860
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.BCC("GIL_NO_WRAP"),         # BCC gil_no_wrap  ; branch if result didn't wrap. meaning whatever we picked up didn't add to the third byte
+            asm.INC(0x1862, asm.ABS),       # INC $1862
+
+            "GIL_NO_WRAP",                  # gil_no_wrap:
+            asm.LDA(0x7f, asm.IMM8),        # LDA #$7F
+            asm.CMP(0x1860, asm.ABS),       # CMP $1860
+            asm.LDA(0x96, asm.IMM8),        # LDA #$96
+            asm.SBC(0x1861, asm.ABS),       # SBC $1861
+            asm.LDA(0x98, asm.IMM8),        # LDA #$98
+            asm.SBC(0x1862, asm.ABS),       # SBC $1862
+            asm.BCS("TREASURE_WRAPUP"),     # BCS treasure_wrapup  ; if carry is still set, we didn't overflow our GP. time to finish up
+            asm.LDX(0x967f, asm.IMM16),     # LDX #$967F
+            asm.STX(0x1860, asm.ABS),       # STX $1860
+            asm.LDA(0x98, asm.IMM8),        # LDA #$98
+            asm.STA(0x1862, asm.ABS),       # STA $1862
+            asm.BRA("TREASURE_WRAPUP"),     # BRA treasure_wrapup
+
+            "NOT_GIL_TREASURE",             # not_gil_treasure:
+            asm.BIT(0x40, asm.IMM8),        # BIT #$40  ; item?
+            asm.BEQ("TREASURE_WRAPUP"),     # BEQ treasure_wrapup  ; if it isn't an item, it's an "Empty" or a MiaB, neither of which we need to do anything about here. not handling MiaB may be an oversight, but let's assume the end-user is smart enough not to remotely open one of those
+            asm.LDA(0x1a, asm.DIR),         # LDA $1A
+            asm.JSR(0xacfc, asm.ABS),       # JSR $ACFC  ; add the item to inventory
+
+            "TREASURE_WRAPUP",              # treasure_wrapup:
+            asm.TDC(),                      # TDC
+            asm.LDA(0x05, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
         ]
+
         space = Write(Bank.C0, src, "custom loot_chest command")
         address = space.start_address
 
         opcode = 0xec
         _set_opcode_address(opcode, address)
 
-        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, (chest_id * CHEST_BLOCK_SIZE).to_bytes(2, "little"))
-        self.__init__(chest_id)
+        CollectChest.__init__ = lambda self, map_id, x, y : super().__init__(opcode, map_id.to_bytes(2, "little"), x, y)
+        self.__init__(map_id, x, y)
 
     def __str__(self):
         return super().__str__(self.args[0])
