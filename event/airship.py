@@ -1,3 +1,4 @@
+from data.npc import NPC
 from event.event import *
 
 class Airship(Event):
@@ -19,6 +20,41 @@ class Airship(Event):
         self.unequip_party_members_npc_mod()
         self.inside_blackjack()
         self.return_to_airship()
+        if self.args.debug:
+            self.chest_test_mod()
+
+    def chest_test_mod(self):
+        narshe_school_right_room = 107 # MIAB in chest 0, Tincture in chest 1
+        miab_chest = self.maps.get_chests(narshe_school_right_room)[0]
+        tincture_chest = self.maps.get_chests(narshe_school_right_room)[1]
+
+        chest_src = [
+            field.CollectChest(narshe_school_right_room, miab_chest.x, miab_chest.y),
+        ]
+        miab = Write(Bank.CA, chest_src, "Trigger treasure chest")
+
+        # Terra will loot the MIAB (currently does nothing, safely exits)
+        new_npc = NPC()
+        new_npc.x = 15
+        new_npc.y = 7
+        new_npc.sprite = 0
+        new_npc.direction = direction.DOWN
+        new_npc.set_event_address(miab.start_address)
+        self.maps.append_npc(6, new_npc)
+
+        # Kefka will loot the Tincture
+        chest_src = [
+            field.CollectChest(narshe_school_right_room, tincture_chest.x, tincture_chest.y),
+        ]
+        tincture = Write(Bank.CA, chest_src, "Trigger treasure chest")
+        new_npc = NPC()
+        new_npc.x = 17
+        new_npc.y = 7
+        new_npc.sprite = 21
+        new_npc.direction = direction.DOWN
+        new_npc.set_event_address(tincture.start_address)
+        self.maps.append_npc(6, new_npc)
+
 
     def controls_mod(self):
         fly_wor_fc_cancel_dialog = 1315
