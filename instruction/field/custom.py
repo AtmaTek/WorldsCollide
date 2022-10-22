@@ -248,9 +248,9 @@ class CollectChest(_Instruction):
             asm.TDC(),                      # TDC
             asm.A8(),                       # SEP #$20
             asm.CPX(0x1e, asm.DIR),         # CPX $1E  ; do the two pointers match? if they do, this map has no treasure
-            asm.BEQ("NO_CHEST_FOUND"),      # BEQ no_chest
+            asm.BEQ("TREASURE_WRAPUP"),     # We chose a map without a treasure chest - branch and exit if so
 
-            "TREASURE_LOOP_AGAIN",           # treasure_loop_again:
+            "TREASURE_LOOP_AGAIN",          # treasure_loop_again:
             asm.LDA(0xed8634, asm.LNG_X),   # LDA $ED8634,X  ; load X coordinate of chest
             asm.CMP(0xed, asm.DIR),         # CMP $ED  ; does it match?
             asm.BNE("NO_CHEST"),            # BNE no_chest  ; we do have to have some kind of fail-safe in place
@@ -267,11 +267,6 @@ class CollectChest(_Instruction):
             asm.CPX(0x1e, asm.DIR),         # CPX $1E
             asm.BNE("TREASURE_LOOP_AGAIN"), # BNE treasure_loop_again
                                             # ; coming in, upper A is already 00
-
-            "NO_CHEST_FOUND",               # Fix for infinite loop
-            asm.TDC(),                      # TDC
-            asm.LDA(0x05, asm.IMM8),        # command size
-            asm.JMP(0x9b5c, asm.ABS),       # next command
 
             "TREASURE_FOUND",               # treasure_found:
             asm.A16(),                      # REP #$20
@@ -291,7 +286,7 @@ class CollectChest(_Instruction):
             asm.A8(),                       # SEP #$20
             asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
             asm.AND(0xc0bafc, asm.LNG_X),   # AND $C0BAFC,X  ; is this bit set?
-            asm.BNE("NO_CHEST"),            # BNE no_chest  ; branch and exit if so
+            asm.BNE("TREASURE_WRAPUP"),     # chest has already been looted  ; branch and exit if so
             asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
             asm.ORA(0xc0bafc, asm.LNG_X),   # ORA $C0BAFC,X  ; set this bit, meaning we have now opened this box
             asm.STA(0x1e40, asm.ABS_Y),     # STA $1E40,Y
@@ -350,15 +345,4 @@ class CollectChest(_Instruction):
         self.__init__(map_id, x, y)
 
     def __str__(self):
-        return super().__str__(self.args[0])
-
-
-# Tried to piggyback off of BattleEventBit branch command but didn't work :(||)
-class BranchIfChestCollected(_Branch):
-    def __init__(self, chest_bit, destination):
-        self.chest_bit = chest_bit
-        chest_bit_from_battle_bits = (0x1e40 - 0x1dc9) + chest_bit
-        super().__init__(0xb7, [chest_bit_from_battle_bits], destination)
-
-    def __str__(self):
-        return super().__str__(hex(self.chest_bit))
+        return super().__str__(self.args)
