@@ -1,5 +1,3 @@
-from constants.entities import IMP
-from data.map_event import MapEvent
 from event.event import *
 
 class NarsheWOB(Event):
