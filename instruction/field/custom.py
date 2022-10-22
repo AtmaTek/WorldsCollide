@@ -238,21 +238,25 @@ class CollectChest(_Instruction):
     def __init__(self, chest_id):
         loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
 
-
+        # how i thought it'd work
         # src = [
         #     asm.PHA(),
         #     asm.PHY(),
         #     asm.PHX(),
         #     asm.A16(),
+        #     asm.LDA(0x0000, asm.IMM16),
         #     asm.LDX(0x0000, asm.IMM16),
         #     asm.LDY(0x0000, asm.IMM16),
         #     asm.LDX(0xeb, asm.DIR),                     # x = chest_id
+        #     asm.LDA(0x1e40, asm.ABS_X),    # 1e40 + absolute chest bit = 1 if collected, else 0
+        #     asm.BEQ("END"),
         #     asm.LDA(0x0005, asm.IMM16),                 # a = 5
         #     asm.STA(0xe8, asm.DIR),                     # (overwriting value address for multiplication)
         #     asm.TXA(),                                  # a = stat / level
         #     asm.JSR(c2.multiply_max_65535, asm.ABS),    # a = 5 * chest id
         #     asm.TAX(),                                  # x = 5 * chest id (indext for loot function)
         #     asm.JSR(loot_treasure_chest_function, asm.ABS),
+        #     "END",
         #     asm.A8(),
         #     asm.PLA(),
         #     asm.PLY(),
@@ -260,39 +264,13 @@ class CollectChest(_Instruction):
         #     asm.RTS(),
         # ]
 
-        # messing around 2
-        # src = [
-        #     asm.PHA(),
-        #     asm.PHY(),
-        #     asm.PHX(),
-        #     asm.A16(),
-        #     asm.LDX(0x0000, asm.IMM16),
-        #     asm.LDY(0x0000, asm.IMM16),
-        #     asm.LDA(0xec, asm.DIR),        # a = absolute_chest_bit
-        #     asm.TAX(),                     # x = absolute_chest_bit
-        #     asm.LSR(),
-        #     asm.LSR(),
-        #     asm.LSR(),
-        #     asm.LSR(),                     # a = absolute_chest_bit // 8
-        #     asm.TAY(),                     # y = absolute_chest_bit // 8
-        #     asm.LDA(0x1e40, asm.ABS_X),    # 1e40 + absolute chest bit = 1 if collected, else 0
-        #     asm.BEQ("CHEST_FOUND"),
-        #     asm.LDX(0xeb, asm.DIR), # relative chest byte
-        #     asm.JSR(loot_treasure_chest_function, asm.ABS),
-        #     "CHEST_FOUND",
-        #     asm.A8(),
-        #     asm.PLA(),
-        #     asm.PLY(),
-        #     asm.PLX(),
-        #     asm.RTS(),
-        # ]
-
+        # working, but attempting to loot an already looted chest will soft lock the game
         src = [
             asm.PHY(),
             asm.PHX(),
             asm.LDX(0x0000, asm.IMM16),
             asm.LDY(0x0000, asm.IMM16),
-            asm.LDX(0xeb, asm.DIR), # chest byte
+            asm.LDX(0xeb, asm.DIR),                             # x = chest byte * 5 (index for loot table, used in chest fn)
             asm.JSR(loot_treasure_chest_function, asm.ABS),
             asm.PLY(),
             asm.PLX(),
