@@ -2,6 +2,7 @@ from memory.space import Bank, START_ADDRESS_SNES, Reserve, Write, Read
 from instruction.event import _Instruction, _Branch
 import instruction.asm as asm
 import instruction.c0 as c0
+import instruction.c2 as c2
 from enum import IntEnum
 
 def _set_opcode_address(opcode, address):
@@ -237,13 +238,61 @@ class CollectChest(_Instruction):
     def __init__(self, chest_id):
         loot_treasure_chest_function = START_ADDRESS_SNES + c0.loot_chest
 
+
+        # src = [
+        #     asm.PHA(),
+        #     asm.PHY(),
+        #     asm.PHX(),
+        #     asm.A16(),
+        #     asm.LDX(0x0000, asm.IMM16),
+        #     asm.LDY(0x0000, asm.IMM16),
+        #     asm.LDX(0xeb, asm.DIR),                     # x = chest_id
+        #     asm.LDA(0x0005, asm.IMM16),                 # a = 5
+        #     asm.STA(0xe8, asm.DIR),                     # (overwriting value address for multiplication)
+        #     asm.TXA(),                                  # a = stat / level
+        #     asm.JSR(c2.multiply_max_65535, asm.ABS),    # a = 5 * chest id
+        #     asm.TAX(),                                  # x = 5 * chest id (indext for loot function)
+        #     asm.JSR(loot_treasure_chest_function, asm.ABS),
+        #     asm.A8(),
+        #     asm.PLA(),
+        #     asm.PLY(),
+        #     asm.PLX(),
+        #     asm.RTS(),
+        # ]
+
+        # messing around 2
+        # src = [
+        #     asm.PHA(),
+        #     asm.PHY(),
+        #     asm.PHX(),
+        #     asm.A16(),
+        #     asm.LDX(0x0000, asm.IMM16),
+        #     asm.LDY(0x0000, asm.IMM16),
+        #     asm.LDA(0xec, asm.DIR),        # a = absolute_chest_bit
+        #     asm.TAX(),                     # x = absolute_chest_bit
+        #     asm.LSR(),
+        #     asm.LSR(),
+        #     asm.LSR(),
+        #     asm.LSR(),                     # a = absolute_chest_bit // 8
+        #     asm.TAY(),                     # y = absolute_chest_bit // 8
+        #     asm.LDA(0x1e40, asm.ABS_X),    # 1e40 + absolute chest bit = 1 if collected, else 0
+        #     asm.BEQ("CHEST_FOUND"),
+        #     asm.LDX(0xeb, asm.DIR), # relative chest byte
+        #     asm.JSR(loot_treasure_chest_function, asm.ABS),
+        #     "CHEST_FOUND",
+        #     asm.A8(),
+        #     asm.PLA(),
+        #     asm.PLY(),
+        #     asm.PLX(),
+        #     asm.RTS(),
+        # ]
+
         src = [
             asm.PHY(),
             asm.PHX(),
             asm.LDX(0x0000, asm.IMM16),
             asm.LDY(0x0000, asm.IMM16),
             asm.LDX(0xeb, asm.DIR), # chest byte
-            asm.LDY(0xec, asm.DIR), # chest bit
             asm.JSR(loot_treasure_chest_function, asm.ABS),
             asm.PLY(),
             asm.PLX(),
@@ -255,45 +304,19 @@ class CollectChest(_Instruction):
         opcode = 0xec
         _set_opcode_address(opcode, address)
 
-        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, (chest_id * CHEST_BLOCK_SIZE).to_bytes(2, "little"), (chest_id // 8).to_bytes(2, "little"))
+        CollectChest.__init__ = lambda self, chest_id : super().__init__(opcode, (chest_id * CHEST_BLOCK_SIZE).to_bytes(2, "little"))
         self.__init__(chest_id)
 
     def __str__(self):
         return super().__str__(self.args[0])
 
 
-# C0/4C08:	BF3886ED	LDA $ED8638,X
-# C0/4C0C:	851A    	STA $1A        (now the contents of the chest)
-# C0/4C0E:	BF3686ED	LDA $ED8636,X
-# C0/4C12:	851E    	STA $1E        (the bit of this chest)
+# Tried to piggyback off of BattleEventBit branch command but didn't work :(||)
 class BranchIfChestCollected(_Branch):
-    def __init__(self, chest_id, destination):
-
-        chest_offset = chest_id * CHEST_BLOCK_SIZE
-
-        src = [
-            asm.PHA(),
-            asm.PHX(),
-            asm.PHY(),
-            asm.LDX(chest_offset, asm.IMM16),
-            asm.LDA(0xed8636, asm.ABS_X),       # Load
-            asm.LDA(0x1a, asm.DIR),
-            asm.AND(0x1a, asm.DIR),
-            asm.BRA(destination),
-            asm.PLA(),
-            asm.PLX(),
-            asm.PLY(),
-            asm.RTS(),
-        ]
-        space = Write(Bank.C0, src, "custom loot_chest command")
-        address = space.start_address
-
-        opcode = 0xa4
-        _set_opcode_address(opcode, address)
-        args = [chest_id.to_bytes(2, "little")]
-
-        BranchIfChestCollected.__init__ = lambda self, chest_id, destination : super().__init__(opcode, chest_id.to_bytes(2, "little"), destination)
-        self.__init__(chest_id, destination)
+    def __init__(self, chest_bit, destination):
+        self.chest_bit = chest_bit
+        chest_bit_from_battle_bits = (0x1e40 - 0x1dc9) + chest_bit
+        super().__init__(0xb7, [chest_bit_from_battle_bits], destination)
 
     def __str__(self):
-        return super().__str__(self.args[0])
+        return super().__str__(hex(self.chest_bit))
