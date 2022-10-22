@@ -20,7 +20,8 @@ class Airship(Event):
         self.unequip_party_members_npc_mod()
         self.inside_blackjack()
         self.return_to_airship()
-        self.chest_test_mod()
+        if self.args.debug:
+            self.chest_test_mod()
 
 
     def chest_test_mod(self):
