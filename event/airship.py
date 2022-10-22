@@ -33,7 +33,7 @@ class Airship(Event):
         ]
         miab = Write(Bank.CA, chest_src, "Trigger treasure chest")
 
-        # Terra will loot the MIAB (will not work right now)
+        # Terra will loot the MIAB (currently does nothing, safely exits)
         new_npc = NPC()
         new_npc.x = 15
         new_npc.y = 7
