@@ -248,7 +248,7 @@ class CollectChest(_Instruction):
             asm.TDC(),                      # TDC
             asm.A8(),                       # SEP #$20
             asm.CPX(0x1e, asm.DIR),         # CPX $1E  ; do the two pointers match? if they do, this map has no treasure
-            asm.BEQ("TREASURE_WRAPUP"),     # We chose a map without a treasure chest - branch and exit if so
+            asm.BEQ("TREASURE_WRAPUP1"),     # We chose a map without a treasure chest - branch and exit if so
 
             "TREASURE_LOOP_AGAIN",          # treasure_loop_again:
             asm.LDA(0xed8634, asm.LNG_X),   # LDA $ED8634,X  ; load X coordinate of chest
@@ -267,6 +267,10 @@ class CollectChest(_Instruction):
             asm.CPX(0x1e, asm.DIR),         # CPX $1E
             asm.BNE("TREASURE_LOOP_AGAIN"), # BNE treasure_loop_again
                                             # ; coming in, upper A is already 00
+            "TREASURE_WRAPUP1",             # treasure_wrapup:
+            asm.TDC(),                      # TDC
+            asm.LDA(0x05, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
 
             "TREASURE_FOUND",               # treasure_found:
             asm.A16(),                      # REP #$20
