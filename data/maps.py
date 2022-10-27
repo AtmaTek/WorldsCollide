@@ -241,34 +241,4 @@ class Maps():
             npcs_ptr[0] = cur_map["npcs_ptr"] & 0xff
             npcs_ptr[1] = (cur_map["npcs_ptr"] & 0xff00) >> 8
             self.rom.set_bytes(npcs_ptr_address, npcs_ptr)
-
-    def add_save_point(self, map_id, x, y):
-        # npc for visual
-        npc = NPC()
-        npc.background_layer = 0
-        npc.background_scrolls = 0
-        npc.const_sprite = 1
-        npc.direction = 3
-        npc.event_bit = 3
-        npc.event_byte = 102
-        npc.map_layer = 1
-        npc.movement = 0
-        npc.no_face_on_trigger = 0
-        npc.palette = 6
-        npc.speed = 2
-        npc.split_sprite = 1
-        npc.sprite = 111
-        npc.unknown1 = 0
-        npc.unknown2 = 0
-        npc.vehicle = 0
-        npc.x = x
-        npc.y = y
-
-        # event for save functionality
-        event = MapEvent()
-        event.set_event_address(0xc9aeb) # save script
-        event.x = x
-        event.y = y
-
-        self.append_npc(map_id, npc)
-        self.add_event(map_id, event)
+            

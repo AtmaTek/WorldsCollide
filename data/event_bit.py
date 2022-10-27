@@ -218,6 +218,7 @@ ALWAYS_CLEAR = 0x176 # this event_bit is always clear, used for branching
 UNLOCKED_KT_GAUNTLET = 0x2c2
 COMPLETED_KT_GAUNTLET = 0x2c3
 # 8 bits 0x1e6-0x1ed Unused, as the SNES versions feature 20 rare item slots rather than 30
+GAUNTLET_IN_PROGRESS = 0x1e6
 
 from constants.objectives import MAX_OBJECTIVES
 for index in range(MAX_OBJECTIVES):

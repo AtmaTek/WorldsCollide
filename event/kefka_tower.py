@@ -224,6 +224,7 @@ class KefkaTower(Event):
 
             debug_event_bits,
 
+            field.SetEventBit(event_bit.GAUNTLET_IN_PROGRESS),
             field.SetEventBit(event_bit.LEFT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.SetEventBit(event_bit.RIGHT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.ClearEventBit(npc_bit.LEFT_UNPUSHED_WEIGHT_KEFKA_TOWER),
@@ -259,6 +260,8 @@ class KefkaTower(Event):
             field.Call(self.poltergeist_cutscene),
             "POST_GAUNTLET",
             field.Call(self.post_gauntlet_cutscene),
+            field.ClearEventBit(event_bit.GAUNTLET_IN_PROGRESS),
+            field.SetEventBit(event_bit.COMPLETED_KT_GAUNTLET),
             self.post_landing_src(final_switch_map_id, 103, 45),
         ]
 
@@ -280,6 +283,7 @@ class KefkaTower(Event):
         space.add_label("ENTRANCE_LANDING", space.end_address + 1)
         space.write(
             field.BranchIfEventWordLess(event_word.CHARACTERS_AVAILABLE, 3, "NEED_MORE_ALLIES"),
+            field.BranchIfEventBitSet(event_bit.UNLOCKED_PERMA_KT_SKIP, "STATUE_MENU_EVAL"),
             field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_SKIP, "STATUE_MENU_EVAL"),
             field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_GAUNTLET, "GAUNTLET_DIALOG"),
 
@@ -391,9 +395,23 @@ class KefkaTower(Event):
 
     # Copy no less than 4 bytes between start_target and end_target
     # This will be called after one of the kt encounters has completed, but just prior to finishing the check
-    def kt_encounter_objective_mod(self, boss_name, bit, start_target, end_target, description):
-        src = Read(start_target, end_target)
+    def kt_encounter_objective_mod(self, boss_name, bit, start_target, end_target, description, trigger_fade_in = False):
+
+        src = []
+        # Guardian/Inferno remove their fade outs for two reasons:
+        # 1) We need to make a map load before the fade in for the gauntlet after a battle completes
+        # 2) We need to make room to check for objective and set proper bit
+        # So we re-add the fade in, but only when the gauntlet isn't happening
+        if trigger_fade_in:
+            src += [
+                field.BranchIfEventBitSet(event_bit.GAUNTLET_IN_PROGRESS, "FINISH_OBJECTIVE"),
+                field.FadeInScreen(),
+                field.WaitForFade()
+            ]
+        src += Read(start_target, end_target)
+
         src += [
+            "FINISH_OBJECTIVE",
             field.SetEventBit(bit),
             field.CheckObjectives(),
             field.FreeScreen(),
@@ -407,6 +425,9 @@ class KefkaTower(Event):
         ])
 
     def guardian_mod(self):
+        # Clear fade out, will manually trigger this in kt_encounter_objective_mod
+        # CC/186C Fade in
+        # CC/186D Wait for fade
         self.rom.set_bytes(0xc186c, [asm.NOP(), asm.NOP()])
         self.kt_encounter_objective_mod(
             "Guardian",
@@ -414,10 +435,15 @@ class KefkaTower(Event):
             0xc186c,
             0xc186f,
             "Guardian battle post-script, wait for fade, set bit",
+            trigger_fade_in= True
         )
 
     def inferno_mod(self):
         self.rom.set_byte(0xc18a2, 0xea)
+
+        # Clear fade out, will manually trigger this in kt_encounter_objective_mod
+        # CC/18AE - Fade in
+        # CC/18AF - Wait for fade
         self.rom.set_bytes(0xc18ae, [0xea, 0xea])
 
         self.kt_encounter_objective_mod(
@@ -426,6 +452,7 @@ class KefkaTower(Event):
             0xc18ae,
             0xc18b1,
             "Inferno battle post-script, fade in, wait, set bit",
+            trigger_fade_in = True
         )
 
     def doom_mod(self):
@@ -661,7 +688,6 @@ class KefkaTower(Event):
             Read(0xa039c, 0xa039f),
             field.LoadMap(map_id, direction.DOWN, default_music = True,
                 x = map_x, y = map_y, fade_in = True, entrance_event = True),
-            field.SetEventBit(event_bit.COMPLETED_KT_GAUNTLET),
             field.CheckObjectives(),
             field.FreeScreen(),
             Read(0xa03b0, 0xa03b9),
