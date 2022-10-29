@@ -84,6 +84,18 @@ class AnimateFrontRightHandUp(_Instruction):
     def __init__(self):
         super().__init__(0x19)
 
+class AnimateFrontRightHandOnHead(_Instruction):
+    def __init__(self):
+        super().__init__(0x1a)
+
+class LaughingOne(_Instruction):
+    def __init__(self):
+        super().__init__(0x1d)
+
+class LaughingTwo(_Instruction):
+    def __init__(self):
+        super().__init__(0x1e)
+
 class AnimateSurprised(_Instruction):
     def __init__(self):
         super().__init__(0x1f)

@@ -2,6 +2,7 @@ from email.policy import default
 from constants.checks import LONE_WOLF_CHASE, LONE_WOLF_MOOGLE_ROOM
 from data.map_event import MapEvent
 from event.event import *
+from music.song_utils import get_character_theme
 
 class LoneWolf(Event):
     def name(self):
@@ -21,13 +22,18 @@ class LoneWolf(Event):
         )
 
         # Load into narshe cliffs and you can trigger lone wolf easily with these bits
-        # if self.args.debug:
-        #     space.write(
-        #         field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
-        #         field.ClearEventBit(573), # Haven't witnessed lone wolf event
-        #         field.SetEventBit(831),   # Visibility bits for lone wolf npcs
-        #         field.SetEventBit(832),
-        #     )
+        if self.args.debug:
+            space.write(
+                field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
+                field.ClearEventBit(573), # Haven't witnessed lone wolf event
+                field.SetEventBit(831),   # Visibility bits for lone wolf npcs
+                field.SetEventBit(832),
+            )
+
+            hills_north_exit = next(x for x in self.maps.exits.long_exits if x.dest_map == 23)
+            hills_north_exit.dest_map = 37
+            hills_north_exit.dest_x = 14
+            hills_north_exit.dest_y = 10
 
     def mod(self):
         self.mog_npc_id = 0x1c
@@ -52,12 +58,15 @@ class LoneWolf(Event):
         elif self.reward1.type == RewardType.ITEM:
             self.item_mod(self.reward1.id)
 
-        if self.reward2.type == RewardType.ESPER:
+        if self.reward2.type == RewardType.CHARACTER:
+            self.alternative_character_mod()
+            self.moogle_room_reward_mod([field.RecruitAndSelectParty(self.reward2.id)], False)
+        elif self.reward2.type == RewardType.ESPER:
             self.alternative_esper_mod()
-            self.moogle_room_reward_mod([field.AddEsper(self.reward2.id)])
+            self.moogle_room_reward_mod([field.AddEsper(self.reward2.id)], True)
         elif self.reward2.type == RewardType.ITEM:
             self.alternative_item_mod()
-            self.moogle_room_reward_mod([field.AddItem(self.reward2.id)])
+            self.moogle_room_reward_mod([field.AddItem(self.reward2.id)], True)
 
         self.moogle_room_entrance_event_mod()
         self.lone_wolf_hide_mod()
@@ -162,11 +171,145 @@ class LoneWolf(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
+    def lone_wolf_character_sprite_mod(self, character):
+        map_sprites = [
+            [20, 0x29], # Narshe: South Exterior (WoB)
+            [21, 0x10], # Narshe: North Exterior (WoB)
+            [23, 0x1a], # Narshe: Cliffs (WoB)
+            [23, 0x1b], # Narshe: Cliffs (WoB)
+            [30, 0x25], # Narshe: Chest room
+            [44, 0x10] # Narshe: Moove cave (WoR)
+        ]
+
+        for map_id, npc_id in map_sprites:
+            npc = self.maps.get_npc(map_id, npc_id)
+            npc.sprite = character
+            npc.palette = self.characters.get_palette(character)
+
+    # lone wolf doesnt jump, but instead joins the party..
+    def alternative_character_mod(self):
+        character = self.reward2.id
+        self.lone_wolf_dialog_character_mod()
+        self.lone_wolf_character_sprite_mod(character)
+
+
+        # This will skip mog's fall/pause animations to view lone wolf cutscene
+        # if self.args.debug:
+        #     space = Reserve(0xcd5a3, 0xcd5a3, "wait 30 frames (0.5s)", field.NOP())
+        #     space = Reserve(0xcd5a8, 0xcd5a8, "wait 30 frames (0.5s)", field.NOP())
+        #     space = Reserve(0xcd5ab, 0xcd5b3, "mog falling", field.NOP())
+
+        space = Reserve(0xcd594, 0xcd59f, "Lone wolf gives item, mog", field.NOP())
+        space = Reserve(0xcd5a4, 0xcd5a7, "Party runs at mog", field.NOP())
+        space = Reserve(0xcd5b6, 0xcd5bc, "Party running after Mog", field.NOP())
+        space = Reserve(0xcd5bd, 0xcd5bd, "wait 60 frames (1s)", field.NOP())
+        space = Reserve(0x0cd5c1, 0xcd5d0, "Lone wolf object script, jumps off cliff, plays sound", field.NOP())
+
+        # pick lone wolf up
+        src = [
+            field.HideEntity(self.invisible_bridge_block_npc_id),
+            field.EntityAct(field_entity.PARTY0, False,
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.DisableWalkingAnimation(),
+                field_entity.Move(direction.LEFT, 1)
+            ),
+            # LW - Jump up from cliff
+            field.EntityAct(self.lone_wolf_npc_id, True,
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.AnimateLowJump(),
+                field_entity.Move(direction.LEFT, 1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(10)
+            ),
+            # LW - Blinks
+            field.EntityAct(self.lone_wolf_npc_id, True,
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(1),
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(5),
+            ),
+            # Party - Blinks
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(1),
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(5),
+            ),
+
+            # LW - Attacks player
+            field.EntityAct(self.lone_wolf_npc_id, False,
+                field_entity.AnimateAttack(),
+                field_entity.AnimateLowJump(),
+                field_entity.Pause(3),
+                field_entity.Turn(direction.DOWN),
+                field_entity.EnableWalkingAnimation()
+            ),
+            #  Player - React to attack
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.Pause(2),
+                field_entity.Turn(direction.DOWN),
+                field_entity.AnimateSurprised(),
+                field_entity.AnimateLowJump(),
+                field_entity.Pause(12),
+                field_entity.Turn(direction.DOWN),
+            ),
+
+            field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.StartSong(get_character_theme(character)),
+
+            # LW - Laugh in player's face
+            field.EntityAct(self.lone_wolf_npc_id, True,
+                field_entity.LaughingOne(),
+                field_entity.Pause(1),
+                field_entity.LaughingTwo(),
+                field_entity.Pause(1),
+                field_entity.LaughingOne(),
+                field_entity.Pause(1),
+                field_entity.LaughingTwo(),
+                field_entity.Pause(1),
+                field_entity.LaughingOne(),
+                field_entity.Pause(1),
+                field_entity.LaughingTwo(),
+                field_entity.Pause(1),
+                field_entity.LaughingOne(),
+                field_entity.Pause(1),
+                field_entity.LaughingTwo(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(12),
+                field_entity.AnimateFrontRightHandOnHead(),
+                field_entity.Pause(4),
+                field_entity.AnimateFrontRightHandUp(),
+                field_entity.Pause(8),
+            ),
+            field.HideEntity(self.lone_wolf_npc_id),
+            field.RecruitAndSelectParty(self.reward2.id),
+            field.RefreshEntities(),
+            field.FadeInScreen(),
+            field.FinishCheck(),
+            field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.Return()
+        ]
+
+        character_space = Write(Bank.F0, src, "Recruit lone wolf")
+
+        space.write([
+            field.Call(character_space.start_address)
+        ])
+
     def alternative_esper_mod(self):
         # esper lone wolf will give as a reward for not picking self.reward1
         self.lone_wolf_dialog_esper_mod()
 
-        esper_space = Allocate(Bank.CC, 50, "idk yet", field.NOP())
+        esper_space = Allocate(Bank.CC, 50, "Receive esper from lone wolf", field.NOP())
         esper_space.write([
             field.AddEsper(self.reward2.id, sound_effect=True),
             field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
@@ -178,7 +321,6 @@ class LoneWolf(Event):
         space.write([
             field.Call(esper_space.start_address)
         ])
-
 
     def alternative_item_mod(self):
         self.lone_wolf_dialog_item_mod()
@@ -209,9 +351,16 @@ class LoneWolf(Event):
 
         space = Reserve(0xcd5d1, 0xcd5d6, "lone wolf hide npcs after fall", field.NOP())
         space.write(
-            field.Call(hide_npcs),
-            field.Pause(1.5),
+            field.Call(hide_npcs)
         )
+
+    def lone_wolf_dialog_character_mod(self):
+        import data.text
+        character_name = data.text.convert(self.characters.get_name(self.reward2.id), data.text.TEXT1) # data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+
+        self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >" + character_name + "!<end>")
+        # this dialog is explicitly not called later on when recruiting the character in the cave
+        self.dialogs.set_text(1742, "")
 
     def lone_wolf_dialog_esper_mod(self):
         import data.text
@@ -290,7 +439,7 @@ class LoneWolf(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
-    def moogle_room_reward_mod(self, reward_instructions):
+    def moogle_room_reward_mod(self, reward_instructions, show_reward_dialog):
         receive_reward = field.RETURN
         if self.reward1.type == RewardType.CHARACTER:
             receive_reward = self.moogle_room_character_mod(self.reward1.id)
@@ -299,30 +448,43 @@ class LoneWolf(Event):
         elif self.reward1.type == RewardType.ITEM:
             receive_reward = self.moogle_room_item_mod(self.reward1.id)
 
+        npc_act_surprised = field.EntityAct(self.mog_moogle_room_npc_id, True,
+            field_entity.AnimateSurprised(),
+            field_entity.Pause(8),
+            field_entity.AnimateStandingFront(),
+        )
+
         src = [
             field.BranchIfEventBitSet(event_bit.RECRUITED_MOG_WOB, "LONE_WOLF_FELL"),
-            field.EntityAct(self.mog_moogle_room_npc_id, True,
-                field_entity.AnimateSurprised(),
-                field_entity.Pause(8),
-                field_entity.AnimateStandingFront(),
-            ),
+            npc_act_surprised,
             field.Call(receive_reward),
             field.Return(),
-
-            "LONE_WOLF_FELL",
-            field.DisableEntityCollision(self.mog_moogle_room_npc_id),
-            field.EntityAct(self.mog_moogle_room_npc_id, True,
-                field_entity.AnimateLowJump(),
-                field_entity.Pause(8),
-                field_entity.SetSpeed(field_entity.Speed.FASTEST),
-                field_entity.Move(direction.DOWN, 8),
-            )
         ]
+
+        if self.reward2.type in [RewardType.ESPER, RewardType.ITEM]:
+            src += [
+                "LONE_WOLF_FELL",
+                field.DisableEntityCollision(self.mog_moogle_room_npc_id),
+                field.EntityAct(self.mog_moogle_room_npc_id, True,
+                    field_entity.AnimateLowJump(),
+                    field_entity.Pause(8),
+                    field_entity.SetSpeed(field_entity.Speed.FASTEST),
+                    field_entity.Move(direction.DOWN, 8),
+                )
+            ]
+        else:
+            src += [
+                "LONE_WOLF_FELL",
+                npc_act_surprised,
+            ]
 
         src += reward_instructions
 
+        if show_reward_dialog:
+            src += [field.Dialog(1742)]
+
         src += [
-            field.Dialog(1742),
+            field.FadeInScreen(),
             field.HideEntity(self.mog_moogle_room_npc_id),
             field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
             field.SetEventBit(event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
