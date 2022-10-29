@@ -1,5 +1,5 @@
 from memory.space import Bank, Allocate
-from event.event_reward import RewardType, Reward, choose_reward, weighted_reward_choice
+from event.event_reward import RewardType, choose_reward, weighted_reward_choice
 import instruction.field as field
 
 class Events():

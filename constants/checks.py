@@ -42,7 +42,7 @@ MAGITEK_FACTORY_FINISH = NameBit("Magitek Factory Finish", event_bit.DEFEATED_CR
 MOBLIZ_ATTACK = NameBit("Mobliz Attack", event_bit.RECRUITED_TERRA_MOBLIZ, ANY_REWARD)
 MT_KOLTS = NameBit("Mt. Kolts", event_bit.DEFEATED_VARGAS, ANY_REWARD)
 MT_ZOZO = NameBit("Mt. Zozo", event_bit.FINISHED_MT_ZOZO, ANY_REWARD)
-NARSHE_BATTLE = NameBit("Narshe Battle", event_bit.FINISHED_NARSHE_BATTLE, ANY_REWARD)
+NARSHE_BATTLE = NameBit("Narshe Battle", event_bit.FINISHED_NARSHE_BATTLE, CHAR_ESPER_REWARD)
 NARSHE_WEAPON_SHOP = NameBit("Narshe Weapon Shop", event_bit.GOT_RAGNAROK, ESPER_ITEM_REWARD)
 NARSHE_WEAPON_SHOP_MINES = NameBit("Narshe Weapon Shop Mines", event_bit.GOT_BOTH_REWARDS_WEAPON_SHOP, ESPER_ITEM_REWARD)
 OPERA_HOUSE_DISRUPTION = NameBit("Opera House Disruption", event_bit.FINISHED_OPERA_DISRUPTION, ANY_REWARD)
@@ -57,7 +57,7 @@ SOUTH_FIGARO_CAVE = NameBit("South Figaro Cave", event_bit.DEFEATED_TUNNEL_ARMOR
 TRITOCH_CLIFF = NameBit("Tritoch Cliff", event_bit.GOT_TRITOCH, ESPER_ITEM_REWARD)
 TZEN_THIEF = NameBit("Tzen Thief", event_bit.BOUGHT_ESPER_TZEN, ESPER_ITEM_REWARD)
 UMAROS_CAVE = NameBit("Umaro's Cave", event_bit.RECRUITED_UMARO_WOR, ANY_REWARD)
-VELDT = NameBit("Veldt", event_bit.VELDT_REWARD_OBTAINED, ESPER_ITEM_REWARD)
+VELDT = NameBit("Veldt", event_bit.VELDT_REWARD_OBTAINED, CHAR_ESPER_REWARD)
 VELDT_CAVE = NameBit("Veldt Cave", event_bit.DEFEATED_SR_BEHEMOTH, ANY_REWARD)
 WHELK_GATE = NameBit("Whelk Gate", event_bit.DEFEATED_WHELK, ANY_REWARD)
 ZONE_EATER = NameBit("Zone Eater", event_bit.RECRUITED_GOGO_WOR, ANY_REWARD)
@@ -140,6 +140,9 @@ all_checks = [
     # KT
     KEFKAS_TOWER_CELL_BEAST,
 ]
+
+# Used to determine some flag limitations (i.e. starting espers)
+CHARACTER_ESPER_ONLY_REWARDS = len([check for check in all_checks if check.reward_types == RewardType.CHARACTER | RewardType.ESPER])
 
 check_name = {check.bit: check.name for (idx, check) in enumerate(all_checks)}
 name_check = {check.name: check.bit for (idx, check) in enumerate(all_checks)}
