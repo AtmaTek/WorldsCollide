@@ -1,5 +1,5 @@
 from memory.space import Bank, START_ADDRESS_SNES, Reserve, Write, Read
-from instruction.event import _Instruction, _Branch
+from instruction.event import EVENT_CODE_START, _Instruction, _Branch
 import instruction.asm as asm
 import instruction.c0 as c0
 from enum import IntEnum
@@ -233,7 +233,7 @@ class LongCall(_Instruction):
         self.__init__(function_address, arg)
 
 CHEST_BLOCK_SIZE = 5
-class CollectChest(_Instruction):
+class CollectTreasure(_Instruction):
     def __init__(self, map_id, x, y):
         src = [
             "REMOTE_TREASURE",
@@ -267,7 +267,7 @@ class CollectChest(_Instruction):
             asm.CPX(0x1e, asm.DIR),         # CPX $1E
             asm.BNE("TREASURE_LOOP_AGAIN"), # BNE treasure_loop_again
                                             # ; coming in, upper A is already 00
-            "TREASURE_WRAPUP1",             # treasure_wrapup:
+            "TREASURE_WRAPUP1",             # treasure_wrapup1: this is a duplicate as the jump to the other is too far to safely make
             asm.TDC(),                      # TDC
             asm.LDA(0x05, asm.IMM8),        # command size
             asm.JMP(0x9b5c, asm.ABS),       # next command
@@ -345,8 +345,61 @@ class CollectChest(_Instruction):
         opcode = 0xec
         _set_opcode_address(opcode, address)
 
-        CollectChest.__init__ = lambda self, map_id, x, y : super().__init__(opcode, map_id.to_bytes(2, "little"), x, y)
+        CollectTreasure.__init__ = lambda self, map_id, x, y : super().__init__(opcode, map_id.to_bytes(2, "little"), x, y)
         self.__init__(map_id, x, y)
+
+    def __str__(self):
+        return super().__str__(self.args)
+
+# Collect the contents (only if it hasn't been collected)
+# If it has been collected, make jump to target destination
+class BranchIfTreasureCollected(_Branch):
+    def __init__(self, chest_bit, destination):
+        src = [
+            "CHECK_TREASURE",               # check_treasure:
+            # ED xxxx aa bb cc
+            # xxxx is treasure bit. there's only #$2F treasure bytes
+            # aa bb cc is the event to jump to should a treasure already be open
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xeb, asm.DIR),         # LDA $EB  ; load our treasure byte/bit that we want to check
+            asm.PHA(),                      # PHA
+            asm.AND(0x0007, asm.IMM16),     # AND #$0007  ; mask out the byte, keep the bits
+            asm.TAX(),                      # TAX
+            asm.PLA(),                      # PLA
+            asm.AND(0x01F8, asm.IMM16),     # AND #$01F8  ; now mask out the bits, keep the byte
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.TAY(),                      # TAY
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y  ; load the treasure we are checking for
+            asm.AND(0xc0bafc, asm.ABS_X),   # AND $C0BAFC,X  ; is the bit we are checking for set? meaning, is this box already open?
+            asm.A8(),                       # SEP #$20
+            asm.BNE("BRANCH_TO_DEST"),      # BNE check_succeeds  ; branch if so!
+            asm.BRA("RETURN"),
+            "BRANCH_TO_DEST",               # check_succeeds:
+            asm.TDC(),                      # TDC
+            asm.LDX(0xed, asm.DIR),         # LDX $ED load address
+            asm.STX(0xe5, asm.DIR),         # STX $E5 store first 4 bytes
+            asm.LDA(0xef, asm.DIR),         # LDA $EF st
+            asm.CLC(),                      # CLC
+            asm.ADC(0xca, asm.IMM8),        # ADC #$CA
+            asm.STA(0xe7, asm.DIR),         # STA $E7
+            asm.JMP(0x9a6d, asm.ABS),       # JMP $9A6D
+            "RETURN",
+            asm.TDC(),                      # TDC
+            asm.LDA(0x06, asm.IMM8),        # LDA #$06
+            asm.JMP(0x9b5c, asm.ABS),       # JMP $9B5C - next command
+        ]
+
+        space = Write(Bank.C0, src, "custom loot_treasure command")
+        address = space.start_address
+
+        opcode = 0xed
+        _set_opcode_address(opcode, address)
+
+        BranchIfTreasureCollected.__init__ = lambda self, chest_bit, destination : super().__init__(opcode, [chest_bit.to_bytes(2, "little")], destination)
+
+        self.__init__(chest_bit, destination)
 
     def __str__(self):
         return super().__str__(self.args)

@@ -24,7 +24,6 @@ def change_party(party):
         field.UpdatePartyLeader(),
     ]
 
-
 class KefkaTower(Event):
     def name(self):
         return "Kefka's Tower"
@@ -970,31 +969,60 @@ class KefkaTower(Event):
 
             field.FadeInScreen(3),
 
-            field.EntityAct(field_entity.PARTY0, False,
+            field.BranchIfTreasureCollected(chest.bit, "IGNORE_CHEST"),
+            "COLLECT_CHEST",
+            field.EntityAct(field_entity.PARTY0, True,
                 field_entity.SetSpeed(field_entity.Speed.NORMAL),
                 field_entity.Move(direction.DOWN, 2),
                 field_entity.Move(direction.RIGHT, 2),
                 field_entity.Move(direction.DOWN, 3),
                 field_entity.AnimateKneeling(),
-                field_entity.Pause(10),
+            ),
+
+            field.CollectTreasure(poltergeist_room_id, chest.x, chest.y),
+            field.PlaySoundEffect(sfx_name_id.get('Chest/Switch')),
+            field.Dialog(self.items.add_receive_dialog(chest.contents), wait_for_input=False),
+
+            field.EntityAct(field_entity.PARTY0, True,
                 field_entity.AnimateStandingFront(),
                 field_entity.Pause(2),
                 field_entity.Move(direction.UP, 3),
                 field_entity.Move(direction.RIGHT, 1),
                 field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                field_entity.Move(direction.UP, 3),
-                field_entity.SetSpeed(field_entity.Speed.FAST),
-                field_entity.Move(direction.UP, 6),
+                field_entity.Move(direction.UP, 5),
             ),
-            field.Pause(2),
-            [
-                field.Dialog(self.items.add_receive_dialog(chest.contents), wait_for_input=False),
-                field.CollectChest(poltergeist_room_id, chest.x, chest.y),
-                field.PlaySoundEffect(sfx_name_id.get('Chest/Switch')),
-            ],
-            field.Pause(2),
-            field.Pause(1.5),
+            field.Branch("POST_TREASURE"),
 
+            "IGNORE_CHEST",
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetSpeed(field_entity.Speed.NORMAL),
+                field_entity.Move(direction.DOWN, 2),
+                field_entity.Move(direction.RIGHT, 3),
+                field_entity.Move(direction.UP, 5),
+            ),
+
+            "POST_TREASURE",
+            field.EntityAct(field_entity.PARTY0, True,
+                field.Pause(4),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(4),
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(4),
+                field_entity.AnimateStandingHeadDown(),
+                field_entity.Pause(24),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(1),
+                field_entity.AnimateCloseEyes(),
+                field_entity.Pause(1),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(4),
+                field_entity.AnimateLowJump(),
+                field_entity.AnimatePowerStance(),
+                field_entity.Pause(12),
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.Move(direction.UP, 4),
+
+            ),
             field.Call(0xc174f),
 
             field.EntityAct(field_entity.PARTY0, False,
