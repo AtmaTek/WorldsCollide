@@ -473,7 +473,6 @@ class FloatingContinent(Event):
     def escape_esper_item_mod(self):
         # use guest character to give esper reward
         guest_char_id = 0x0f
-        guest_char = self.maps.get_npc(0x189, guest_char_id) # is this necessary?
 
         random_sprite = self.characters.get_random_esper_item_sprite()
         random_sprite_palette = self.characters.get_palette(random_sprite)
@@ -485,10 +484,10 @@ class FloatingContinent(Event):
             field.RefreshEntities(),
         )
 
-        return (guest_char_id)
+        return guest_char_id
 
     def escape_esper_mod(self, esper_id):
-        (guest_char_id) = self.escape_esper_item_mod()
+        guest_char_id = self.escape_esper_item_mod()
 
         self.escape_mod(guest_char_id, [
             field.DeleteEntity(guest_char_id),
@@ -499,7 +498,7 @@ class FloatingContinent(Event):
         ])
 
     def escape_item_mod(self, item_id):
-        (guest_char_id) = self.escape_esper_item_mod()
+        guest_char_id = self.escape_esper_item_mod()
 
         self.escape_mod(guest_char_id, [
             field.DeleteEntity(guest_char_id),

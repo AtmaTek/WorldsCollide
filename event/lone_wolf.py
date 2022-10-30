@@ -22,18 +22,13 @@ class LoneWolf(Event):
         )
 
         # Load into narshe cliffs and you can trigger lone wolf easily with these bits
-        if self.args.debug:
-            space.write(
-                field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
-                field.ClearEventBit(573), # Haven't witnessed lone wolf event
-                field.SetEventBit(831),   # Visibility bits for lone wolf npcs
-                field.SetEventBit(832),
-            )
-
-            hills_north_exit = next(x for x in self.maps.exits.long_exits if x.dest_map == 23)
-            hills_north_exit.dest_map = 37
-            hills_north_exit.dest_x = 14
-            hills_north_exit.dest_y = 10
+        # if self.args.debug:
+        #     space.write(
+        #         field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
+        #         field.ClearEventBit(573), # Haven't witnessed lone wolf event
+        #         field.SetEventBit(831),   # Visibility bits for lone wolf npcs
+        #         field.SetEventBit(832),
+        #     )
 
     def mod(self):
         self.mog_npc_id = 0x1c
@@ -53,7 +48,7 @@ class LoneWolf(Event):
 
         if self.reward1.type == RewardType.CHARACTER:
             self.character_mod(self.reward1.id)
-        if self.reward1.type == RewardType.ESPER:
+        elif self.reward1.type == RewardType.ESPER:
             self.esper_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ITEM:
             self.item_mod(self.reward1.id)
@@ -70,9 +65,7 @@ class LoneWolf(Event):
 
         self.moogle_room_entrance_event_mod()
         self.lone_wolf_hide_mod()
-
         self.finish_check_mod()
-
 
         self.log_reward(self.reward1)
         self.log_reward(self.reward2)
@@ -191,7 +184,6 @@ class LoneWolf(Event):
         character = self.reward2.id
         self.lone_wolf_dialog_character_mod()
         self.lone_wolf_character_sprite_mod(character)
-
 
         # This will skip mog's fall/pause animations to view lone wolf cutscene
         # if self.args.debug:

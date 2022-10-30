@@ -1,6 +1,5 @@
 from constants.checks import KEFKAS_TOWER_CELL_BEAST
 from event.event import *
-import args
 
 class KefkaTower(Event):
     def name(self):

@@ -15,7 +15,6 @@ class FanaticsTower(Event):
             field.SetEventBit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD),
         ])
 
-
     def init_rewards(self):
         self.reward1 = self.add_reward(FANATICS_TOWER_FOLLOWER)
         self.reward2 = self.add_reward(FANATICS_TOWER_LEADER)
