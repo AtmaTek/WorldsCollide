@@ -4,8 +4,7 @@ def name():
 
 def parse(parser):
     advanced_checks = parser.add_argument_group("Forced Check Rewards")
-    # check_rewards = advanced_checks.add_mutually_exclusive_group()
-    # advanced_checks.name = "Check Rewards"
+
     advanced_checks.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Mt. Zozo, Narshe Weapon Shop, Sealed Gate, South Figaro Basement, Tzen Thief, Zone Eater")
 
@@ -13,10 +12,10 @@ def parse(parser):
                 help = "Forces list of checks to give an ITEM reward. Maximum of 12 checks.")
 
     advanced_checks.add_argument("-ferr", "--force-esper-rewards", type = str,
-                help = "Forces list of checks to give an ESPER reward. Maximum of 26 checks")
+                help = "Forces list of checks to give an ESPER reward.")
 
     advanced_checks.add_argument("-feirr", "--force-esper-item-rewards", type = str,
-                help = "Forces list of checks to give an (ESPER | ITEM) reward. Maximum of 20 checks")
+                help = "Forces list of checks to give an (ESPER | ITEM) reward.")
 
 
 esper_item_title = "Esper+Item Checks"

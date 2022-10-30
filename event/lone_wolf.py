@@ -21,7 +21,9 @@ class LoneWolf(Event):
             field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
         )
 
-        # Load into narshe cliffs and you can trigger lone wolf easily with these bits
+        # Load into narshe cliffs (map 23, coordinates 25,20) and lone wolf will be triggerable
+        # After choosing lone wolf or mog, exit to the previous map and re-enter the cliff
+        # It will then take you to the room before the Moogle Room to easily test the full flow
         # if self.args.debug:
         #     space.write(
         #         field.SetEventBit(572),   # Spectate lone wolf cross the bridge to cliff
@@ -29,6 +31,11 @@ class LoneWolf(Event):
         #         field.SetEventBit(831),   # Visibility bits for lone wolf npcs
         #         field.SetEventBit(832),
         #     )
+        #     exit_maps = [x for x in self.maps.exits.long_exits if x.dest_map == 23]
+        #     exit = next(iter(exit_maps))
+        #     exit.dest_map = 37
+        #     exit.dest_x = 14
+        #     exit.dest_y = 10
 
     def mod(self):
         self.mog_npc_id = 0x1c
@@ -55,13 +62,13 @@ class LoneWolf(Event):
 
         if self.reward2.type == RewardType.CHARACTER:
             self.alternative_character_mod(self.reward2.id)
-            self.moogle_room_reward_mod([field.RecruitAndSelectParty(self.reward2.id)], False)
+            self.moogle_room_reward_mod()
         elif self.reward2.type == RewardType.ESPER:
             self.alternative_esper_mod(self.reward2.id)
-            self.moogle_room_reward_mod([field.AddEsper(self.reward2.id)], True)
+            self.moogle_room_reward_mod()
         elif self.reward2.type == RewardType.ITEM:
             self.alternative_item_mod(self.reward2.id)
-            self.moogle_room_reward_mod([field.AddItem(self.reward2.id)], True)
+            self.moogle_room_reward_mod()
 
         self.moogle_room_entrance_event_mod()
         self.lone_wolf_hide_mod()
@@ -101,6 +108,9 @@ class LoneWolf(Event):
             field.CreateEntity(character),
             field.RecruitCharacter(character),
         )
+
+        space = Reserve(0xcd607, 0xcd607, "Song played when recruiting mog")
+        space.write(get_character_theme(character))
 
         # move lone wolf falling up to make room for adding character
         # skip copying lone wolf take this dialog at [0xcd693,0xcd695]
@@ -298,7 +308,7 @@ class LoneWolf(Event):
 
     def alternative_esper_mod(self, esper):
         # esper lone wolf will give as a reward for not picking self.reward1
-        self.lone_wolf_dialog_esper_mod()
+        self.lone_wolf_dialog_esper_mod(esper)
 
         esper_space = Allocate(Bank.CC, 50, "Receive esper from lone wolf", field.NOP())
         esper_space.write([
@@ -314,7 +324,7 @@ class LoneWolf(Event):
         ])
 
     def alternative_item_mod(self, item):
-        self.lone_wolf_dialog_item_mod()
+        self.lone_wolf_dialog_item_mod(item)
 
         # item lone wolf will give as a reward for not picking self.reward1
         space = Reserve(0xcd59f, 0xcd59f, "lone wolf item received", field.NOP())
@@ -350,22 +360,18 @@ class LoneWolf(Event):
         character_name = data.text.convert(self.characters.get_name(character), data.text.TEXT1) # data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >" + character_name + "!<end>")
-        # this dialog is explicitly not called later on when recruiting the character in the cave
-        self.dialogs.set_text(1742, "")
 
     def lone_wolf_dialog_esper_mod(self, esper):
         import data.text
         esper_name = data.text.convert(self.espers.get_name(esper), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + esper_name + "”!<end>")
-        self.dialogs.set_text(1742, f" <line>     Received the Magicite<line>              “{esper_name}.”<end>")
 
     def lone_wolf_dialog_item_mod(self, item):
         import data.text
         item_name = data.text.convert(self.items.get_name(item), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + item_name + "”!<end>")
-        self.dialogs.set_text(1742, "<line><      >Got “" + item_name + "”!<end>")
 
     def finish_check_mod(self):
         src = [
@@ -389,21 +395,39 @@ class LoneWolf(Event):
 
     def moogle_room_character_mod(self, character):
         src = [
-            field.RecruitAndSelectParty(character),
+            field.SetEventBit(event_bit.TEMP_SONG_OVERRIDE),
+            field.StartSong(get_character_theme(character)),
 
+            field.EntityAct(self.mog_moogle_room_npc_id, True,
+                field_entity.AnimateSurprised(),
+                field_entity.Pause(8),
+                field_entity.AnimateStandingFront(),
+            ),
+
+            field.RecruitAndSelectParty(character),
             field.HideEntity(self.mog_moogle_room_npc_id),
             field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
             field.SetEventBit(event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
             field.RefreshEntities(),
             field.FadeInScreen(),
             field.FinishCheck(),
+            field.ClearEventBit(event_bit.TEMP_SONG_OVERRIDE),
             field.Return(),
         ]
-        space = Write(Bank.CC, src, "lone wolf moogle room npc character reward")
+
+        space = Write(Bank.F0, src, "lone wolf moogle room npc character reward")
         return space.start_address
 
     def moogle_room_esper_item_mod(self, esper_item_instructions):
         src = [
+            field.DisableEntityCollision(self.mog_moogle_room_npc_id),
+            field.EntityAct(self.mog_moogle_room_npc_id, True,
+                field_entity.AnimateLowJump(),
+                field_entity.Pause(8),
+                field_entity.SetSpeed(field_entity.Speed.FASTEST),
+                field_entity.Move(direction.DOWN, 8),
+            ),
+
             esper_item_instructions,
 
             field.FadeOutScreen(),
@@ -415,7 +439,8 @@ class LoneWolf(Event):
             field.FinishCheck(),
             field.Return(),
         ]
-        space = Write(Bank.CC, src, "lone wolf moogle room npc esper/item reward")
+
+        space = Write(Bank.F0, src, "lone wolf moogle room npc esper/item reward")
         return space.start_address
 
     def moogle_room_esper_mod(self, esper):
@@ -430,59 +455,33 @@ class LoneWolf(Event):
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
 
-    def moogle_room_reward_mod(self, reward_instructions, show_reward_dialog):
-        receive_reward = field.RETURN
+    def moogle_room_reward_mod(self):
+        mog_reward = field.RETURN
         if self.reward1.type == RewardType.CHARACTER:
-            receive_reward = self.moogle_room_character_mod(self.reward1.id)
+            mog_reward = self.moogle_room_character_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ESPER:
-            receive_reward = self.moogle_room_esper_mod(self.reward1.id)
+            mog_reward = self.moogle_room_esper_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ITEM:
-            receive_reward = self.moogle_room_item_mod(self.reward1.id)
+            mog_reward = self.moogle_room_item_mod(self.reward1.id)
 
-        npc_act_surprised = field.EntityAct(self.mog_moogle_room_npc_id, True,
-            field_entity.AnimateSurprised(),
-            field_entity.Pause(8),
-            field_entity.AnimateStandingFront(),
-        )
+        lone_wolf_reward = field.RETURN
+        if self.reward2.type == RewardType.CHARACTER:
+            lone_wolf_reward = self.moogle_room_character_mod(self.reward2.id)
+        if self.reward2.type == RewardType.ESPER:
+            lone_wolf_reward = self.moogle_room_esper_mod(self.reward2.id)
+        if self.reward2.type == RewardType.ITEM:
+            lone_wolf_reward = self.moogle_room_item_mod(self.reward2.id)
 
         src = [
             field.BranchIfEventBitSet(event_bit.RECRUITED_MOG_WOB, "LONE_WOLF_FELL"),
-            npc_act_surprised,
-            field.Call(receive_reward),
+            field.Call(mog_reward),
             field.Return(),
+            "LONE_WOLF_FELL",
+            field.Call(lone_wolf_reward),
+            field.Return()
         ]
 
-        if self.reward2.type in [RewardType.ESPER, RewardType.ITEM]:
-            src += [
-                "LONE_WOLF_FELL",
-                field.DisableEntityCollision(self.mog_moogle_room_npc_id),
-                field.EntityAct(self.mog_moogle_room_npc_id, True,
-                    field_entity.AnimateLowJump(),
-                    field_entity.Pause(8),
-                    field_entity.SetSpeed(field_entity.Speed.FASTEST),
-                    field_entity.Move(direction.DOWN, 8),
-                )
-            ]
-        else:
-            src += [
-                "LONE_WOLF_FELL",
-                npc_act_surprised,
-            ]
-
-        src += reward_instructions
-
-        if show_reward_dialog:
-            src += [field.Dialog(1742)]
-
-        src += [
-            field.FadeInScreen(),
-            field.HideEntity(self.mog_moogle_room_npc_id),
-            field.ClearEventBit(npc_bit.MOG_MOOGLE_ROOM_WOR),
-            field.SetEventBit(event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
-            field.FinishCheck(),
-            field.Return(),
-        ]
-        space = Write(Bank.CC, src, "lone wolf npc event second reward not chosen")
+        space = Write(Bank.F0, src, "lone wolf npc event second reward not chosen")
         npc_event = space.start_address
 
         space = Reserve(0xc396c, 0xc3970, "lone wolf npc not saved second reward", field.NOP())
