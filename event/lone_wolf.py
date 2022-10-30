@@ -54,13 +54,13 @@ class LoneWolf(Event):
             self.item_mod(self.reward1.id)
 
         if self.reward2.type == RewardType.CHARACTER:
-            self.alternative_character_mod()
+            self.alternative_character_mod(self.reward2.id)
             self.moogle_room_reward_mod([field.RecruitAndSelectParty(self.reward2.id)], False)
         elif self.reward2.type == RewardType.ESPER:
-            self.alternative_esper_mod()
+            self.alternative_esper_mod(self.reward2.id)
             self.moogle_room_reward_mod([field.AddEsper(self.reward2.id)], True)
         elif self.reward2.type == RewardType.ITEM:
-            self.alternative_item_mod()
+            self.alternative_item_mod(self.reward2.id)
             self.moogle_room_reward_mod([field.AddItem(self.reward2.id)], True)
 
         self.moogle_room_entrance_event_mod()
@@ -180,9 +180,8 @@ class LoneWolf(Event):
             npc.palette = self.characters.get_palette(character)
 
     # lone wolf doesnt jump, but instead joins the party..
-    def alternative_character_mod(self):
-        character = self.reward2.id
-        self.lone_wolf_dialog_character_mod()
+    def alternative_character_mod(self, character):
+        self.lone_wolf_dialog_character_mod(character)
         self.lone_wolf_character_sprite_mod(character)
 
         # This will skip mog's fall/pause animations to view lone wolf cutscene
@@ -283,7 +282,7 @@ class LoneWolf(Event):
                 field_entity.Pause(8),
             ),
             field.HideEntity(self.lone_wolf_npc_id),
-            field.RecruitAndSelectParty(self.reward2.id),
+            field.RecruitAndSelectParty(character),
             field.RefreshEntities(),
             field.FadeInScreen(),
             field.FinishCheck(),
@@ -297,14 +296,14 @@ class LoneWolf(Event):
             field.Call(character_space.start_address)
         ])
 
-    def alternative_esper_mod(self):
+    def alternative_esper_mod(self, esper):
         # esper lone wolf will give as a reward for not picking self.reward1
         self.lone_wolf_dialog_esper_mod()
 
         esper_space = Allocate(Bank.CC, 50, "Receive esper from lone wolf", field.NOP())
         esper_space.write([
-            field.AddEsper(self.reward2.id, sound_effect=True),
-            field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
+            field.AddEsper(esper, sound_effect=True),
+            field.Dialog(self.espers.get_receive_esper_dialog(esper)),
             Read(0xcd59d, 0xcd59d), # Wait 30 frames
             field.Return()
         ])
@@ -314,13 +313,13 @@ class LoneWolf(Event):
             field.Call(esper_space.start_address)
         ])
 
-    def alternative_item_mod(self):
+    def alternative_item_mod(self, item):
         self.lone_wolf_dialog_item_mod()
 
         # item lone wolf will give as a reward for not picking self.reward1
         space = Reserve(0xcd59f, 0xcd59f, "lone wolf item received", field.NOP())
         space.write(
-            self.reward2.id,
+            item
         )
 
     # add pause after lone wolf jumps to wait for falling sound effect
@@ -346,24 +345,24 @@ class LoneWolf(Event):
             field.Call(hide_npcs)
         )
 
-    def lone_wolf_dialog_character_mod(self):
+    def lone_wolf_dialog_character_mod(self, character):
         import data.text
-        character_name = data.text.convert(self.characters.get_name(self.reward2.id), data.text.TEXT1) # data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+        character_name = data.text.convert(self.characters.get_name(character), data.text.TEXT1) # data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >" + character_name + "!<end>")
         # this dialog is explicitly not called later on when recruiting the character in the cave
         self.dialogs.set_text(1742, "")
 
-    def lone_wolf_dialog_esper_mod(self):
+    def lone_wolf_dialog_esper_mod(self, esper):
         import data.text
-        esper_name = data.text.convert(self.espers.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+        esper_name = data.text.convert(self.espers.get_name(esper), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + esper_name + "”!<end>")
         self.dialogs.set_text(1742, f" <line>     Received the Magicite<line>              “{esper_name}.”<end>")
 
-    def lone_wolf_dialog_item_mod(self):
+    def lone_wolf_dialog_item_mod(self, item):
         import data.text
-        item_name = data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
+        item_name = data.text.convert(self.items.get_name(item), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + item_name + "”!<end>")
         self.dialogs.set_text(1742, "<line><      >Got “" + item_name + "”!<end>")
