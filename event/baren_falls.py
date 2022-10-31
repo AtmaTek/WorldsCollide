@@ -133,6 +133,12 @@ class BarenFalls(Event):
             field.Call(finish_check),
         )
 
+        from music.song_utils import get_character_theme
+        space = Reserve(0xbc0ff, 0xbc100, "play gau's theme")
+        space.write([
+            field.StartSong(get_character_theme(character)),
+        ])
+
     def esper_item_mod(self, esper_item_instructions):
         space = Reserve(0xbc0f7, 0xbc1b7, "baren falls gau moving/naming", field.NOP())
         space.write(
