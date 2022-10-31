@@ -56,20 +56,17 @@ def process(args):
             ZONE_EATER.bit,
         ]
 
-    # assert that no items in item_reward_checks is CHAR | ESPER only reward
-    assert len(args.item_rewards) < 13
-
 def flags(args):
     flags = ""
 
     if args.force_esper_item_rewards:
-        flags += f" -feir {args.force_esper_item_rewards}"
+        flags += f" -feirr {args.force_esper_item_rewards}"
 
     if args.force_esper_rewards:
-        flags += f" -fer {args.force_esper_rewards}"
+        flags += f" -ferr {args.force_esper_rewards}"
 
     if args.force_item_rewards:
-        flags += f" -fir {args.force_item_rewards}"
+        flags += f" -firr {args.force_item_rewards}"
 
 
     return flags

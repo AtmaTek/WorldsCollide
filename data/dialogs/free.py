@@ -2,7 +2,6 @@
 dialogs = []
 dialogs += range(515, 528)   # kefka assaulting thamasa
 dialogs += range(550, 598)   # sabin scenario, cyan kefka doma event
-dialogs += [1742]            # random lone wolf dialog
 # dialogs +=range(1777, 1878)  # BANQUET DIALOGS - Do not use these. These dialogs are repurposed for item dialogs in data/items.py - "available_dialogs"
 
 multi_line_battle_dialogs = [

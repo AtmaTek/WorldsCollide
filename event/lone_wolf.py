@@ -360,19 +360,22 @@ class LoneWolf(Event):
         character_name = data.text.convert(self.characters.get_name(character), data.text.TEXT1) # data.text.convert(self.items.get_name(self.reward2.id), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >" + character_name + "!<end>")
+        # this dialog is explicitly not called later on when recruiting the character in the cave
+        self.dialogs.set_text(1742,  f" <line>  Recruited {character_name}!”<end>")
 
     def lone_wolf_dialog_esper_mod(self, esper):
         import data.text
         esper_name = data.text.convert(self.espers.get_name(esper), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + esper_name + "”!<end>")
+        self.dialogs.set_text(1742, f" <line>     Received the Magicite<line>              “{esper_name}.”<end>")
 
     def lone_wolf_dialog_item_mod(self, item):
         import data.text
         item_name = data.text.convert(self.items.get_name(item), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
 
         self.dialogs.set_text(1765, "<line><     >Grrrr…<line><     >You'll never get this<line><     >“" + item_name + "”!<end>")
-
+        self.dialogs.set_text(1742, "<line><      >Got “" + item_name + "”!<end>")
     def finish_check_mod(self):
         src = [
             field.ClearEventBit(npc_bit.LONE_WOLF_MOG_NARSHE_CLIFF),
