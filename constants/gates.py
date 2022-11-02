@@ -1,9 +1,9 @@
 import constants.checks as c
 from constants.checks import (
-    CELES, CYAN, DRAGONS, EDGAR, GAU,
+    CELES, CYAN, EDGAR, GAU,
     GOGO, LOCKE, MOG, RELM,
     SABIN, SETZER, STRAGO, SHADOW,
-    TERRA,  UMARO, UNGATED
+    TERRA,  UMARO, UNGATED, UNGATED_DRAGONS
 )
 
 character_checks = {
@@ -21,5 +21,5 @@ character_checks = {
     "Strago" : [c.name for c in STRAGO],
     "Terra"  : [c.name for c in TERRA],
     "Umaro"  : [c.name for c in UMARO],
-    ""       : [c.name for c in DRAGONS] + [c.name for c in UNGATED],
+    ""       : [c.name for c in UNGATED_DRAGONS] + [c.name for c in UNGATED],
 }

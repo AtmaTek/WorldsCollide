@@ -61,11 +61,6 @@ nfce = [
     SOUTH_FIGARO_PRISONER,
 ]
 
-legacy = [
-    FANATICS_TOWER_LEADER,
-    LONE_WOLF_MOOGLE_ROOM,
-    NARSHE_WEAPON_SHOP_MINES,
-]
 class FlagsForceRewardChecks(scroll_area.ScrollArea):
 
     def __init__(self, title, item_checks, is_nfce):
@@ -115,3 +110,6 @@ class FlagsForceEsperItemRewardChecks(FlagsForceRewardChecks):
 
 class FlagsForceItemRewardChecks(FlagsForceRewardChecks):
     MENU_NUMBER = 18
+
+class FlagsForceCharacterRewardChecks(FlagsForceRewardChecks):
+    MENU_NUMBER = 19

@@ -8,16 +8,22 @@ def parse(parser):
     advanced_checks.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Mt. Zozo, Narshe Weapon Shop, Sealed Gate, South Figaro Basement, Tzen Thief, Zone Eater")
 
+    advanced_checks.add_argument("-fcrr", "--force-character-rewards", type = str,
+                help = "Forces list of checks to give an CHARACTER reward")
+
     advanced_checks.add_argument("-firr", "--force-item-rewards", type = str,
-                help = "Forces list of checks to give an ITEM reward. Maximum of 12 checks.")
+                help = "Forces list of checks to give an ITEM reward")
 
     advanced_checks.add_argument("-ferr", "--force-esper-rewards", type = str,
-                help = "Forces list of checks to give an ESPER reward.")
+                help = "Forces list of checks to give an ESPER reward")
 
     advanced_checks.add_argument("-feirr", "--force-esper-item-rewards", type = str,
-                help = "Forces list of checks to give an (ESPER | ITEM) reward.")
+                help = "Forces list of checks to give an (ESPER | ITEM) reward")
 
+    advanced_checks.add_argument("-dcbc", "--dragons-can-be-characters", action = "store_true",
+                help = "Characters can be rewarded in the dragon spots")
 
+character_title = "Character Checks"
 esper_item_title = "Esper+Item Checks"
 esper_title = "Esper Checks"
 item_title = "Item Checks"
@@ -28,9 +34,13 @@ def process(args):
         GAUS_FATHERS_HOUSE,KOHLINGEN_CAFE, MT_ZOZO, NARSHE_WEAPON_SHOP,
         SEALED_GATE, SOUTH_FIGARO_PRISONER, TZEN_THIEF, ZONE_EATER
     )
+    args.character_rewards = []
     args.esper_item_rewards = []
     args.esper_rewards = []
     args.item_rewards = []
+
+    if args.force_character_rewards:
+        args.character_rewards =  [int(check) for check in args.force_character_rewards.split(',')]
 
     if args.force_esper_item_rewards:
         args.esper_item_rewards =  [int(check) for check in args.force_esper_item_rewards.split(',')]
@@ -56,8 +66,16 @@ def process(args):
             ZONE_EATER.bit,
         ]
 
+    if args.dragons_can_be_characters:
+        from constants.checks import RECRUITABLE_DRAGONS
+        recruitable_dragon_bits = [check.bit for check in RECRUITABLE_DRAGONS]
+        args.character_rewards += recruitable_dragon_bits
+
 def flags(args):
     flags = ""
+
+    if args.force_character_rewards:
+        flags += f" -fcrr {args.force_character_rewards}"
 
     if args.force_esper_item_rewards:
         flags += f" -feirr {args.force_esper_item_rewards}"
@@ -68,11 +86,12 @@ def flags(args):
     if args.force_item_rewards:
         flags += f" -firr {args.force_item_rewards}"
 
-
     return flags
 
 def options(args):
     options = []
+    if args.character_rewards:
+        options.append((character_title, args.character_rewards))
     if args.esper_item_rewards:
         options.append((esper_item_title, args.esper_item_rewards))
     if args.esper_rewards:
@@ -89,11 +108,17 @@ def _format_check_log_entries(check_ids):
     return check_entries
 
 def menu(args):
-    from menus.submenu_force_item_reward_checks import FlagsForceEsperItemRewardChecks, FlagsForceEsperRewardChecks, FlagsForceItemRewardChecks
+    from menus.submenu_force_item_reward_checks import FlagsForceCharacterRewardChecks, FlagsForceEsperItemRewardChecks, FlagsForceEsperRewardChecks, FlagsForceItemRewardChecks
 
     entries = options(args)
     for index, entry in enumerate(entries):
         key, value = entry
+        if key == character_title:
+            if value:
+                entries[index] = (character_title, FlagsForceCharacterRewardChecks(character_title, value, False)) # flags sub-menu
+            else:
+                 entries[index] = (character_title, "None")
+
         if key == esper_item_title:
             if value:
                 entries[index] = (esper_item_title, FlagsForceEsperItemRewardChecks(esper_item_title, value, False)) # flags sub-menu

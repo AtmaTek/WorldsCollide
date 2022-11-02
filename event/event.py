@@ -47,12 +47,12 @@ class Event():
 
         assert bit
 
+        if bit in self.args.character_rewards:
+            return RewardType.CHARACTER
         if bit in self.args.esper_item_rewards:
             return RewardType.ESPER | RewardType.ITEM
-
         if bit in self.args.esper_rewards:
             return RewardType.ESPER
-
         if bit in self.args.item_rewards:
             return RewardType.ITEM
 
