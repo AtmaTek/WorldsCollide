@@ -196,11 +196,11 @@ class KefkaTower(Event):
             disable_victory_dance(boss_name)
             disable_battle_music(boss_name)
 
-        disable_all("Inferno")
-        disable_all("Guardian")
-        disable_all("Doom")
-        disable_all("Goddess")
-        disable_all("Poltrgeist")
+        # disable_all("Inferno")
+        # disable_all("Guardian")
+        # disable_all("Doom")
+        # disable_all("Goddess")
+        # disable_all("Poltrgeist")
 
         self.inferno_cutscene = self.gauntlet_inferno_cutscene()
         self.guardian_cutscene = self.gauntlet_guardian_cutscene()
