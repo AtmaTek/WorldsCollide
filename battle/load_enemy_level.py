@@ -12,10 +12,10 @@ enemy_level_address = 0x3b18
 
 class _LoadEnemyLevel:
     def __init__(self):
-        add_enemy_levels = self._add_objective_levels_mod("Add Enemy Levels", FormationFlag.BOSS_DRAGON_FINAL, asm.BNE)
-        add_boss_levels = self._add_objective_levels_mod("Add Boss Levels", FormationFlag.BOSS, asm.BEQ)
-        add_dragon_levels = self._add_objective_levels_mod("Add Dragon Levels", FormationFlag.DRAGON, asm.BEQ)
-        add_final_levels = self._add_objective_levels_mod("Add Final Levels", FormationFlag.FINAL, asm.BEQ)
+        add_enemy_levels = self._add_objective_levels_mod("Add Enemy Levels", FormationFlag.BOSS_DRAGON_FINAL, asm.BEQ)
+        add_boss_levels = self._add_objective_levels_mod("Add Boss Levels", FormationFlag.BOSS, asm.BNE)
+        add_dragon_levels = self._add_objective_levels_mod("Add Dragon Levels", FormationFlag.DRAGON, asm.BNE)
+        add_final_levels = self._add_objective_levels_mod("Add Final Levels", FormationFlag.FINAL, asm.BNE)
 
         src = [
             Read(0x22d1e, 0x22d24), # unscaled enemy level
@@ -42,10 +42,13 @@ class _LoadEnemyLevel:
         )
 
     def _add_objective_levels_mod(self, result_name, formation_flag, branch_instr):
+        # Note: branch instruction is inverted to avoid trying to branch > 127 bytes.
         src = [
             asm.LDA(formation_flag, asm.IMM8),
             asm.BIT(formation_flags_address, asm.ABS),
-            branch_instr(f"RETURN_{result_name}"),
+            branch_instr(f"DO_{result_name}"),
+            asm.RTL(),
+            f"DO_{result_name}",
         ]
         if result_name in objectives.results:
             for objective in objectives.results[result_name]:
@@ -66,7 +69,6 @@ class _LoadEnemyLevel:
                     f"SKIP_{objective.letter}",
                 ]
         src += [
-            f"RETURN_{result_name}",
             asm.RTL(),
         ]
         space = Write(Bank.F0, src, f"{result_name} objectives")
