@@ -1,5 +1,5 @@
 __pycache__/
 *.py[cod]
 $py.class
-*-metadata.json
+*-objective.json
 *-flag.json
