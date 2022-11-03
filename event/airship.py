@@ -29,7 +29,7 @@ class Airship(Event):
         tincture_chest = self.maps.get_chests(narshe_school_right_room)[1]
 
         chest_src = [
-            field.CollectChest(narshe_school_right_room, miab_chest.x, miab_chest.y),
+            field.CollectTreasure(narshe_school_right_room, miab_chest.x, miab_chest.y),
         ]
         miab = Write(Bank.CA, chest_src, "Trigger treasure chest")
 
@@ -44,7 +44,7 @@ class Airship(Event):
 
         # Kefka will loot the Tincture
         chest_src = [
-            field.CollectChest(narshe_school_right_room, tincture_chest.x, tincture_chest.y),
+            field.CollectTreasure(narshe_school_right_room, tincture_chest.x, tincture_chest.y),
         ]
         tincture = Write(Bank.CA, chest_src, "Trigger treasure chest")
         new_npc = NPC()
