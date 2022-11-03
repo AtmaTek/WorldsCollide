@@ -11,6 +11,7 @@ def parse(parser):
                        help = "Start with random lores learned")
 
     lores_mp = lores.add_mutually_exclusive_group()
+    lores_mp.title = 'Lores'
     lores_mp.add_argument("-lmps", "--lores-mp-shuffle", action = "store_true",
                           help = "Lore MP costs shuffled")
     lores_mp.add_argument("-lmprv", "--lores-mp-random-value", default = None, type = int,

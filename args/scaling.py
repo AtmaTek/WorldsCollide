@@ -5,6 +5,7 @@ def parse(parser):
     scaling = parser.add_argument_group("Scaling")
 
     level_scaling = scaling.add_mutually_exclusive_group()
+    level_scaling.title = 'Level Scaling'
     level_scaling.add_argument("-lsa", "--level-scaling-average", default = None, type = float,
                                metavar = ("VALUE"), choices = [x / 10.0 for x in range(5, 55, 5)],
                                help = "Enemy and boss levels equal to %(metavar)s * party average level")
@@ -25,6 +26,7 @@ def parse(parser):
                                help = "Enemies and bosses gain 1 level every %(metavar)s minutes")
 
     hp_mp_scaling = scaling.add_mutually_exclusive_group()
+    hp_mp_scaling.title = 'HP/MP Scaling'
     hp_mp_scaling.add_argument("-hma", "--hp-mp-scaling-average", default = None, type = float,
                                metavar = ("VALUE"), choices = [x / 10.0 for x in range(5, 55, 5)],
                                help = "Enemy and boss hp/mp scales %(metavar)s * party averaage level")
@@ -45,6 +47,7 @@ def parse(parser):
                                help = "Enemy and boss hp/mp scales every %(metavar)s minutes")
 
     xp_gp_scaling = scaling.add_mutually_exclusive_group()
+    xp_gp_scaling.title = 'XP/GP Scaling'
     xp_gp_scaling.add_argument("-xga", "--xp-gp-scaling-average", default = None, type = float,
                                metavar = ("VALUE"), choices = [x / 10.0 for x in range(5, 55, 5)],
                                help = "Enemy and boss exp/gp scales %(metavar)s * party averaage level")
@@ -65,6 +68,7 @@ def parse(parser):
                                help = "Enemy and boss exp/gp scales every %(metavar)s minutes")
 
     ability_scaling = scaling.add_mutually_exclusive_group()
+    ability_scaling.title = 'Ability Scaling'
     ability_scaling.add_argument("-ase", "--ability-scaling-element", default = None, type = float,
                                  metavar = ("VALUE"), choices = [x / 10.0 for x in range(5, 55, 5)],
                                  help = "Enemy and boss abilities retain element and increase in tier approximately every (%(metavar)s + 3) levels reaching max tier at level (%(metavar)s + 3) * 8")

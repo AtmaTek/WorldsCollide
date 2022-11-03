@@ -15,12 +15,14 @@ def parse(parser):
                       help = "All enemies scannable. All characters start with scan learned. Scan costs 0 MP. Useful for testing/debugging")
 
     event_timers = misc.add_mutually_exclusive_group()
+    event_timers.title = 'Event Timers'
     event_timers.add_argument("-etr", "--event-timers-random", action = "store_true",
                               help = "Collapsing House, Opera House, and Floating Continent timers randomized")
     event_timers.add_argument("-etn", "--event-timers-none", action = "store_true",
                               help = "Collapsing House, Opera House, and Floating Continent timers removed")
 
     y_npc = misc.add_mutually_exclusive_group()
+    y_npc.title = 'Y NPC'
     y_npc.add_argument("-ymascot", "--y-npc-mascot", action = "store_true",
                        help = "Transform NPC into random mascot")
     y_npc.add_argument("-ycreature", "--y-npc-creature", action = "store_true",
@@ -44,6 +46,7 @@ def parse(parser):
     parser.y_npc_group = y_npc
 
     remove_flashes = misc.add_mutually_exclusive_group()
+    remove_flashes.title = 'Remove Flashes'
     remove_flashes.add_argument("-frw", "--flashes-remove-worst", action = "store_true",
                               help = "Removes only the worst flashes from animations. Ex: Learning Bum Rush, Bum Rush, Quadra Slam/Slice, Flash, etc.")
     remove_flashes.add_argument("-frm", "--flashes-remove-most", action = "store_true",

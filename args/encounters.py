@@ -5,6 +5,7 @@ def parse(parser):
     encounters = parser.add_argument_group("Encounters")
 
     random = encounters.add_mutually_exclusive_group()
+    random.title = 'Random Encounters'
     random.add_argument("-res", "--random-encounters-shuffle", action = "store_true",
                         help = "Random encounters are shuffled")
     random.add_argument("-rer", "--random-encounters-random",
@@ -12,11 +13,13 @@ def parse(parser):
                         help = "Random encounters are randomized")
 
     fixed = encounters.add_mutually_exclusive_group()
+    fixed.title = 'Fixed Encounters'
     fixed.add_argument("-fer", "--fixed-encounters-random",
                        default = None, type = int, metavar = "PERCENT", choices = range(101),
                        help = "Fixed encounters are randomized. Lete River, Serpent Trench, Mine Cart, Imperial Camp, ...")
 
     escapable = encounters.add_mutually_exclusive_group()
+    escapable.title = 'Escapable Encounters'
     escapable.add_argument("-escr", "--encounters-escapable-random",
                            default = None, type = int, metavar = "PERCENT", choices = range(101),
                            help = "Percent of random encounters escapable including with warp or smoke bombs")

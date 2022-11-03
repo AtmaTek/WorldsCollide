@@ -5,6 +5,7 @@ def parse(parser):
     bosses = parser.add_argument_group("Bosses")
 
     bosses_battles = bosses.add_mutually_exclusive_group()
+    bosses_battles.title = 'Boss Battles'
     bosses_battles.add_argument("-bbs", "--boss-battles-shuffle", action = "store_true",
                         help = "Boss battles shuffled")
     bosses_battles.add_argument("-bbr", "--boss-battles-random", action = "store_true",

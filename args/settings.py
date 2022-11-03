@@ -1,8 +1,13 @@
+from argparse import ArgumentParser
+
+
 def name():
     return "Settings"
 
-def parse(parser):
+def parse(parser: ArgumentParser):
     mode = parser.add_mutually_exclusive_group()
+    mode.title = 'Game Mode'
+
     mode.add_argument("-open", "--open-world", action = "store_true",
                       help = "Unrestricted event access")
     mode.add_argument("-cg", "--character-gating", action = "store_true",

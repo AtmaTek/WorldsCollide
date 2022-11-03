@@ -7,6 +7,7 @@ def parse(parser):
     espers = parser.add_argument_group("Espers")
 
     esper_spells = espers.add_mutually_exclusive_group()
+    esper_spells.title = 'Esper Spells'
     esper_spells.add_argument("-esrr", "--esper-spells-random-rates", action = "store_true",
                               help = "Original esper spells with random learn rates")
     esper_spells.add_argument("-ess", "--esper-spells-shuffle", action = "store_true",
@@ -20,6 +21,7 @@ def parse(parser):
                               help = "Esper spells and learn rates randomized by tier")
 
     esper_bonuses = espers.add_mutually_exclusive_group()
+    esper_bonuses.title = 'Esper Bonuses'
     esper_bonuses.add_argument("-ebs", "--esper-bonuses-shuffle", action = "store_true",
                                help = "Esper bonuses shuffled")
     esper_bonuses.add_argument("-ebr", "--esper-bonuses-random",
@@ -27,6 +29,7 @@ def parse(parser):
                                help = "Esper bonuses randomized")
 
     esper_mp = espers.add_mutually_exclusive_group()
+    esper_mp.title = 'Esper MP'
     esper_mp.add_argument("-emps", "--esper-mp-shuffle", action = "store_true",
                           help = "Esper MP costs shuffled")
     esper_mp.add_argument("-emprv", "--esper-mp-random-value", default = None, type = int,
@@ -37,6 +40,7 @@ def parse(parser):
                           help = "Each esper's MP cost set to random percent of original within given range")
 
     esper_equipable = espers.add_mutually_exclusive_group()
+    esper_equipable.title = 'Equipable Espers'
     esper_equipable.add_argument("-eer", "--esper-equipable-random",
                                  default = None, type = int, nargs = 2, metavar = ("MIN", "MAX"),
                                  choices = range(Characters.CHARACTER_COUNT - 1), # exclude gogo/umaro

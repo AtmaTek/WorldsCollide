@@ -5,6 +5,8 @@ def parse(parser):
     chests = parser.add_argument_group("Chests")
 
     chests_contents = chests.add_mutually_exclusive_group()
+    chests_contents.title = 'Chest Contents'
+
     chests_contents.add_argument("-ccsr", "--chest-contents-shuffle-random", default = None, type = int,
                                  metavar = "PERCENT", choices = range(101),
                                  help = "Chest contents shuffled and given percent randomized")
