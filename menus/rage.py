@@ -32,13 +32,10 @@ class RageMenu:
         self.special_effects.append("Drain MP")
         self.special_effects.append("Remove Reflect")
 
-        self.element_strings = ["<fire>", "<ice>", "<lightning>", "<poison>", "<wind>", "<pearl>", "<earth>", "<water>"] # in bit order for spell.element
-
         self.mod()
 
     def get_rage_string(self, id, attack_id):
         from data.spell_names import id_name, name_id
-
 
         if attack_id == name_id["Special"]:
             # handle special name lookup + special attack info (dmg multipler, status effect)
@@ -48,92 +45,12 @@ class RageMenu:
 
             rage_str = f"{special_name}: "
             rage_str += self.special_effects[special_effect]
-        elif attack_id == name_id["Pep Up"]:
-            rage_str = "Pep Up: Remove Caster+Heal Ally"
-        elif attack_id == name_id["Flare Star"]:
-            rage_str = "Flare Star: <fire> E.Lvl*80 IgnDef<line>All Enemies"
-        elif attack_id == name_id["Dischord"]:
-            rage_str = "Dischord: Halve Enemy Level"
-        elif attack_id == name_id["Revenge"]:
-            rage_str = "Revenge: dmg = Max - Curr.HP"
-        elif attack_id == name_id["Blow Fish"]:
-            rage_str = "Blow Fish: 1000 dmg"
-        elif attack_id == name_id["Pearl Wind"]:
-            rage_str = "Pearl Wind: Heal Curr.HP<line>Party"
-        elif attack_id == name_id["Step Mine"]:
-            rage_str = "Step Mine: dmg = Steps/32"
         else:
             rage_str = f"{id_name[attack_id]}"
-
-            ability = self.rages.abilities[attack_id]
-            ability_details = ""
-
-            # Add the element graphic to the rage string for any element bits that are set
-            spell_elements = ability.elements
-            for bit in range(0,8):
-                if (spell_elements >> bit) & 1:
-                    ability_details += self.element_strings[bit]
-            if (ability.status1 & 0x80) and (ability.flags1 & 0x02): # Instant-death effect
-                ability_details += "<death>"
-
-            if ability.power > 1: # Ignoring 1, which includes special damage skills like Exploder & Blow Fish
-                if ability_details != "":
-                    ability_details += " "
-
-                if ability.flags3 & 0x80: # fractional damage
-                    from fractions import Fraction
-                    hp_fraction = Fraction(ability.power/16)
-                    ability_details += f"{str(hp_fraction)} HP"
-                else:
-                    ability_details += f"{ability.power}"
-                    if (ability.flags1 & 1):
-                        # Physical damage
-                        ability_details += "P"
-                    else:
-                        # Magic damage
-                        ability_details += "M"
-                    ability_details += "Pwr"
-
-                    if ability.flags1 & 0x20: #ignore def
-                        ability_details += " IgnDef"
-
-            # Add status effects
-            offset = 0
-            bits_set = 0
-            status_details = " "
-            statuses = [ability.status1, ability.status2, ability.status3, ability.status4]
-            for status in statuses:
-                for bit in range(0,8):
-                    if(status >> bit) & 1:
-                        status_details += f"{self.status_effects[offset + bit]} "
-                        bits_set += 1
-                offset += 8
-            if bits_set > 2:
-                # we only have room to show 2 statuses
-                status_details = " Multi-Status"
-            ability_details += status_details
-
-            # Indicate multi-target spells
-            if ability.targets & 0x08: # Select One Group flag 
-                if ability.targets & 0x40: # Enemy selected
-                    ability_details += "<line>All Enemies"
-                else:
-                    ability_details += "<line>Party"
-            elif ability.targets & 0x04: # Select all targets (both groups)
-                ability_details += "<line>All"
-
-            # Add ability_details to rage_string if it's not empty and the description doesn't match the name
-            if ability_details.strip() != "" and ability_details.strip() != id_name[attack_id]:
-                rage_str += f": {ability_details}"
 
         # # remove duplicate white spaces
         import re
         rage_str = re.sub(' +', ' ', rage_str)
-
-        # add a space after <poison> due to it overlapping to the right
-        rage_str = rage_str.replace("<poison>", "<poison> ")
-        # remove spaces before <line>
-        rage_str = rage_str.replace(" <line>", "<line>")
 
         # remove leading and trailing spaces
         rage_str = rage_str.strip()
