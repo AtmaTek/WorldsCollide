@@ -1,3 +1,5 @@
+from memory.space import *
+
 def main():
     import args
     import log
