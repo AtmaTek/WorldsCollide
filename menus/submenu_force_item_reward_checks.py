@@ -1,16 +1,4 @@
 from constants.checks import (
-    FANATICS_TOWER_LEADER,
-    LONE_WOLF_MOOGLE_ROOM,
-    NARSHE_WEAPON_SHOP_MINES,
-    AUCTION1,
-    AUCTION2,
-    COLLAPSING_HOUSE,
-    FIGARO_CASTLE_THRONE,
-    GAUS_FATHERS_HOUSE,
-    KOHLINGEN_CAFE,
-    NARSHE_WEAPON_SHOP,
-    SEALED_GATE,
-    SOUTH_FIGARO_PRISONER,
     CELES,
     CYAN,
     EDGAR,
@@ -49,40 +37,27 @@ groups = [
     ("Ungated", UNGATED),
 ]
 
-nfce = [
-    AUCTION1,
-    AUCTION2,
-    COLLAPSING_HOUSE,
-    FIGARO_CASTLE_THRONE,
-    GAUS_FATHERS_HOUSE,
-    KOHLINGEN_CAFE,
-    NARSHE_WEAPON_SHOP,
-    SEALED_GATE,
-    SOUTH_FIGARO_PRISONER,
-]
-
 class FlagsForceRewardChecks(scroll_area.ScrollArea):
 
-    def __init__(self, title, item_checks, is_nfce):
+    def __init__(self, title, item_checks, check_preset):
         self.number_items = len(item_checks)
         self.lines = []
 
         self.lines.append(scroll_area.Line(title, f0.set_blue_text_color))
 
-        if is_nfce:
+        if check_preset:
+            from constants.check_presets import key_preset
+            preset_title = key_preset[check_preset].name
+
             self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
-            self.lines.append(scroll_area.Line("No Free Characters Espers", f0.set_user_text_color))
+            self.lines.append(scroll_area.Line(f"{preset_title}", f0.set_user_text_color))
             self.lines.append(scroll_area.Line("-------------------------", f0.set_user_text_color))
-            for check in nfce:
-                self.lines.append(scroll_area.Line(f"{check.name}", f0.set_user_text_color))
 
             self.lines.append(scroll_area.Line("", f0.set_user_text_color))
 
-        # Someone set the check rewards
-        if not (is_nfce):
-            check_lines = FlagsForceRewardChecks._format_check_list_menu(item_checks)
-            for check in check_lines:
-                self.lines.append(scroll_area.Line(f"{check}", f0.set_user_text_color))
+        check_lines = FlagsForceRewardChecks._format_check_list_menu(item_checks)
+        for check in check_lines:
+            self.lines.append(scroll_area.Line(f"{check}", f0.set_user_text_color))
 
         super().__init__()
 

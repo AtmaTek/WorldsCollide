@@ -1,3 +1,5 @@
+
+from event.event_reward import RewardType, Reward
 from data.item import Item
 from memory.space import Bank, Space, Reserve, Allocate, Free, Write, Read
 import data.direction as direction
@@ -14,7 +16,6 @@ import instruction.world as world
 import instruction.vehicle as vehicle
 
 from instruction.event import EVENT_CODE_START
-from event.event_reward import RewardType, Reward
 
 class Event():
     def __init__(self, events, rom, args, dialogs, characters, items, maps, enemies, espers, shops):

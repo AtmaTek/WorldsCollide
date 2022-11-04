@@ -146,7 +146,6 @@ CHARACTER_ESPER_ONLY_REWARDS = len([check for check in all_checks if check.rewar
 
 check_name = {check.bit: check.name for (idx, check) in enumerate(all_checks)}
 name_check = {check.name: check.bit for (idx, check) in enumerate(all_checks)}
-check_reward = {check.bit: check.reward_types for (idx, check) in enumerate(all_checks)}
 
 CELES = [
     MAGITEK_FACTORY_TRASH,
@@ -254,7 +253,7 @@ UNGATED_DRAGONS = [
     PHOENIX_CAVE_DRAGON,
 ]
 
-UNGATED = [
+UNGATED = UNGATED_DRAGONS + [
     AUCTION1,
     AUCTION2,
     TZEN_THIEF,
@@ -265,4 +264,4 @@ UNGATED = [
 
     # KT
     KEFKAS_TOWER_CELL_BEAST,
-] + UNGATED_DRAGONS
+]
