@@ -1,9 +1,9 @@
 
 def name():
-    return "Forced Check Rewards"
+    return "Check Rewards"
 
 def parse(parser):
-    advanced_checks = parser.add_argument_group("Forced Check Rewards")
+    advanced_checks = parser.add_argument_group("Check Rewards")
 
     advanced_checks.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Mt. Zozo, Narshe Weapon Shop, Sealed Gate, South Figaro Basement, Tzen Thief, Zone Eater")
@@ -20,8 +20,9 @@ def parse(parser):
     advanced_checks.add_argument("-feirr", "--force-esper-item-rewards", type = str,
                 help = "Forces list of checks to give an (ESPER | ITEM) reward")
 
-    advanced_checks.add_argument("-dcbc", "--dragons-can-be-characters", action = "store_true",
-                help = "Characters can be rewarded in the dragon spots")
+    advanced_checks.add_argument("-dchar", "--dragons-as-characters", default = [0, 0], type = int,
+                nargs = 2, metavar = ("MIN", "MAX"), choices = range(6),
+                help = "Up to 5 dragons will reward characters. The dragon will have the recruited character's sprite. Kefka's Tower and Phoenix Cave dragons cannot be characters.")
 
 character_title = "Character Checks"
 esper_item_title = "Esper+Item Checks"
@@ -38,6 +39,8 @@ def process(args):
     args.esper_item_rewards = []
     args.esper_rewards = []
     args.item_rewards = []
+
+    args._process_min_max("dragons_as_characters")
 
     if args.force_character_rewards:
         args.character_rewards =  [int(check) for check in args.force_character_rewards.split(',')]
@@ -66,11 +69,6 @@ def process(args):
             ZONE_EATER.bit,
         ]
 
-    if args.dragons_can_be_characters:
-        from constants.checks import RECRUITABLE_DRAGONS
-        recruitable_dragon_bits = [check.bit for check in RECRUITABLE_DRAGONS]
-        args.character_rewards += recruitable_dragon_bits
-
 def flags(args):
     flags = ""
 
@@ -86,10 +84,15 @@ def flags(args):
     if args.force_item_rewards:
         flags += f" -firr {args.force_item_rewards}"
 
+    if args.dragons_as_characters_min != 0 or args.dragons_as_characters_max != 0:
+        flags += f" -dchar {args.dragons_as_characters_min} {args.dragons_as_characters_max}"
+
     return flags
 
 def options(args):
     options = []
+    if args.dragons_as_characters:
+        options.append(('Dragon Characters', f"{args.dragons_as_characters_min}-${args.dragons_as_characters_max}"))
     if args.character_rewards:
         options.append((character_title, args.character_rewards))
     if args.esper_item_rewards:

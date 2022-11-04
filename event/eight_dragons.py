@@ -1,14 +1,5 @@
-from constants.checks import ANCIENT_CASTLE_DRAGON, DRAGONS, FANATICS_TOWER_DRAGON, KEFKAS_TOWER_DRAGON_G, KEFKAS_TOWER_DRAGON_S, MT_ZOZO_DRAGON, NARSHE_DRAGON, OPERA_HOUSE_DRAGON, PHOENIX_CAVE_DRAGON
+from constants.checks import ANCIENT_CASTLE_DRAGON, FANATICS_TOWER_DRAGON, KEFKAS_TOWER_DRAGON_G, KEFKAS_TOWER_DRAGON_S, MT_ZOZO_DRAGON, NARSHE_DRAGON, OPERA_HOUSE_DRAGON, PHOENIX_CAVE_DRAGON, RECRUITABLE_DRAGONS
 from event.event import *
-
-ANCIENT_CASTLE_DRAGON
-FANATICS_TOWER_DRAGON
-KEFKAS_TOWER_DRAGON_G
-KEFKAS_TOWER_DRAGON_S
-MT_ZOZO_DRAGON
-NARSHE_DRAGON
-OPERA_HOUSE_DRAGON
-PHOENIX_CAVE_DRAGON
 
 from collections import namedtuple
 DragonData = namedtuple("DragonData", ["name", "check", "battle_address", "countdown_address", "map_id", "npc_id"])
@@ -29,8 +20,15 @@ class EightDragons(Event):
 
     def init_rewards(self):
         self.dragon_rewards = []
-        for dragon_check in dragon_data:
-            self.dragon_rewards.append(self.add_reward(dragon_check.check))
+
+        import random
+        dragon_character_count = random.randint(self.args.dragons_as_characters_min, self.args.dragons_as_characters_max)
+        character_rewards = [x.bit for x in random.sample(RECRUITABLE_DRAGONS, dragon_character_count)]
+
+        for dragon in dragon_data:
+            reward = dragon.check.reward_types
+            bit = dragon.check.bit
+            self.dragon_rewards.append(self.add_reward(dragon.check, RewardType.CHARACTER if bit in character_rewards else reward))
 
     def init_event_bits(self, space):
         space.write(

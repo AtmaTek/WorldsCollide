@@ -42,11 +42,13 @@ class Event():
     def characters_required(self):
         return 1
 
-    def get_reward_type(self, check_info = None):
+    def get_reward_type(self, check_info, reward_type = None):
         bit = check_info.bit
 
         assert bit
 
+        if reward_type:
+            return reward_type
         if bit in self.args.character_rewards:
             return RewardType.CHARACTER
         if bit in self.args.esper_item_rewards:
@@ -68,8 +70,8 @@ class Event():
         self.rewards.append(reward)
         return reward
 
-    def add_reward(self, check_info):
-        possible_types = self.get_reward_type(check_info)
+    def add_reward(self, check_info, reward_type = None):
+        possible_types = self.get_reward_type(check_info, reward_type)
         assert possible_types
 
         reward = Reward(self, possible_types)
