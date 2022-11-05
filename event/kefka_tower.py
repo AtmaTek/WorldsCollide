@@ -166,7 +166,7 @@ class KefkaTower(Event):
 
         space = Reserve(0xa03ad, 0xa03af, "kefka tower the statues are up ahead", field.NOP())
 
-    def invoke_kt_battle(self, party, original_pack_name, battle_sound = False):
+    def invoke_kt_battle(self, original_pack_name):
         boss_id = self.get_boss(original_pack_name, False)
         return [
             field.InvokeBattle(boss_id, battle_sound = True, battle_animation = True),
@@ -174,33 +174,14 @@ class KefkaTower(Event):
 
     # Trigger five bosses back-to-back
     def boss_rush_mod(self):
-        #  return the boss in place of the given boss_name
-        # e.g. bosses are shuffled, if Ultros is in Goddess spot, return Ultros
-        def get_replacement_formation(boss_name):
-            from data.bosses import pack_name
-            replacement = self.get_boss(boss_name, False)
-            location_boss = pack_name[replacement]
-            formation_id = self.enemies.formations.get_id(location_boss)
-            return self.enemies.formations.formations[formation_id]
+        src = [
+            field.ReturnIfEventBitClear(event_bit.GAUNTLET_IN_PROGRESS), # return if we're not in gauntlet
+            field.StartSong(song_name_id['FierceBattle']), # subroutine will return if song is already playing, so will be called repeatedly
+            field.Return(),
+        ]
 
-        # If encounters are random, it could be a tell when a fight loses its music/victory dance
-        def disable_victory_dance(original_encounter_name):
-            formation = get_replacement_formation(original_encounter_name)
-            formation.disable_victory_dance = formation.disable_victory_dance if self.args.boss_battles_random else 1
 
-        def disable_battle_music(original_encounter_name):
-            formation = get_replacement_formation(original_encounter_name)
-            formation.disable_battle_music = formation.disable_battle_music if self.args.boss_battles_random else 1
-
-        def disable_all(boss_name):
-            disable_victory_dance(boss_name)
-            disable_battle_music(boss_name)
-
-        # disable_all("Inferno")
-        # disable_all("Guardian")
-        # disable_all("Doom")
-        # disable_all("Goddess")
-        # disable_all("Poltrgeist")
+        self.trigger_gauntlet_music = Write(Bank.F0, src, "Trigger gauntlet music").start_address
 
         self.inferno_cutscene = self.gauntlet_inferno_cutscene()
         self.guardian_cutscene = self.gauntlet_guardian_cutscene()
@@ -224,6 +205,7 @@ class KefkaTower(Event):
 
             debug_event_bits,
 
+            field.SetEventBit(event_bit.CONTINUE_MUSIC_DURING_BATTLE),
             field.SetEventBit(event_bit.GAUNTLET_IN_PROGRESS),
             field.SetEventBit(event_bit.LEFT_WEIGHT_PUSHED_KEFKA_TOWER),
             field.SetEventBit(event_bit.RIGHT_WEIGHT_PUSHED_KEFKA_TOWER),
@@ -260,6 +242,7 @@ class KefkaTower(Event):
             field.Call(self.poltergeist_cutscene),
             "POST_GAUNTLET",
             field.Call(self.post_gauntlet_cutscene),
+            field.ClearEventBit(event_bit.CONTINUE_MUSIC_DURING_BATTLE),
             field.ClearEventBit(event_bit.GAUNTLET_IN_PROGRESS),
             field.SetEventBit(event_bit.COMPLETED_KT_GAUNTLET),
             self.post_landing_src(final_switch_map_id, 103, 45),
@@ -283,7 +266,6 @@ class KefkaTower(Event):
         space.add_label("ENTRANCE_LANDING", space.end_address + 1)
         space.write(
             field.BranchIfEventWordLess(event_word.CHARACTERS_AVAILABLE, 3, "NEED_MORE_ALLIES"),
-            field.BranchIfEventBitSet(event_bit.UNLOCKED_PERMA_KT_SKIP, "STATUE_MENU_EVAL"),
             field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_SKIP, "STATUE_MENU_EVAL"),
             field.BranchIfEventBitSet(event_bit.UNLOCKED_KT_GAUNTLET, "GAUNTLET_DIALOG"),
 
@@ -404,9 +386,8 @@ class KefkaTower(Event):
         # So we re-add the fade in, but only when the gauntlet isn't happening
         if trigger_fade_in:
             src += [
-                field.BranchIfEventBitSet(event_bit.GAUNTLET_IN_PROGRESS, "FINISH_OBJECTIVE"),
                 field.FadeInScreen(),
-                field.WaitForFade()
+                field.BranchIfEventBitSet(event_bit.GAUNTLET_IN_PROGRESS, "FINISH_OBJECTIVE"),
             ]
         src += Read(start_target, end_target)
 
@@ -417,7 +398,7 @@ class KefkaTower(Event):
             field.FreeScreen(),
             field.Return(),
         ]
-        post_battle = Write(Bank['CC'], src, f"{boss_name} post-battle. 1) Set event bit. 2) Finish check")
+        post_battle = Write(Bank.F0, src, f"{boss_name} post-battle. 1) Set event bit. 2) Finish check")
 
         space = Reserve(start_target, end_target, description, asm.NOP())
         space.write([
@@ -492,7 +473,7 @@ class KefkaTower(Event):
             field.FinishCheck(),
             field.Return(),
         ]
-        space = Write(Bank.CC, src, "kefka tower atma reward")
+        space = Write(Bank.F0, src, "kefka tower atma reward")
         atma_reward = space.start_address
 
         space = Reserve(0xc18d3, 0xc18d6, "kefka tower after atma", field.NOP())
@@ -502,11 +483,11 @@ class KefkaTower(Event):
 
     def inferno_battle_mod(self):
         boss_src = [
-            field.StartSong(song_name_id['FierceBattle']),
-            self.invoke_kt_battle(3, 'Inferno', True),
+            field.Call(self.trigger_gauntlet_music),
+            self.invoke_kt_battle('Inferno'),
             field.Return(),
         ]
-        boss_space = Write(Bank.CC, boss_src, "trigger inferno fight, ")
+        boss_space = Write(Bank.F0, boss_src, "trigger inferno fight, ")
         space = Reserve(0xc18a2, 0xc18a9, "call inferno fight subroutine", asm.NOP())
         space.write([
             field.Call(boss_space.start_address)
@@ -568,35 +549,55 @@ class KefkaTower(Event):
         invisible_block_npc_id = self.maps.append_npc(0x11f, invisible_block_npc)
 
     def guardian_battle_mod(self):
-        boss_pack_id = self.get_boss("Guardian")
+        boss_src = [
+            field.Call(self.trigger_gauntlet_music),
+            self.invoke_kt_battle('Guardian'),
+            field.Return(),
+        ]
+        boss_space = Write(Bank.F0, boss_src, "trigger inferno fight, ")
 
         space = Reserve(0xc184a, 0xc1850, "kefka tower invoke battle guardian", field.NOP())
         space.write(
-            field.InvokeBattle(boss_pack_id),
+            field.Call(boss_space.start_address),
         )
 
     def doom_battle_mod(self):
-        boss_pack_id = self.get_boss("Doom")
+        boss_src = [
+            field.Call(self.trigger_gauntlet_music),
+            self.invoke_kt_battle('Doom'),
+            field.Return(),
+        ]
+        boss_space = Write(Bank.F0, boss_src, "trigger inferno fight, ")
 
         space = Reserve(0xc16dc, 0xc16e2, "kefka tower invoke battle doom", field.NOP())
         space.write(
-            field.InvokeBattle(boss_pack_id),
+            field.Call(boss_space.start_address),
         )
 
     def goddess_battle_mod(self):
-        boss_pack_id = self.get_boss("Goddess")
+        boss_src = [
+            field.Call(self.trigger_gauntlet_music),
+            self.invoke_kt_battle('Goddess'),
+            field.Return(),
+        ]
+        boss_space = Write(Bank.F0, boss_src, "trigger inferno fight, ")
 
         space = Reserve(0xc171c, 0xc1722, "kefka tower invoke battle goddess", field.NOP())
         space.write(
-            field.InvokeBattle(boss_pack_id),
+            field.Call(boss_space.start_address),
         )
 
     def poltergeist_battle_mod(self):
-        boss_pack_id = self.get_boss("Poltrgeist")
+        boss_src = [
+            field.Call(self.trigger_gauntlet_music),
+            self.invoke_kt_battle('Poltrgeist'),
+            field.Return(),
+        ]
+        boss_space = Write(Bank.F0, boss_src, "trigger inferno fight, ")
 
         space = Reserve(0xc1755, 0xc175b, "kefka tower invoke battle poltergeist", field.NOP())
         space.write(
-            field.InvokeBattle(boss_pack_id),
+            field.Call(boss_space.start_address),
         )
 
     def kefka_battle_mod(self):
@@ -645,7 +646,7 @@ class KefkaTower(Event):
 
             field.Branch(0xc1970),
         ]
-        space = Write(Bank.CC, src, "kefka tower 3 parties on final switches check")
+        space = Write(Bank.F0, src, "kefka tower 3 parties on final switches check")
         three_switches_check = space.start_address
 
         space = Reserve(0xc193f, 0xc196f, "kefka tower final kefka access check", field.NOP())
@@ -727,6 +728,9 @@ class KefkaTower(Event):
                 field_entity.Move(direction.LEFT, 8),
             ),
             field.Call(0xc1872), # Inferno event tile address
+            field.EntityAct(field_entity.PARTY0, False,
+                field_entity.AnimateAttack(),
+            ),
             field.Return(),
         ]
 
@@ -742,19 +746,22 @@ class KefkaTower(Event):
             # Initialize party positions
             [
                 change_party(1),
+                field.Pause(0.25),
                 field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.NORMAL),
                     field_entity.SetPosition(6, 15),
                     field_entity.Turn(direction.UP),
                 ),
+
                 change_party(2),
+                field.Pause(0.25),
                 field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.FAST),
                     field_entity.SetPosition(12, 17),
                     field_entity.Turn(direction.UP),
                 ),
-
                 change_party(3),
+                field.Pause(0.25),
                 field.EntityAct(field_entity.PARTY0, True,
                     field_entity.SetSpeed(field_entity.Speed.SLOW),
                     field_entity.SetPosition(18, 15),
