@@ -9,6 +9,8 @@ class Lores:
     LORE_COUNT = 24
     CONDEMNED, ROULETTE, CLEAN_SWEEP, AQUA_RAKE, AERO, BLOW_FISH, BIG_GUARD, REVENGE, PEARL_WIND, L_5_DOOM, L_4_FLARE, L_3_MUDDLE, REFLECT, L_PEARL, STEP_MINE, FORCE_FIELD, DISCHORD, SOUR_MOUTH, PEP_UP, RIPPLER, STONE, QUASAR, GRAND_TRAIN, EXPLODER = range(LORE_COUNT)
 
+    DIALOG_OFFSET = 139 # starting offset for battle dialog
+
     INITIAL_LORES_START = 0x26f564
     INITIAL_LORES_END = 0x26f566
 
@@ -185,7 +187,7 @@ class Lores:
             raise ValueError(f'Unexpected lore index: {lore_index}')
         return new_desc
 
-    def random_lx_levels(self):
+    def random_lx_levels(self, dialogs):
         import random, re
         LX_LORE_IDX = [Lores.L_5_DOOM, Lores.L_4_FLARE, Lores.L_3_MUDDLE, Lores.L_PEARL]
         LQ_EFFECT = 29 # the AbilityData.effect setting for L?
@@ -208,8 +210,10 @@ class Lores:
                 lore.effect = LQ_EFFECT
             lore.name = re.sub('L.*[?1-9]', f'L.{level_divisor}', lore.name)
             lore.desc = Lores._get_new_level_desc(lore_index, level_divisor)
+            battle_message = re.sub('<dotted line>', '“', lore.desc)
+            dialogs.set_battle_message_text(self.DIALOG_OFFSET + lore_index, battle_message)
 
-    def mod(self):
+    def mod(self, dialogs):
         self.write_learners_table()
         self.write_is_learner()
         self.after_battle_check_mod()
@@ -225,7 +229,7 @@ class Lores:
             self.random_mp_percent()
 
         if self.args.lores_level_randomize:
-            self.random_lx_levels()
+            self.random_lx_levels(dialogs)
 
     def write(self):
         if self.args.spoiler_log:
