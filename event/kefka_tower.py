@@ -184,7 +184,9 @@ class KefkaTower(Event):
         self.trigger_gauntlet_music = Write(Bank.F0, src, "Trigger gauntlet music").start_address
 
         self.inferno_cutscene = self.gauntlet_inferno_cutscene()
+        self.post_inferno_cutscene = self.gauntlet_post_inferno_cutscene()
         self.guardian_cutscene = self.gauntlet_guardian_cutscene()
+        self.post_guardian_cutscene = self.gauntlet_post_guardian_cutscene()
         self.doom_cutscene = self.gauntlet_doom_cutscene()
         self.goddess_cutscene = self.gauntlet_goddess_cutscene()
         self.poltergeist_cutscene = self.gauntlet_poltergeist_cutscene()
@@ -228,9 +230,11 @@ class KefkaTower(Event):
         src += [
             field.BranchIfEventBitSet(event_bit.DEFEATED_INFERNO, "GUARDIAN"),
             field.Call(self.inferno_cutscene),
+            field.Call(self.post_inferno_cutscene),
             "GUARDIAN",
             field.BranchIfEventBitSet(event_bit.DEFEATED_GUARDIAN, "DOOM"),
             field.Call(self.guardian_cutscene),
+            field.Call(self.post_guardian_cutscene),
             "DOOM",
             field.BranchIfEventBitSet(event_bit.DEFEATED_DOOM, "GODDESS"),
             field.Call(self.doom_cutscene),
@@ -377,18 +381,8 @@ class KefkaTower(Event):
 
     # Copy no less than 4 bytes between start_target and end_target
     # This will be called after one of the kt encounters has completed, but just prior to finishing the check
-    def kt_encounter_objective_mod(self, boss_name, bit, start_target, end_target, description, trigger_fade_in = False):
-
+    def kt_encounter_objective_mod(self, boss_name, bit, start_target, end_target, description):
         src = []
-        # Guardian/Inferno remove their fade outs for two reasons:
-        # 1) We need to make a map load before the fade in for the gauntlet after a battle completes
-        # 2) We need to make room to check for objective and set proper bit
-        # So we re-add the fade in, but only when the gauntlet isn't happening
-        if trigger_fade_in:
-            src += [
-                field.FadeInScreen(),
-                field.BranchIfEventBitSet(event_bit.GAUNTLET_IN_PROGRESS, "FINISH_OBJECTIVE"),
-            ]
         src += Read(start_target, end_target)
 
         src += [
@@ -406,34 +400,21 @@ class KefkaTower(Event):
         ])
 
     def guardian_mod(self):
-        # Clear fade out, will manually trigger this in kt_encounter_objective_mod
-        # CC/186C Fade in
-        # CC/186D Wait for fade
-        self.rom.set_bytes(0xc186c, [asm.NOP(), asm.NOP()])
         self.kt_encounter_objective_mod(
             "Guardian",
             event_bit.DEFEATED_GUARDIAN,
             0xc186c,
             0xc186f,
             "Guardian battle post-script, wait for fade, set bit",
-            trigger_fade_in= True
         )
 
     def inferno_mod(self):
-        self.rom.set_byte(0xc18a2, 0xea)
-
-        # Clear fade out, will manually trigger this in kt_encounter_objective_mod
-        # CC/18AE - Fade in
-        # CC/18AF - Wait for fade
-        self.rom.set_bytes(0xc18ae, [0xea, 0xea])
-
         self.kt_encounter_objective_mod(
             "Inferno",
             event_bit.DEFEATED_INFERNO,
             0xc18ae,
             0xc18b1,
             "Inferno battle post-script, fade in, wait, set bit",
-            trigger_fade_in = True
         )
 
     def doom_mod(self):
@@ -737,6 +718,28 @@ class KefkaTower(Event):
         space = Write(Bank.F0, src, "Inferno Gauntlet Cutscene")
         return space.start_address
 
+    # Need a cutscene for getting objectives after gauntlet, otherwise can show dialog behind black screen
+    def gauntlet_post_inferno_cutscene(self):
+        src = [
+            field.EntityAct(field_entity.PARTY0, False,
+                field_entity.SetSpriteLayer(1),
+                field_entity.SetSpeed(field_entity.Speed.FAST),
+                field_entity.Move(direction.LEFT, 1),
+                field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
+                field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
+                field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
+                field_entity.Move(direction.DOWN, 3),
+                field_entity.Move(direction.RIGHT, 2),
+                field_entity.Move(direction.DOWN, 3),
+            ),
+            field.Pause(0.5),
+            field.FadeOutScreen(4),
+            field.WaitForFade(),
+            field.Return()
+        ]
+
+        space = Write(Bank.F0, src, "Post-Inferno Gauntlet Cutscene")
+        return space.start_address
 
     def gauntlet_guardian_cutscene(self):
         src = [
@@ -903,6 +906,23 @@ class KefkaTower(Event):
             field.Return(),
         ]
         space = Write(Bank.F0, src, "Guardian Gauntlet Cutscene")
+        return space.start_address
+
+    # Need a cutscene for getting objectives after gauntlet, otherwise can show dialog behind black screen
+    def gauntlet_post_guardian_cutscene(self):
+        src = [
+            field.EntityAct(field_entity.PARTY0, False,
+                field_entity.Move(direction.UP, 8),
+            ),
+            field.PauseUnits(1),
+            field.FlashScreen(field.Flash.BLUE),
+            field.PlaySoundEffect(141),
+            field.FadeOutScreen(4),
+            field.WaitForFade(),
+            field.Return()
+        ]
+
+        space = Write(Bank.F0, src, "Post-Guardian Gauntlet Cutscene")
         return space.start_address
 
 
