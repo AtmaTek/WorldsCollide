@@ -18,7 +18,6 @@ def parse(parser):
     presets.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
                 help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Mt. Zozo, Narshe Weapon Shop, Sealed Gate, South Figaro Basement, Tzen Thief, Zone Eater")
 
-
     advanced_checks.add_argument("-firr", "--force-item-rewards", type = str,
                 help = "Forces list of checks to give an ITEM reward")
 
@@ -34,7 +33,7 @@ def parse(parser):
 
     characters.add_argument("-dchar", "--dragons-as-characters", default = [0, 0], type = int,
                 nargs = 2, metavar = ("MIN", "MAX"), choices = range(6),
-                help = "Up to 5 dragons will reward characters. The dragon will have the recruited character's sprite. Kefka's Tower and Phoenix Cave dragons cannot be characters.")
+                help = "Up to 5 dragons are guranteed to reward characters. The dragon will have the recruited character's sprite. Kefka's Tower and Phoenix Cave dragons cannot be characters.")
 
 character_title = "Character Checks"
 esper_item_title = "Esper+Item Checks"

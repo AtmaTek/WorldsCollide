@@ -72,6 +72,11 @@ class AnimateAttacked(_Instruction):
     def __init__(self):
         super().__init__(0x0b)
 
+
+class AnimateArmsRaisedWalking(_Instruction):
+    def __init__(self):
+        super().__init__(0x0e)
+
 class AnimateHandsUp(_Instruction):
     def __init__(self):
         super().__init__(0x0f)
