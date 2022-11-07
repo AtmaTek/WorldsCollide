@@ -728,6 +728,7 @@ class KefkaTower(Event):
                 field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
                 field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
                 field_entity.MoveDiagonal(direction.LEFT, 1, direction.DOWN, 1),
+                field_entity.SetSpriteLayer(0),
                 field_entity.Move(direction.DOWN, 3),
                 field_entity.Move(direction.RIGHT, 2),
                 field_entity.Move(direction.DOWN, 3),
