@@ -687,11 +687,24 @@ class KefkaTower(Event):
 
     def gauntlet_inferno_cutscene(self):
         src = [
-            change_party(3),
             field.LoadMap(inferno_room_id, direction.DOWN, default_music = False,
                         x = 27, y = 18, fade_in = False, entrance_event = True),
             field.HoldScreen(),
 
+            field.SetPartyMap(1, inferno_room_id),
+            field.SetPartyMap(2, inferno_room_id),
+            field.SetPartyMap(3, inferno_room_id),
+            change_party(1),
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetPosition(0, 0),
+            ),
+
+            change_party(2),
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetPosition(0, 0),
+            ),
+
+            change_party(3),
             # Move main party to east of inferno
             field.EntityAct(field_entity.PARTY0, True,
                 field_entity.SetPosition(39, 18),
@@ -747,51 +760,33 @@ class KefkaTower(Event):
             field.LoadMap(guardian_room_id, direction.DOWN, default_music = False,
                         x = 12, y = 14, fade_in = False, entrance_event = True),
             field.HoldScreen(),
-            # Initialize party positions
+            # Initialize sprite positions
             [
-                change_party(1),
-                field.Pause(0.25),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetSpeed(field_entity.Speed.NORMAL),
-                    field_entity.SetPosition(6, 15),
-                    field_entity.Turn(direction.UP),
-                ),
-
-                change_party(2),
-                field.Pause(0.25),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetSpeed(field_entity.Speed.FAST),
-                    field_entity.SetPosition(12, 17),
-                    field_entity.Turn(direction.UP),
-                ),
-                change_party(3),
-                field.Pause(0.25),
-                field.EntityAct(field_entity.PARTY0, True,
-                    field_entity.SetSpeed(field_entity.Speed.SLOW),
-                    field_entity.SetPosition(18, 15),
-                    field_entity.Turn(direction.UP),
-                ),
 
                 # Move Guardian back 1 cell
                 field.EntityAct(0x10, False,
                     field_entity.SetPosition(11, 9)
                 ),
-                field.EntityAct(0x13, True,
+                field.EntityAct(0x13, False,
                     field_entity.SetPosition(12, 9)
                 ),
-                field.EntityAct(0x16, True,
+                field.EntityAct(0x16, False,
                     field_entity.SetPosition(13, 9)
                 ),
             ],
-            field.Pause(0.25),
             # Camera position
             field.EntityAct(field_entity.CAMERA, False,
                 field_entity.SetSpeed(field_entity.Speed.SLOW),
                 field_entity.Move(direction.UP, 2),
             ),
+            # init party 1 position
+            field.SetPartyMap(1, guardian_room_id),
+            change_party(1),
+            field.EntityAct(field_entity.PARTY0, True,
+                field_entity.SetPosition(6, 15),
+            ),
             # Party 1 picking magitek flowers
             [
-                change_party(1),
                 field.EntityAct(field_entity.PARTY0, False,
                     field_entity.SetSpeed(field_entity.Speed.NORMAL),
                     field_entity.Move(direction.UP, 3),
@@ -824,12 +819,16 @@ class KefkaTower(Event):
                     field_entity.SetPosition(0, 0)
                 ),
             ],
+            # init party 3 position
+            field.SetPartyMap(3, guardian_room_id),
+            change_party(3),
+            field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(18, 14),
+            ),
             # Party 3 walking around
             [
-                change_party(3),
                 field.EntityAct(field_entity.PARTY0, False,
                     field_entity.SetSpeed(field_entity.Speed.SLOW),
-                    field_entity.SetPosition(18, 14),
                     field_entity.Move(direction.UP, 2),
                     field_entity.Move(direction.LEFT, 1),
                     field_entity.Pause(8),
@@ -855,14 +854,19 @@ class KefkaTower(Event):
                     field_entity.SetPosition(0, 0)
                 ),
             ],
+            # field.FadeInScreen(3),
+            field.SetPartyMap(2, guardian_room_id),
+            change_party(2),
+            field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetPosition(12, 17),
+            ),
             field.FadeInScreen(3),
+            field.Pause(2),
             # Party 2, the initiator
             [
-                change_party(2),
-
-                field.Pause(2),
                 # getting in position
                 field.EntityAct(field_entity.PARTY0, True,
+                    field_entity.SetSpeed(field_entity.Speed.FAST),
                     field_entity.Move(direction.UP, 3),
                     field_entity.AnimateFrontHandsUp(),
                     field_entity.Pause(5),
@@ -888,18 +892,25 @@ class KefkaTower(Event):
                 field.EntityAct(field_entity.PARTY0, False,
                     field_entity.AnimateSurprised(),
                     field_entity.AnimateLowJump(),
-                    field_entity.Pause(5),
+                    field_entity.Pause(4),
                     field_entity.AnimateKnockedOut(),
-                    field_entity.Pause(13),
+                    field_entity.Pause(4),
                     field_entity.AnimateKneeling(),
-                    field_entity.Pause(10),
+                    field_entity.Pause(4),
                     field_entity.AnimateStandingHeadDown(),
                     field_entity.Pause(4),
-                    field_entity.AnimateStandingFront(),
-                    field_entity.Pause(4),
-                    field_entity.AnimatePowerStance(),
-                    field_entity.AnimateLowJump(),
-                    field_entity.Pause(6),
+                    field_entity.Turn(direction.DOWN),
+                    field_entity.Pause(12),
+                    field_entity.AnimateFingerWagStraightUp(),
+                    field_entity.Pause(1),
+                    field_entity.AnimateFingerWagToSide(),
+                    field_entity.Pause(1),
+                    field_entity.AnimateFingerWagStraightUp(),
+                    field_entity.Pause(1),
+                    field_entity.AnimateFingerWagToSide(),
+                    field_entity.Pause(1),
+                    field_entity.AnimateFingerWagStraightUp(),
+                    field_entity.Pause(8),
                     field_entity.Move(direction.UP, 1),
                 ),
             ],
@@ -929,6 +940,7 @@ class KefkaTower(Event):
 
     def gauntlet_doom_cutscene(self):
         src = [
+            field.SetPartyMap(1, doom_room_id),
             change_party(1),
             field.LoadMap(doom_room_id, direction.DOWN, default_music = False,
                 x = 64, y = 15, fade_in = False, entrance_event = True),
@@ -965,6 +977,7 @@ class KefkaTower(Event):
 
     def gauntlet_goddess_cutscene(self):
         src = [
+            field.SetPartyMap(3, goddess_room_id),
             change_party(3),
             field.LoadMap(goddess_room_id, direction.DOWN, default_music = False,
                         x = 12, y = 28, fade_in = False, entrance_event = True),
@@ -1003,6 +1016,7 @@ class KefkaTower(Event):
         chests = self.maps.get_chests(poltergeist_room_id)
         chest = chests[7]
         src = [
+            field.SetPartyMap(2, goddess_room_id),
             change_party(2),
             field.HoldScreen(),
             field.LoadMap(poltergeist_room_id, direction.DOWN, default_music = False,
@@ -1116,6 +1130,7 @@ class KefkaTower(Event):
 
                 # Party 1 init position
                 [
+                    field.SetPartyMap(1, final_switch_map_id),
                     change_party(1),
                     Read(0xa0334, 0xa033c),
                     field.EntityAct(field_entity.PARTY0, True,
@@ -1126,6 +1141,7 @@ class KefkaTower(Event):
                 ],
                 # Party 2 init position
                 [
+                    field.SetPartyMap(2, final_switch_map_id),
                     Read(0xa031e, 0xa0320),
                     field.EntityAct(field_entity.PARTY0, True,
                         field_entity.SetPosition(party2_x, party2_y_start),
@@ -1134,6 +1150,7 @@ class KefkaTower(Event):
                 ],
                 # Party 3 init position
                 [
+                    field.SetPartyMap(3, final_switch_map_id),
                     Read(0xa0327, 0xa032d),
                     field.EntityAct(field_entity.PARTY0, True,
                         field_entity.SetPosition(party3_x, party3_y_start),
