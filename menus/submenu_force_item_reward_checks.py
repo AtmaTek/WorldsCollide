@@ -1,41 +1,8 @@
-from constants.checks import (
-    CELES,
-    CYAN,
-    EDGAR,
-    GAU,
-    GOGO,
-    LOCKE,
-    MOG,
-    RELM,
-    SABIN,
-    SETZER,
-    SHADOW,
-    STRAGO,
-    TERRA,
-    UMARO,
-    UNGATED,
-)
+
 import menus.pregame_track_scroll_area as scroll_area
 from data.text.text2 import text_value
 import instruction.f0 as f0
-
-groups = [
-    ("Celes", CELES),
-    ("Cyan", CYAN),
-    ("Edgar", EDGAR),
-    ("Gau", GAU),
-    ("Gogo", GOGO),
-    ("Locke", LOCKE),
-    ("Mog", MOG),
-    ("Relm", RELM),
-    ("Sabin", SABIN),
-    ("Setzer", SETZER),
-    ("Shadow", SHADOW),
-    ("Strago", STRAGO),
-    ("Terra", TERRA),
-    ("Umaro", UMARO),
-    ("Ungated", UNGATED),
-]
+from constants.gates import character_checks
 
 class FlagsForceRewardChecks(scroll_area.ScrollArea):
 
@@ -65,7 +32,7 @@ class FlagsForceRewardChecks(scroll_area.ScrollArea):
         from constants.checks import check_name
         check_lines = []
 
-        for (group_name, checks) in groups:
+        for (group_name, checks) in [(group, checks) for (group, checks) in character_checks.items()]:
             group_check_ids = [check.bit for check in checks]
             group_checks = [check for check in check_ids if check in group_check_ids]
             if len(group_checks) > 0:

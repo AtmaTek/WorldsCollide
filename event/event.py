@@ -71,11 +71,12 @@ class Event():
         self.rewards.append(reward)
         return reward
 
-    def add_reward(self, check_info, reward_type = None):
-        possible_types = self.get_reward_type(check_info, reward_type)
+    def add_reward(self, check, reward_type = None):
+        possible_types = self.get_reward_type(check, reward_type)
         assert possible_types
 
         reward = Reward(self, possible_types)
+        reward.check = check
         self.rewards.append(reward)
         return reward
 

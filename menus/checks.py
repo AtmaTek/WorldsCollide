@@ -4,7 +4,7 @@ import instruction.f0 as f0
 import args
 
 import data.event_bit as event_bit
-from constants.gates import character_checks
+from constants.gates import character_check_names
 import constants.objectives.condition_bits as condition_bits
 import menus.pregame_track_scroll_area as scroll_area
 
@@ -43,7 +43,7 @@ class Checks(scroll_area.ScrollArea):
 
     def open_world_init(self):
         checks = []
-        for group in character_checks.values():
+        for group in character_check_names.values():
             checks += group
         checks = sorted(checks)
 
@@ -62,7 +62,7 @@ class Checks(scroll_area.ScrollArea):
 
         self.lines = []
         self.line_skip_bits = []
-        for character, checks in character_checks.items():
+        for character, checks in character_check_names.items():
             if not character:
                 character = "Open"
                 character_address = constant_ffff   # always 0xffff
