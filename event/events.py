@@ -15,7 +15,12 @@ class Events():
         self.espers = data.espers
         self.shops = data.shops
 
-        self.mod()
+        self.pathing = ""   #used for display but not in logic
+        self.pathingdict = {}
+
+        events = self.mod()
+
+        self.validate(events)
 
     def mod(self):
         # generate list of events from files
@@ -139,6 +144,14 @@ class Events():
             self.characters.set_character_path(slot.id, slot.check.gate_character)
             iteration += 1
 
+        if self.args.debug:
+            for event in events:
+                for reward in event.rewards:
+                    if reward.type == RewardType.CHARACTER:
+                        self.pathing = self.pathing + "\n" + event.name() + ": " + self.characters.get_name(reward.id) + "/ " + self.characters.get_default_name(reward.id)
+                        self.pathingdict[self.characters.get_default_name(reward.id)] = event.name()
+                self.print_pathing_tree()
+
         # get all reward slots still available
         reward_slots = [reward for event in events for reward in event.rewards if reward.id is None]
         random.shuffle(reward_slots) # shuffle to prevent picking them in alphabetical order
@@ -170,3 +183,35 @@ class Events():
 
         # choose the rest of the rewards, items given to events after all characters/events assigned
         self.choose_item_possible_rewards(reward_slots)
+
+    def validate(self, events):
+        char_esper_checks = []
+        for event in events:
+            char_esper_checks += [r for r in event.rewards if r.possible_types == (RewardType.CHARACTER)]
+
+    def print_pathing_tree(self):
+        pathway_with_chars_list = []
+        pathway_list = []
+
+        for x in range(14):
+            path = self.characters.get_character_path(x)
+            pathway_with_chars = ""
+            pathway = ""
+
+            ### get the path leading to the character's location
+            for req_char_index in path:
+                character_location = self.pathingdict[self.characters.DEFAULT_NAME[req_char_index]]
+                character_name = self.characters.DEFAULT_NAME[req_char_index]
+                pathway += character_location + " -> "
+                pathway_with_chars += (character_name + " / " + character_location + " -> ")
+
+            ### get the character's location
+            character_location = self.pathingdict[self.characters.DEFAULT_NAME[x]]
+            character_name = self.characters.DEFAULT_NAME[x]
+            pathway += character_location
+            pathway_with_chars += (character_name + " / " + character_location)
+
+            print(pathway_with_chars)
+            pathway_with_chars_list.append(pathway_with_chars)
+            pathway_list.append(pathway)
+
