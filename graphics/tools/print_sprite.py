@@ -13,7 +13,7 @@ def get_rgb_bytes(sprite_path, palette_path, pose_id):
 
     sprite = SpriteFile(sprite_path, palette)
 
-    return sprite.rgb_data(CHARACTER[pose_id])
+    return sprite.rgb_data(CHARACTER[pose_id]) + palette.alpha_rgb_data()
 
 if __name__ == "__main__":
     import os, sys
