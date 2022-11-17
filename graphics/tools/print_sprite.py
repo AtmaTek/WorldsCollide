@@ -6,6 +6,11 @@ def print_sprite(sprite_id, palette_id, pose_id):
     print(str(get_rgb_bytes(get_sprite_path(sprite_id),
           get_palette_path(palette_id), pose_id)))
 
+def get_sprite_bytes(sprite_id, palette_id, pose_id):
+    from graphics.sprites.sprites import get_path as get_sprite_path
+    from graphics.palettes.palettes import get_path as get_palette_path
+
+    return get_rgb_bytes(get_sprite_path(sprite_id), get_palette_path(palette_id), pose_id)
 
 def get_rgb_bytes(sprite_path, palette_path, pose_id):
     from graphics.palette_file import PaletteFile
