@@ -13,11 +13,12 @@ AH_CLOSED = CheckPreset(
         AUCTION2
     ]
 )
+
 SEDENTARY_LIFESTYLE = CheckPreset(
     "sitlife",
     "Sedentary Lifestyle",
     RewardType.ITEM,
-    "The longest checks in the game are forced item rewards.",
+    "Longer checks in the game are guaranteed to reward an ITEM.",
     [
         ANCIENT_CASTLE,
         BURNING_HOUSE,
@@ -33,29 +34,27 @@ SEDENTARY_LIFESTYLE = CheckPreset(
     ],
 )
 
-NO_FREE_PROGRESSION_NEW = CheckPreset(
-    'nfce',
-    "No Free Characters/Espers",
-    RewardType.ITEM,
-    "All free checks are forced items. Similar to classic, but does not include auction house and tzen thief.",
+NO_FREE_CHARACTERS = CheckPreset(
+    'nfchar',
+    "No Free Characters",
+    RewardType.ESPER | RewardType.ITEM,
+    "All free checks that can reward characters are guaranteed to reward an ESPER or ITEM",
     [
         COLLAPSING_HOUSE,
         FIGARO_CASTLE_THRONE,
         GAUS_FATHERS_HOUSE,
         KOHLINGEN_CAFE,
         MT_ZOZO,
-        NARSHE_WEAPON_SHOP,
-        NARSHE_WEAPON_SHOP_MINES,
         SEALED_GATE,
         SOUTH_FIGARO_PRISONER,
     ]
 )
 
-NO_FREE_PROGRESSION_CLASSIC = CheckPreset(
-    'nfce-classic',
-    "No Free C+E (Classic)",
+NO_FREE_PROGRESSION = CheckPreset(
+    'nfce',
+    "No Free C+E",
     RewardType.ITEM,
-    "All free checks are forced items. Includes auction house and tzen thief.",
+    "All free checks are guaranteed to reward an ITEM. Includes Auction House and Tzen Thief.",
     [
         AUCTION1,
         AUCTION2,
@@ -72,11 +71,29 @@ NO_FREE_PROGRESSION_CLASSIC = CheckPreset(
     ]
 )
 
+NO_FREE_PROGRESSION_NO_GP = CheckPreset(
+    'nfcegp',
+    "No Free C+E (No AH/Tzen)",
+    RewardType.ITEM,
+    "All free checks are guaranteed to reward an ITEM. GP-based checks Auction House and Tzen Thief can still reward ESPER or ITEM.",
+    [
+        COLLAPSING_HOUSE,
+        FIGARO_CASTLE_THRONE,
+        GAUS_FATHERS_HOUSE,
+        KOHLINGEN_CAFE,
+        MT_ZOZO,
+        NARSHE_WEAPON_SHOP,
+        NARSHE_WEAPON_SHOP_MINES,
+        SEALED_GATE,
+        SOUTH_FIGARO_PRISONER,
+    ]
+)
+
 SQUID_GAMES = CheckPreset(
     'squid',
     'Squid Games',
     RewardType.CHARACTER,
-    'The rewards following the vanilla ultros fights are guaranteed to grant a character. The checks are Esper Mountain, Floating Continent 1, Lete River, Opera House.',
+    'The checks which you fight Ultros in the vanilla game are guaranteed to reward a CHARACTER. The checks are Lete River, Opera House, Esper Mountain, and Floating Continent Arrival.',
     [
         ESPER_MOUNTAIN,
         FLOATING_CONT_ARRIVE,
@@ -89,7 +106,7 @@ VANILLA_ESPERS = CheckPreset(
     'vanesp',
     "Vanilla Espers",
     RewardType.ESPER,
-    "Most checks/events that involve espers in the base game will grant an esper as the reward.",
+    "Most checks/events in the vanilla game which revolve around espers are guaranteed to reward an ESPER.",
     [
         ANCIENT_CASTLE,
         MAGITEK_FACTORY_TRASH,
@@ -104,8 +121,9 @@ VANILLA_ESPERS = CheckPreset(
 
 all_presets = [
     AH_CLOSED,
-    NO_FREE_PROGRESSION_NEW,
-    NO_FREE_PROGRESSION_CLASSIC,
+    NO_FREE_CHARACTERS,
+    NO_FREE_PROGRESSION,
+    NO_FREE_PROGRESSION_NO_GP,
     SEDENTARY_LIFESTYLE,
     SQUID_GAMES,
     VANILLA_ESPERS,
