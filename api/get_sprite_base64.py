@@ -29,8 +29,9 @@ def get_base64(sprite_path, palette_path, pose_id):
 
     no_bg.putdata(new_image)
     
-    io = BytesIO(no_bg.tobytes()).read()
-    encoded = base64.b64encode(io)
-    
-    return encoded
+    io = BytesIO()
+    no_bg.save(io, format="PNG")
+    img_str = base64.b64encode(io.getvalue())
+    print(img_str.decode('utf-8'))
+    return img_str.decode('utf-8')
     
