@@ -13,7 +13,7 @@ def get_base64(sprite_path, palette_path, pose_id):
     (r, g, b) = palette.alpha_rgb_data
 
     image = sprite.get_ppm(CHARACTER[pose_id])
-    from PIL import Image
+    from PIL import Image 
     from io import BytesIO
     import base64
     
@@ -29,7 +29,6 @@ def get_base64(sprite_path, palette_path, pose_id):
 
     no_bg.putdata(new_image)
     
-    # crap bytes
     io = BytesIO(no_bg.tobytes()).read()
     encoded = base64.b64encode(io)
     
