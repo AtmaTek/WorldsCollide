@@ -12,12 +12,12 @@ def get_base64(sprite_path, palette_path, pose_id):
     sprite = SpriteFile(sprite_path, palette)
     (r, g, b) = palette.alpha_rgb_data
 
-    sprite.write_ppm("foo.bar", CHARACTER[pose_id])
+    image = sprite.get_ppm(CHARACTER[pose_id])
     from PIL import Image
     from io import BytesIO
     import base64
     
-    png = Image.open('foo.bar').convert('RGBA')
+    png = Image.open(BytesIO(bytes(image))).convert('RGBA')
     no_bg = Image.new('RGBA', png.size, (r, g, b, 0))
 
     new_image = []
@@ -30,8 +30,8 @@ def get_base64(sprite_path, palette_path, pose_id):
     no_bg.putdata(new_image)
     
     # crap bytes
-    bytes = BytesIO(no_bg.tobytes()).read()
-    encoded = base64.b64encode(bytes)
+    io = BytesIO(no_bg.tobytes()).read()
+    encoded = base64.b64encode(io)
     
     return encoded
     
