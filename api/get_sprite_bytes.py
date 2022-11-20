@@ -12,5 +12,6 @@ def get_rgb_bytes(sprite_path, palette_path, pose_id):
 
     sprite = SpriteFile(sprite_path, palette)
 
-    alpha = palette.alpha_rgb_data
-    return sprite.rgb_data(CHARACTER[pose_id]) + alpha
+    rgb_bytes = sprite.rgb_data(CHARACTER[pose_id])
+    alpha_bytes = palette.alpha_rgb_data
+    return (rgb_bytes, alpha_bytes)
