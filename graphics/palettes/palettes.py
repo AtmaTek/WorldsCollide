@@ -137,8 +137,7 @@ id_palette = {
     145 : "Emperor-HoxNorf-FF2",
     146 : "Chen-HoxNorf-Touhou",
     147 : "Selphie-HoxNorf-FF8",
-    148 : "Sora-HoxNorf-KH",
-    161 : 'locke-squall-p'
+    148 : "Sora-HoxNorf-KH"
 }
 
 def get_path(id_):
