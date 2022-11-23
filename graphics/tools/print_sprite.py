@@ -1,10 +1,11 @@
 
 def print_sprite(sprite_id, palette_id, pose_id):
-    from graphics.sprites.sprites import get_path as get_sprite_path
-    from graphics.palettes.palettes import get_path as get_palette_path
-
-    print(str(get_rgb_bytes(get_sprite_path(sprite_id),
-          get_palette_path(palette_id), pose_id)))
+    from api.get_sprite_palette_bytes import get_sprite_palette_bytes
+    (sprite_bytes, palette_bytes) = get_sprite_palette_bytes(sprite_id, palette_id, pose_id)
+    print({
+        'sprite': sprite_bytes,
+        'palette': palette_bytes
+    })
 
 def get_sprite_bytes(sprite_id, palette_id, pose_id):
     from graphics.sprites.sprites import get_path as get_sprite_path
@@ -22,7 +23,6 @@ def get_rgb_bytes(sprite_path, palette_path, pose_id):
 
     alpha = palette.alpha_rgb_data
     return sprite.rgb_data(CHARACTER[pose_id]) + alpha
-
 
 if __name__ == "__main__":
     import os
