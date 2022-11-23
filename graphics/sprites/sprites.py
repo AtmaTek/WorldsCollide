@@ -154,7 +154,12 @@ id_sprite = {
     157 : "Emperor-HoxNorf-FF2",
     158 : "Chen-HoxNorf-Touhou",
     159 : "Selphie-HoxNorf-FF8",
-    160 : "Sora-HoxNorf-KH"
+    160 : "Sora-HoxNorf-KH",
+    
+    200 : "Flandre-HoxNorf-Touhou",
+    201 : "Porom-Devout-HoxNorf-FF4",
+    202 : "Remilia-HoxNorf-Touhou",
+    203 : "Resien-HoxNorf-Touhou",
 }
 
 def get_path(id_):
