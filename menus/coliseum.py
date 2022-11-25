@@ -4,7 +4,7 @@ import args
 
 class ColiseumMenu:
     def __init__(self):
-        self.free_space = Allocate(Bank.C3, 201, "coliseum menu")
+        self.free_space = Allocate(Bank.C3, 198, "coliseum menu")
         self.args = args
 
         self.mod()
@@ -34,8 +34,8 @@ class ColiseumMenu:
             asm.JSR(0x04e0, asm.ABS),   # convert to text
             asm.LDX(0x7ac1, asm.IMM16), # position to draw text
             asm.JSR(0x04b6, asm.ABS),   # draw 2 digits
-            asm.JSR(0x0f61, asm.ABS),   # upload bg3 a version 2
-            asm.RTS(),
+            asm.JMP(0x0f61, asm.ABS),   # upload bg3 a version 2
+            # asm.RTS(),
         )
 
         space = Reserve(0x3aced, 0x3acef, "coliseum sustain item menu load item description")
@@ -115,8 +115,8 @@ class ColiseumMenu:
             asm.JSR(0x80f6, asm.ABS),       # load empty string
 
             "DRAW_REWARD_STRING",
-            asm.JSR(0x7fd9, asm.ABS),       # draw loaded reward string
-            asm.RTS(),
+            asm.JMP(0x7fd9, asm.ABS),       # draw loaded reward string
+            # asm.RTS(),
         )
 
         # replace draw item quantity with draw reward icon/name
@@ -131,8 +131,8 @@ class ColiseumMenu:
             asm.RTS(),
 
             "DRAW_REWARD",
-            asm.JSR(draw_reward_item, asm.ABS),
-            asm.RTS(),
+            asm.JMP(draw_reward_item, asm.ABS),
+            # asm.RTS(),
         )
 
         space = Reserve(0x37fa8, 0x37fb9, "coliseum item menu draw item quantity", asm.NOP())
