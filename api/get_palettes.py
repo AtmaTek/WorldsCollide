@@ -5,6 +5,17 @@ def get_palettes():
     palettes = [{
         'id': palette_id,
         'key': key,
+    } for ((palette_id, key)) in id_palette.items()]
+
+    return palettes
+
+def get_palettes_with_colors():
+    from graphics.palettes.palettes import id_palette
+    from api.get_palette_bytes import get_palette_bytes
+
+    palettes = [{
+        'id': palette_id,
+        'key': key,
         'palette': get_palette_bytes(palette_id)
     } for ((palette_id, key)) in id_palette.items()]
 
