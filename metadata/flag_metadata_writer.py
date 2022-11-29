@@ -20,8 +20,8 @@ class FlagMetadataWriter:
         self.groups = args.parser._action_groups
         self.mutually_exclusive_groups = args.parser._mutually_exclusive_groups
         self.metadata = {}
-
-    def write(self):
+        
+    def get_flag_metadata(self):
         for group in self.groups:
             title = group.title
             description = group.description
@@ -65,11 +65,13 @@ class FlagMetadataWriter:
                             'min_val': action.choices[0] if isinstance(action.choices, range) else None,
                             'max_val': action.choices[-1] if isinstance(action.choices, range) else None
                         }
+        
+        val = {key: value.toJSON() for key, value in self.metadata.items()}
+        return val
 
-            self.final_output = {key: value.toJSON() for key, value in self.metadata.items()}
-
-            import args
-            import json
-            file_name = f"{args.output_file}-flag.json"
-            with open(file_name, "w") as out_file:
-                out_file.write(json.dumps(self.final_output, indent = 4))
+    def write(self):
+        import args
+        import json
+        file_name = f"{args.output_file}-flag.json"
+        with open(file_name, "w") as out_file:
+            out_file.write(json.dumps(self.get_flag_metadata(), indent = 4))

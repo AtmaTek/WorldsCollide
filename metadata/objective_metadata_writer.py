@@ -20,24 +20,28 @@ class ObjectiveMetadataWriter:
         self.objectives = [ObjectiveMetadata(result_type) for result_type in result_types]
         self.conditions = [ObjectiveConditionMetadata(condition_type) for condition_type in condition_types]
 
-    def write(self):
-        import args
-        import json
-        meta = {
+    def get_objective_metadata(self):
+        metadata = {
             'conditions': [],
             'objectives': [],
         }
         for index in range(0, len(self.objectives)):
             objective = self.objectives[index]
-            meta['objectives'].append(objective.to_json())
+            metadata['objectives'].append(objective.to_json())
 
         for index in range(0, len(self.conditions)):
             condition = self.conditions[index]
-            meta['conditions'].append(condition.to_json())
+            metadata['conditions'].append(condition.to_json())
+      
+        return metadata
 
+    def write(self):
+        import json        
+        import args
         file_name = f"{args.output_file}-objective.json"
+        metadata = self.get_objective_metadata()
         with open(file_name, "w") as out_file:
-            out_file.write(json.dumps(meta, indent = 4))
+            out_file.write(json.dumps(metadata, indent = 4))
 
     def __len__(self):
         return len(self.objectives)

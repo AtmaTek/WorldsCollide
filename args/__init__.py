@@ -1,4 +1,4 @@
-from args.arguments import Arguments
+from arguments import Arguments
 arguments = Arguments()
 
 import sys
