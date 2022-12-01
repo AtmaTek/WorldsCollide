@@ -35,33 +35,34 @@ class FlagMetadataWriter:
                     if action in (meg._group_actions or []):
                         action.mutually_exclusive_group_title = meg.title
 
-                self.metadata[action.dest] = Object()
-                self.metadata[action.dest].key = action.dest
+                key = action.option_strings[0]
+                self.metadata[key] = Object()
+                self.metadata[key].key = action.dest
 
                 if isinstance(action, _StoreTrueAction):
-                    self.metadata[action.dest].type = 'bool'
+                    self.metadata[key].type = 'bool'
                 else:
-                    self.metadata[action.dest].type = action.type.__name__ if action.type else str.__name__
+                    self.metadata[key].type = action.type.__name__ if action.type else str.__name__
 
-                self.metadata[action.dest].flag = action.option_strings[0]
+                self.metadata[key].flag = action.option_strings[0]
 
                 if action.default:
-                    self.metadata[action.dest].default = action.default
+                    self.metadata[key].default = action.default
                 if action.help:
-                    self.metadata[action.dest].description = action.help
+                    self.metadata[key].description = action.help
                 if action.nargs:
-                    self.metadata[action.dest].nargs = action.nargs
+                    self.metadata[key].nargs = action.nargs
                 if action.metavar:
-                    self.metadata[action.dest].args = action.metavar
+                    self.metadata[key].args = action.metavar
                 if action.choices is not None and isinstance(action.choices, list) and not isinstance(action.choices, range):
-                    self.metadata[action.dest].allowed_values = list(action.choices)
+                    self.metadata[key].allowed_values = list(action.choices)
                 if type(group_title):
-                    self.metadata[action.dest].group = group_title if type(group_title) == str else None if group_title == None else group_title()
+                    self.metadata[key].group = group_title if type(group_title) == str else None if group_title == None else group_title()
                 if getattr(action, 'mutually_exclusive_group_title', None) is not None:
-                    self.metadata[action.dest].mutually_exclusive_group = action.mutually_exclusive_group_title
+                    self.metadata[key].mutually_exclusive_group = action.mutually_exclusive_group_title
                 if getattr(action, 'choices', None) is not None:
                     if isinstance(action.choices, range):
-                        self.metadata[action.dest].options = {
+                        self.metadata[key].options = {
                             'min_val': action.choices[0] if isinstance(action.choices, range) else None,
                             'max_val': action.choices[-1] if isinstance(action.choices, range) else None
                         }
