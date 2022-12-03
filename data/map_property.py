@@ -1,6 +1,4 @@
 
-ENABLE_WARP = 0x02
-ENABLE_RANDOM_ENCOUNTER = 0x80
 
 class MapProperty:
     DATA_SIZE = 33
@@ -20,13 +18,16 @@ class MapProperty:
         self.data = self.rom.get_bytes(self.data_start, self.DATA_SIZE)
 
         self.name_index = self.data[0]
-        self.enable_warp = (self.data[1] | ENABLE_WARP) >> 1
-        self.enable_random_encounters = (self.data[5] | ENABLE_RANDOM_ENCOUNTER) >> 7
+        
+        self.enable_warp =              (self.data[1] & 0x02) >> 1
+        self.enable_random_encounters = (self.data[5] & 0x80) >> 7
+        
         self.song = self.data[28]
 
     def write(self):
-        self.data[1] &= self.enable_warp << 1
-        self.data[5] &= self.enable_random_encounters << 7
+        self.data[1] |=     self.enable_warp              << 1
+        self.data[5] |=     self.enable_random_encounters << 7
+
         self.data[28] = self.song
         self.rom.set_bytes(self.data_start, self.data)
 
