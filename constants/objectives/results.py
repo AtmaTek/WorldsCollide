@@ -85,6 +85,9 @@ category_types = {
     ],
 }
 
+category_types["Kefka's Tower"] += [ResultType(90, "Unlock KT Gauntlet", "Unlock KT Gauntlet", None)]
+
+
 categories = list(category_types.keys())
 
 id_type = {}

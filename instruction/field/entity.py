@@ -72,17 +72,61 @@ class AnimateAttacked(_Instruction):
     def __init__(self):
         super().__init__(0x0b)
 
+class AnimateBattleStanding(_Instruction):
+    def __init__(self):
+        super().__init__(0x0c)
+
+class AnimateAirborneHandAtSide(_Instruction):
+    def __init__(self):
+        super().__init__(0x0d)
+class AnimateAirborneHandInAir(_Instruction):
+    def __init__(self):
+        super().__init__(0x0e)
+
 class AnimateHandsUp(_Instruction):
     def __init__(self):
         super().__init__(0x0f)
+
+class AnimateCastingMouthClosed(_Instruction):
+    def __init__(self):
+        super().__init__(0x10)
+
+class AnimateCastingMouthOpen(_Instruction):
+    def __init__(self):
+        super().__init__(0x11)
 
 class AnimateFrontHandsUp(_Instruction):
     def __init__(self):
         super().__init__(0x16)
 
+class AnimateFacingUpHandsUp(_Instruction):
+    def __init__(self):
+        super().__init__(0x17)
+
+class AnimatePowerStance(_Instruction):
+    def __init__(self):
+        super().__init__(0x18)
+
+
 class AnimateFrontRightHandUp(_Instruction):
     def __init__(self):
         super().__init__(0x19)
+
+class AnimateFrontRightHandOnHead(_Instruction):
+    def __init__(self):
+        super().__init__(0x1a)
+
+class AnimateBackRightHandOnHead(_Instruction):
+    def __init__(self):
+        super().__init__(0x1b)
+
+class AnimateBackRightHandUp(_Instruction):
+    def __init__(self):
+        super().__init__(0x1c)
+
+class AnimateHappy(_Instruction):
+    def __init__(self):
+        super().__init__(0x1d)
 
 class AnimateSurprised(_Instruction):
     def __init__(self):
@@ -91,6 +135,34 @@ class AnimateSurprised(_Instruction):
 class AnimateStandingHeadDown(_Instruction):
     def __init__(self):
         super().__init__(0x20)
+
+class AnimateFacingUpHeadDown(_Instruction):
+    def __init__(self):
+        super().__init__(0x21)
+
+class AnimateFacingLeftHeadDown(_Instruction):
+    def __init__(self):
+        super().__init__(0x22)
+
+class AnimateStandingLookingToSide(_Instruction):
+    def __init__(self):
+        super().__init__(0x23)
+
+class AnimateFingerWagToSide(_Instruction):
+    def __init__(self):
+        super().__init__(0x24)
+
+class AnimateFingerWagStraightUp(_Instruction):
+    def __init__(self):
+        super().__init__(0x25)
+
+class AnimateEmbracingSelf(_Instruction):
+    def __init__(self):
+        super().__init__(0x26)
+
+class AnimateTent(_Instruction):
+    def __init__(self):
+        super().__init__(0x27)
 
 class AnimateKnockedOut(_Instruction):
     def __init__(self):

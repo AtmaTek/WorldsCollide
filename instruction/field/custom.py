@@ -1,5 +1,5 @@
 from memory.space import Bank, START_ADDRESS_SNES, Reserve, Write, Read
-from instruction.event import _Instruction, _Branch
+from instruction.event import EVENT_CODE_START, _Instruction, _Branch
 import instruction.asm as asm
 import instruction.c0 as c0
 from enum import IntEnum
@@ -7,7 +7,7 @@ from enum import IntEnum
 def _set_opcode_address(opcode, address):
     FIRST_OPCODE = 0x35
     opcode_table_address = 0x098c4 + (opcode - FIRST_OPCODE) * 2
-    space = Reserve(opcode_table_address, opcode_table_address + 1, "field opcode table, {opcode} {hex(address)}")
+    space = Reserve(opcode_table_address, opcode_table_address + 1, f"field opcode table, {opcode} {hex(address)}")
     space.write(
         (address & 0xffff).to_bytes(2, "little"),
     )
@@ -231,3 +231,175 @@ class LongCall(_Instruction):
         LongCall.__init__ = (lambda self, function_address, arg = 0 :
                              super().__init__(opcode, function_address.to_bytes(3, "little"), arg))
         self.__init__(function_address, arg)
+
+CHEST_BLOCK_SIZE = 5
+class CollectTreasure(_Instruction):
+    def __init__(self, map_id, x, y):
+        src = [
+            "REMOTE_TREASURE",
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xeb, asm.DIR),         # LDA $EB ; load map
+            asm.ASL(),                      # ASL A
+            asm.TAX(),                      # TAX
+            asm.LDA(0xed82f6, asm.LNG_X),   # LDA $ED82F6,X  ; load the pointer for the *next room*
+            asm.STA(0x1e, asm.DIR),         # STA $1E   $1e = next room pointer
+            asm.LDA(0xed82f4, asm.LNG_X),   # LDA $ED82F4,X  ; load the pointer for our current room
+            asm.TAX(),                      # TAX       x = current room pointer
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.CPX(0x1e, asm.DIR),         # CPX $1E  ; do the two pointers match? if they do, this map has no treasure
+            asm.BEQ("TREASURE_WRAPUP1"),     # We chose a map without a treasure chest - branch and exit if so
+
+            "TREASURE_LOOP_AGAIN",          # treasure_loop_again:
+            asm.LDA(0xed8634, asm.LNG_X),   # LDA $ED8634,X  ; load X coordinate of chest
+            asm.CMP(0xed, asm.DIR),         # CMP $ED  ; does it match?
+            asm.BNE("NO_CHEST"),            # BNE no_chest  ; we do have to have some kind of fail-safe in place
+            asm.LDA(0xed8635, asm.LNG_X),   # LDA $ED8635,X  ; load Y coordinate of chest
+            asm.CMP(0xee, asm.DIR),         # CMP $EE  ; does it match?
+            asm.BEQ("TREASURE_FOUND"),      # BEQ treasure_found  ; we have matched X and Y, let's get the contents
+
+            "NO_CHEST",                     # no_chest:
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.INX(),                      # INX
+            asm.CPX(0x1e, asm.DIR),         # CPX $1E
+            asm.BNE("TREASURE_LOOP_AGAIN"), # BNE treasure_loop_again
+                                            # ; coming in, upper A is already 00
+            "TREASURE_WRAPUP1",             # treasure_wrapup1: this is a duplicate as the jump to the other is too far to safely make
+            asm.TDC(),                      # TDC
+            asm.LDA(0x05, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
+
+            "TREASURE_FOUND",               # treasure_found:
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xed8638, asm.LNG_X),   # LDA $ED8638,X  ; load contents
+            asm.STA(0x1a, asm.DIR),         # STA $1A
+            asm.LDA(0xed8636, asm.LNG_X),   # LDA $ED8636,X  ; load the byte and bit
+            asm.STA(0x1e, asm.DIR),         # STA $1E
+            asm.AND(0x0007, asm.IMM16),     # AND #$0007
+            asm.TAX(),                      # TAX
+            asm.LDA(0x1e, asm.DIR),         # LDA $1E
+            asm.AND(0x01f8, asm.IMM16),     # AND #$01F8
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.TAY(),                      # TAY
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
+            asm.AND(0xc0bafc, asm.LNG_X),   # AND $C0BAFC,X  ; is this bit set?
+            asm.BNE("TREASURE_WRAPUP"),     # chest has already been looted  ; branch and exit if so
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y
+            asm.ORA(0xc0bafc, asm.LNG_X),   # ORA $C0BAFC,X  ; set this bit, meaning we have now opened this box
+            asm.STA(0x1e40, asm.ABS_Y),     # STA $1E40,Y
+            asm.LDA(0x1f, asm.DIR),         # LDA $1F
+            asm.BPL("NOT_GIL_TREASURE"),    # BPL not_gil_treasure
+            asm.LDA(0x1a, asm.DIR),         # LDA $1A  ; load amount
+            asm.STA(0x4202, asm.ABS),       # STA $4202
+            asm.LDA(0x64, asm.IMM8),        # LDA #$64
+            asm.STA(0x4203, asm.ABS),       # STA $4203  ; multiply it by 100
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.NOP(),                      # NOP
+            asm.REP(0x21),                  # REP #$21
+            asm.LDA(0x4216, asm.ABS),       # LDA $4216  ; load product
+            asm.ADC(0x1860, asm.ABS),       # ADC $1860
+            asm.STA(0x1860, asm.ABS),       # STA $1860
+            asm.TDC(),                      # TDC
+            asm.A8(),                       # SEP #$20
+            asm.BCC("GIL_NO_WRAP"),         # BCC gil_no_wrap  ; branch if result didn't wrap. meaning whatever we picked up didn't add to the third byte
+            asm.INC(0x1862, asm.ABS),       # INC $1862
+
+            "GIL_NO_WRAP",                  # gil_no_wrap:
+            asm.LDA(0x7f, asm.IMM8),        # LDA #$7F
+            asm.CMP(0x1860, asm.ABS),       # CMP $1860
+            asm.LDA(0x96, asm.IMM8),        # LDA #$96
+            asm.SBC(0x1861, asm.ABS),       # SBC $1861
+            asm.LDA(0x98, asm.IMM8),        # LDA #$98
+            asm.SBC(0x1862, asm.ABS),       # SBC $1862
+            asm.BCS("TREASURE_WRAPUP"),     # BCS treasure_wrapup  ; if carry is still set, we didn't overflow our GP. time to finish up
+            asm.LDX(0x967f, asm.IMM16),     # LDX #$967F
+            asm.STX(0x1860, asm.ABS),       # STX $1860
+            asm.LDA(0x98, asm.IMM8),        # LDA #$98
+            asm.STA(0x1862, asm.ABS),       # STA $1862
+            asm.BRA("TREASURE_WRAPUP"),     # BRA treasure_wrapup
+
+            "NOT_GIL_TREASURE",             # not_gil_treasure:
+            asm.BIT(0x40, asm.IMM8),        # BIT #$40  ; item?
+            asm.BEQ("TREASURE_WRAPUP"),     # BEQ treasure_wrapup  ; if it isn't an item, it's an "Empty" or a MiaB, neither of which we need to do anything about here. not handling MiaB may be an oversight, but let's assume the end-user is smart enough not to remotely open one of those
+            asm.LDA(0x1a, asm.DIR),         # LDA $1A
+            asm.JSR(0xacfc, asm.ABS),       # JSR $ACFC  ; add the item to inventory
+
+            "TREASURE_WRAPUP",              # treasure_wrapup:
+            asm.TDC(),                      # TDC
+            asm.LDA(0x05, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
+        ]
+
+        space = Write(Bank.C0, src, "custom loot_chest command")
+        address = space.start_address
+
+        opcode = 0xec
+        _set_opcode_address(opcode, address)
+
+        CollectTreasure.__init__ = lambda self, map_id, x, y : super().__init__(opcode, map_id.to_bytes(2, "little"), x, y)
+        self.__init__(map_id, x, y)
+
+    def __str__(self):
+        return super().__str__(self.args)
+
+# Collect the contents (only if it hasn't been collected)
+# If it has been collected, make jump to target destination
+class BranchIfTreasureCollected(_Branch):
+    def __init__(self, chest_bit, destination):
+        src = [
+            "CHECK_TREASURE",               # check_treasure:
+            # ED xxxx aa bb cc
+            # xxxx is treasure bit. there's only #$2F treasure bytes
+            # aa bb cc is the event to jump to should a treasure already be open
+            asm.A16(),                      # REP #$20
+            asm.LDA(0xeb, asm.DIR),         # LDA $EB  ; load our treasure byte/bit that we want to check
+            asm.PHA(),                      # PHA
+            asm.AND(0x0007, asm.IMM16),     # AND #$0007  ; mask out the byte, keep the bits
+            asm.TAX(),                      # TAX
+            asm.PLA(),                      # PLA
+            asm.AND(0x01F8, asm.IMM16),     # AND #$01F8  ; now mask out the bits, keep the byte
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.LSR(),                      # LSR A
+            asm.TAY(),                      # TAY
+            asm.LDA(0x1e40, asm.ABS_Y),     # LDA $1E40,Y  ; load the treasure we are checking for
+            asm.AND(0xc0bafc, asm.ABS_X),   # AND $C0BAFC,X  ; is the bit we are checking for set? meaning, is this box already open?
+            asm.A8(),                       # SEP #$20
+            asm.BNE("BRANCH_TO_DEST"),      # BNE check_succeeds  ; branch if so!
+            asm.BRA("RETURN"),
+            "BRANCH_TO_DEST",               # check_succeeds:
+            asm.TDC(),                      # TDC
+            asm.LDX(0xed, asm.DIR),         # LDX $ED load address
+            asm.STX(0xe5, asm.DIR),         # STX $E5 store first 4 bytes
+            asm.LDA(0xef, asm.DIR),         # LDA $EF st
+            asm.CLC(),                      # CLC
+            asm.ADC(0xca, asm.IMM8),        # ADC #$CA
+            asm.STA(0xe7, asm.DIR),         # STA $E7
+            asm.JMP(0x9a6d, asm.ABS),       # JMP $9A6D
+            "RETURN",
+            asm.TDC(),                      # TDC
+            asm.LDA(0x06, asm.IMM8),        # LDA #$06
+            asm.JMP(0x9b5c, asm.ABS),       # JMP $9B5C - next command
+        ]
+
+        space = Write(Bank.C0, src, "custom loot_treasure command")
+        address = space.start_address
+
+        opcode = 0xed
+        _set_opcode_address(opcode, address)
+
+        BranchIfTreasureCollected.__init__ = lambda self, chest_bit, destination : super().__init__(opcode, [chest_bit.to_bytes(2, "little")], destination)
+
+        self.__init__(chest_bit, destination)
+
+    def __str__(self):
+        return super().__str__(self.args)

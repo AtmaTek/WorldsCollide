@@ -1,3 +1,4 @@
+from data.npc import NPC
 from event.event import *
 
 class Airship(Event):

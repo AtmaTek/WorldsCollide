@@ -106,10 +106,10 @@ class Dialogs():
             self.multi_line_battle_dialogs.append(dialog)
 
     def free(self):
-        import data.dialogs.free as free
+        from data.dialogs.free import multi_line_battle_dialogs
 
         self.free_multi_line_battle_dialogs = []
-        for dialog_id in free.multi_line_battle_dialogs:
+        for dialog_id in multi_line_battle_dialogs:
             self.multi_line_battle_dialogs[dialog_id].text = ""
             self.free_multi_line_battle_dialogs.append(dialog_id)
 
@@ -178,6 +178,12 @@ class Dialogs():
             line2 = self.get_centered("Objective Complete!")
             mlid = self.allocate_multi_line_battle(line1 + "<line>" + line2 + "<wait for key><end>")
             self.multi_line_battle_objectives.append(mlid)
+
+    def create_dialog(self, text):
+        from data.dialogs.free import dialogs
+        id = dialogs.pop()
+        self.set_text(id, text)
+        return id
 
     def mod(self):
         self.move_battle_messages()

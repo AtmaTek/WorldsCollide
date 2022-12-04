@@ -107,6 +107,9 @@ class Maps():
     def set_chest_item(self, map_id, x, y, item_id):
         self.chests.set_item(map_id, x, y, item_id)
 
+    def get_chests(self, map_id):
+        return self.chests.map_chests[map_id]
+
     def get_event_count(self, map_id):
         return (self.maps[map_id + 1]["events_ptr"] - self.maps[map_id]["events_ptr"]) // MapEvent.DATA_SIZE
 
@@ -155,6 +158,12 @@ class Maps():
     def print_long_exits(self, map_id):
         first_exit_id = (self.maps[map_id]["long_exits_ptr"] - self.maps[0]["long_exits_ptr"]) // LongMapExit.DATA_SIZE
         self.exits.print_long_exit_range(first_exit_id, self.get_long_exit_count(map_id))
+
+    def disable_random_encounter(self, map_id):
+        self.properties[map_id].set_random_encounters(False)
+
+    def disable_warp(self, map_id):
+        self.properties[map_id].set_warp(False)
 
     def _fix_imperial_camp_boxes(self):
         # near the northern tent normally accessed by jumping over a wall
@@ -232,3 +241,4 @@ class Maps():
             npcs_ptr[0] = cur_map["npcs_ptr"] & 0xff
             npcs_ptr[1] = (cur_map["npcs_ptr"] & 0xff00) >> 8
             self.rom.set_bytes(npcs_ptr_address, npcs_ptr)
+            

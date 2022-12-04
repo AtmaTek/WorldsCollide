@@ -1,5 +1,5 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 DISABLE_SAVE_POINT_TUTORIAL = 0x133
@@ -182,6 +182,13 @@ DEFEATED_ANCIENT_CASTLE_DRAGON = 0x11f # custom
 DEFEATED_PHOENIX_CAVE_DRAGON = 0x120 # custom
 DEFEATED_FANATICS_TOWER_DRAGON = 0x121 # custom
 
+# KT Battles
+DEFEATED_GUARDIAN = 0x0bc
+DEFEATED_INFERNO = 0x0bd
+DEFEATED_DOOM = 0x072
+DEFEATED_GODDESS = 0x073
+DEFEATED_POLTERGEIST = 0x074
+
 LEFT_WEIGHT_PUSHED_KEFKA_TOWER = 0x063
 RIGHT_WEIGHT_PUSHED_KEFKA_TOWER = 0x064
 WEST_PATH_BLOCKED_KEFKA_TOWER = 0x065   # path to doom in switch room
@@ -199,8 +206,20 @@ VELDT_REWARD_OBTAINED = 0x1bc # custom
 DISABLE_SPRINT = 0x1c1
 DISABLE_MENU_ACCESS = 0x1c2
 TEMP_SONG_OVERRIDE = 0x1cc
+CONTINUE_MUSIC_DURING_BATTLE = 0x2bc
 ENABLE_Y_PARTY_SWITCHING = 0x1ce
 ALWAYS_CLEAR = 0x176 # this event_bit is always clear, used for branching
+
+# Unused Bits
+# bits 0x200-0x22e Used for banquet soldiers
+# 2 bits 0x1bc-0x1bd Unused
+# 3 bits 0x1c7-0x1c9 Unused
+# 3 bits 0x2c1-0x2c3 Unused
+
+UNLOCKED_KT_GAUNTLET = 0x2c2
+COMPLETED_KT_GAUNTLET = 0x2c3
+# 8 bits 0x1e6-0x1ed Unused, as the SNES versions feature 20 rare item slots rather than 30
+GAUNTLET_IN_PROGRESS = 0x1e6
 
 from constants.objectives import MAX_OBJECTIVES
 for index in range(MAX_OBJECTIVES):

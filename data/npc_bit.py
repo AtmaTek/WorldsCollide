@@ -1,5 +1,5 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 SOLDIER_DOORWAY_ARVIS_HOUSE = 0x688
@@ -145,7 +145,7 @@ CENTER_DOOR_BLOCK_KEFKA_TOWER = 0x6a6
 
 DOOM_STATUE_KEFKA_TOWER = 0x6b0
 GODDESS_STATUE_KEFKA_TOWER = 0x6b1
-POLTRGEIST_STATUE_KEFKA_TOWER = 0x6b2
+POLTERGEIST_STATUE_KEFKA_TOWER = 0x6b2
 
 def byte(npc_bit):
     return npc_bit // 8

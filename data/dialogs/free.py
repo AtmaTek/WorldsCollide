@@ -1,3 +1,9 @@
+
+dialogs = []
+dialogs += range(515, 528)   # kefka assaulting thamasa
+dialogs += range(550, 598)   # sabin scenario, cyan kefka doma event
+dialogs +=range(1767, 1878)  # BANQUET
+
 multi_line_battle_dialogs = [
     0,  # WEDGE:<line>Hey! What's the matter?<wait for key><line>Do you know something we<line>don't……? ...
     1,  # GIRL:<line>……<wait for key><end>
