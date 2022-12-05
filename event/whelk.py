@@ -8,7 +8,8 @@ class Whelk(Event):
         return self.characters.TERRA
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import WHELK_GATE
+        self.reward = self.add_reward(WHELK_GATE)
 
     def init_event_bits(self, space):
         space.write(

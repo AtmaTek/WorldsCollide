@@ -1,3 +1,4 @@
+from constants.checks import VELDT
 from event.event import *
 from event.veldt_helpers import *
 
@@ -8,13 +9,17 @@ from event.veldt_helpers import *
 
 class Veldt(Event):
     def name(self):
-        return "Veldt"
+        return VELDT.name
 
     def character_gate(self):
         return self.characters.GAU
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
+        self.reward = self.add_reward(VELDT)
+
+        # Veldt cannot currently be an item.
+        # This will catch the event either `-firr`` or `-feirr` flags are used to target veldt
+        assert self.reward.type != RewardType.ITEM
 
     def init_event_bits(self, space):
         # abusing init event bits space here...

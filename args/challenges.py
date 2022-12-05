@@ -1,3 +1,6 @@
+from constants.checks import FIGARO_CASTLE_THRONE, KOHLINGEN_CAFE
+from data.npc_bit import WEAPON_ELDER_NARSHE
+
 def name():
     return "Challenges"
 
@@ -13,8 +16,6 @@ def parse(parser):
                             help = "Ultima cannot be learned from espers/items/natural magic")
     challenges.add_argument("-nfps", "--no-free-paladin-shields", action = "store_true",
                             help = "Paladin/Cursed Shields will not appear in coliseum/auction/shops/chests/events (Narshe WOR exclusive)")
-    challenges.add_argument("-nfce", "--no-free-characters-espers", action = "store_true",
-                            help = "Remove character/esper rewards from: Auction House, Collapsing House, Figaro Castle Throne, Gau's Father's House, Kohlingen Inn, Narshe Weapon Shop, Sealed Gate, South Figaro Basement")
     challenges.add_argument("-pd", "--permadeath", action = "store_true",
                             help = "Life spells cannot be learned. Fenix Downs unavailable (except from starting items). Buckets/inns/tents/events do not revive characters. Phoenix casts Life 3 on party instead of Life")
 
@@ -34,8 +35,6 @@ def flags(args):
         flags += " -nu"
     if args.no_free_paladin_shields:
         flags += " -nfps"
-    if args.no_free_characters_espers:
-        flags += " -nfce"
     if args.permadeath:
         flags += " -pd"
 
@@ -48,7 +47,6 @@ def options(args):
         ("No Illuminas", args.no_illuminas),
         ("No Ultima", args.no_ultima),
         ("No Free Paladin Shields", args.no_free_paladin_shields),
-        ("No Free Characters/Espers", args.no_free_characters_espers),
         ("Permadeath", args.permadeath),
     ]
 

@@ -2,15 +2,16 @@ from event.event import *
 
 class DomaWOR(Event):
     def name(self):
-        return "Doma WOR"
+        return "Doma Dream"
 
     def character_gate(self):
         return self.characters.CYAN
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
-        self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward3 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import DOMA_DREAM_DOOR, DOMA_DREAM_AWAKEN, DOMA_DREAM_THRONE
+        self.reward1 = self.add_reward(DOMA_DREAM_AWAKEN)
+        self.reward2 = self.add_reward(DOMA_DREAM_THRONE)
+        self.reward3 = self.add_reward(DOMA_DREAM_DOOR)
 
     def mod(self):
         self.cyan_phantom_train_npc_id = 0x10
@@ -45,6 +46,8 @@ class DomaWOR(Event):
             self.cyan_character_mod(self.reward1.id)
         elif self.reward1.type == RewardType.ESPER:
             self.cyan_esper_mod(self.reward1.id)
+        elif self.reward1.type == RewardType.ITEM:
+            self.cyan_item_mod(self.reward1.id)
         self.finish_dream_awaken_mod()
 
         if self.reward2.type == RewardType.ESPER:
@@ -258,6 +261,21 @@ class DomaWOR(Event):
         space.write(
             field.AddEsper(esper),
             field.Dialog(self.espers.get_receive_esper_dialog(esper)),
+            field.Branch(space.end_address + 1), # skip nops
+        )
+
+    def cyan_item_mod(self, item):
+        self.random_cyan_npc_mod()
+
+        space = Reserve(0xb9818, 0xb982f, "doma wor split up party after wrexsoul battle", field.NOP())
+        space.write(
+            field.Branch(space.end_address + 1), # skip nops
+        )
+
+        space = Reserve(0xb99b4, 0xb99d4, "doma wor cyan touches sword", field.NOP())
+        space.write(
+            field.AddItem(item),
+            field.Dialog(self.items.get_receive_dialog(item)),
             field.Branch(space.end_address + 1), # skip nops
         )
 

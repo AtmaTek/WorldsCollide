@@ -1,17 +1,15 @@
 from event.event import *
+from constants.checks import SOUTH_FIGARO_PRISONER
 
 class SouthFigaro(Event):
     def name(self):
-        return "South Figaro"
+        return SOUTH_FIGARO_PRISONER.name
 
     def character_gate(self):
         return self.characters.CELES
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward = self.add_reward(RewardType.CHARACTER | RewardType.ESPER | RewardType.ITEM)
+        self.reward = self.add_reward(SOUTH_FIGARO_PRISONER)
 
     def init_event_bits(self, space):
         space.write(

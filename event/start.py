@@ -25,7 +25,7 @@ class Start(Event):
         # assign chosen character rewards
         for character_id in party:
             if character_id is not None:
-                reward = self.add_reward(RewardType.CHARACTER)
+                reward = self.add_character_reward()
                 reward.id = character_id
                 reward.type = RewardType.CHARACTER
 
@@ -189,14 +189,10 @@ class Start(Event):
             ]
 
         if self.args.debug:
-            src += [
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Dried Meat", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-                field.AddItem("Warp Stone", sound_effect = False),
-            ]
+            from constants.items import name_id
+            for char in self.characters.characters:
+                char.init_relic1 = name_id["Moogle Charm"]
+
         src += [
             field.Return(),
         ]
@@ -211,7 +207,6 @@ class Start(Event):
             vehicle.SetPosition(84, 34),
             vehicle.LoadMap(0x06, direction.DOWN, default_music = True,
                             x = 16, y = 6, entrance_event = True),
-
             field.EntityAct(field_entity.PARTY0, True,
                 field_entity.CenterScreen(),
             ),

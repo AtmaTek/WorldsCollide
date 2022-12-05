@@ -8,7 +8,8 @@ class DoomGaze(Event):
         return self.characters.SETZER # gate for airship option
 
     def init_rewards(self):
-        self.reward = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+        from constants.checks import SEARCH_THE_SKIES
+        self.reward = self.add_reward(SEARCH_THE_SKIES)
 
     def mod(self):
         self.magicite_npc_id = 0x12
@@ -18,6 +19,8 @@ class DoomGaze(Event):
         if self.args.doom_gaze_no_escape:
             self.doom_gaze_battle_mod()
 
+        if self.reward.type == RewardType.CHARACTER:
+            self.character_mod(self.reward.id)
         if self.reward.type == RewardType.ESPER:
             self.esper_mod(self.reward.id)
         elif self.reward.type == RewardType.ITEM:
@@ -74,6 +77,76 @@ class DoomGaze(Event):
         space.write(
             field.Call(receive_reward),
         )
+
+    def character_mod(self, character):
+        start_addr = 0xa00a7 # begin magicite animation
+        end_addr = 0xa00b6   # end magicite animation
+        src = [
+            field.EntityAct(self.magicite_npc_id, True,
+                # Character "Attacked" animation will often cause clipping with the airship
+                field_entity.SetSpriteLayer(1),
+                field_entity.DisableWalkingAnimation(),
+                field_entity.AnimateAttacked(),
+            ),
+
+            # Keep character on the same path as the esper, but change animation once movement has stopped
+            self.rom.get_bytes(start_addr, end_addr - start_addr + 1),
+            field.EntityAct(self.magicite_npc_id, True,
+                field_entity.AnimateKneeling(),
+            ),
+            field.Return(),
+        ]
+
+
+        spit_out_reward = Write(Bank.F0, src, "doom gaze spits out character").start_address
+
+        # Use preevious event space to call new subroutine recruiting character
+        space = Reserve(start_addr, end_addr, "doom gaze spits out magicite", asm.NOP())
+        space.write([
+            field.Call(spit_out_reward)
+        ])
+
+        space = Reserve(0xa00ca, 0xa00dc, "Character pulls reward toward them, hide item, show dialog.", asm.NOP())
+
+        self.magicite_npc.sprite = character
+        self.magicite_npc.palette = self.characters.get_palette(character)
+        self.magicite_npc.direction = direction.DOWN
+        self.magicite_npc.split_sprite = 0
+
+        self.receive_reward_mod([
+            field.HideEntity(self.magicite_npc_id),
+            field.RecruitAndSelectParty(character),
+            field.FadeInScreen(),
+
+            # Party performs small victory dance
+            field.EntityAct(field_entity.PARTY0, False,
+                field_entity.Turn(direction.LEFT),
+                field_entity.Pause(0),
+                field_entity.Turn(direction.UP),
+                field_entity.Pause(0),
+                field_entity.Turn(direction.RIGHT),
+                field_entity.Pause(0),
+                field_entity.Turn(direction.DOWN),
+                field_entity.Pause(0),
+                field_entity.Turn(direction.LEFT),
+                field_entity.Pause(2),
+                field_entity.AnimateArmsRaisedWalking(),
+                field_entity.Pause(4),
+                field_entity.Turn(direction.LEFT),
+                field_entity.Pause(4),
+                field_entity.AnimateArmsRaisedWalking(),
+                field_entity.Pause(4),
+                field_entity.Turn(direction.LEFT),
+                field_entity.Pause(4),
+                field_entity.AnimateArmsRaisedWalking(),
+                field_entity.Pause(4),
+                field_entity.Turn(direction.LEFT),
+                field_entity.Pause(4),
+                field_entity.AnimateArmsRaisedWalking(),
+            ),
+            field.WaitForFade(),
+            field.Pause(1)
+        ])
 
     def esper_mod(self, esper):
         self.receive_reward_mod([

@@ -1,5 +1,5 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 DISABLE_SAVE_POINT_TUTORIAL = 0x133
@@ -162,6 +162,7 @@ RECRUITED_GOGO_WOR = 0x0d4
 DEFEATED_STOOGES = 0x0d8
 FINISHED_DOMA_WOR = 0x0da
 GOT_ALEXANDR = 0x0db
+RECEIVED_FANATICS_TOWER_REWARD = 0x2da
 DEFEATED_MAGIMASTER = 0x2db
 RECRUITED_STRAGO_FANATICS_TOWER = 0x0ba
 DEFEATED_DOOM_GAZE = 0x2a1 # custom

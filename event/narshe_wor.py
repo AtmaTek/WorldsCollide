@@ -1,18 +1,17 @@
 from event.event import *
+from constants.checks import NARSHE_WEAPON_SHOP, NARSHE_WEAPON_SHOP_MINES
 
 class NarsheWOR(Event):
     def name(self):
-        return "Narshe WOR"
+        return NARSHE_WEAPON_SHOP.name
 
     def character_gate(self):
         return self.characters.LOCKE
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
-            self.reward1 = self.add_reward(RewardType.ITEM)
-        else:
-            self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+
+        self.reward1 = self.add_reward(NARSHE_WEAPON_SHOP)
+        self.reward2 = self.add_reward(NARSHE_WEAPON_SHOP_MINES)
 
     def init_event_bits(self, space):
         space.write(
@@ -30,11 +29,10 @@ class NarsheWOR(Event):
             # allow doors to be unlocked without any condition
             self.unlock_doors_condition_mod([])
 
-        self.item = self.reward2.id
         if self.reward1.type == RewardType.ESPER:
-            self.weapon_shop_esper_mod(self.reward1.id)
+            self.weapon_shop_esper_mod()
         elif self.reward1.type == RewardType.ITEM:
-            self.weapon_shop_item_mod(self.reward1.id)
+            self.weapon_shop_item_mod()
 
         self.cursed_shield_mod()
 
@@ -102,13 +100,24 @@ class NarsheWOR(Event):
             field.BranchIfEventBitClear(event_bit.character_recruited(self.character_gate()), LOCKED),
         ])
 
-    def weapon_shop_mod(self, dialog_first_choice_text, reward_instructions):
+    def weapon_shop_mod(self, dialog_first_line):
         space = Reserve(0xc0b24, 0xc0b26, "narshe wor i wanted to give you this", field.NOP())
 
         import data.text
+        reward1_esper = self.reward1.type == RewardType.ESPER
+        reward2_esper = self.reward2.type == RewardType.ESPER
         # item names stored as TEXT2, dialogs are TEXT1
-        item_name = data.text.convert(self.items.get_name(self.item), data.text.TEXT1)
-        self.dialogs.set_text(1519, dialog_first_choice_text + "<line><choice> Make it “" + item_name + "”<end>")
+        reward1_esper_line = lambda esper: f"<line><choice> Leave it the stone “" + data.text.convert(self.espers.get_name(esper) + "”", data.text.TEXT1)
+        reward2_esper_line = lambda esper: f"<line><choice> Make it the stone “" + data.text.convert(self.espers.get_name(esper) + "”", data.text.TEXT1)
+        get_item_line = lambda item: f"<line><choice> Make it “" + data.text.convert(self.items.get_name(item) + "”", data.text.TEXT1)
+
+        add_esper = lambda esper: field.AddEsper(esper, sound_effect = False)
+        add_item = lambda item: field.AddItem(item, sound_effect = False)
+
+        reward1 = reward1_esper_line(self.reward1.id) if reward1_esper else get_item_line(self.reward1.id)
+        reward2 = reward2_esper_line(self.reward2.id) if reward2_esper else get_item_line(self.reward2.id)
+
+        self.dialogs.set_text(1519, dialog_first_line + reward1  + reward2 + "<end>")
 
         # if esper or first item chosen, set event bit to know second item should be given by guard
         space = Reserve(0xc0b42, 0xc0b44, "narshe wor ragnarok esper right", field.NOP())
@@ -121,7 +130,8 @@ class NarsheWOR(Event):
         )
 
         src = [
-            reward_instructions,
+            # add reward 1 based on item type
+            add_esper(self.reward1.id) if reward1_esper else add_item(self.reward1.id),
             field.SetEventBit(event_bit.GOT_RAGNAROK),
             field.SetEventBit(event_bit.CHOSE_RAGNAROK_ESPER),
             field.FinishCheck(),
@@ -136,7 +146,8 @@ class NarsheWOR(Event):
         )
 
         src = [
-            field.AddItem(self.item, sound_effect = False),
+            # add reward 2 based on item type
+            add_esper(self.reward2.id) if reward2_esper else add_item(self.reward2.id),
             field.SetEventBit(event_bit.GOT_RAGNAROK),
             field.FinishCheck(),
             field.Return(),
@@ -149,7 +160,7 @@ class NarsheWOR(Event):
             field.Call(choose_second_option),
         )
 
-    def esper_room_mod(self, esper_item_instructions):
+    def behind_whelk_mod(self):
         from data.npc import NPC
         guard_npc = NPC()
         guard_npc.x = 74
@@ -158,20 +169,38 @@ class NarsheWOR(Event):
         guard_npc.palette = 0
         guard_npc.direction = direction.DOWN
         guard_npc.speed = 3
-        guard_npc.event_byte = 0x60
-        guard_npc.event_bit = 0x05
+        guard_npc.event_byte = npc_bit.event_byte(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB) # 0x60
+        guard_npc.event_bit = npc_bit.event_bit(npc_bit.WHELK_GUARD_TRITOCH_NARSHE_WOB)   # 0x05
 
         guard_npc_id = self.maps.append_npc(0x02b, guard_npc)
 
+        add_esper = lambda esper_id: [
+            field.AddEsper(esper_id),
+            field.Dialog(self.espers.get_receive_esper_dialog(esper_id)),
+        ]
+
+        add_item = lambda item_id: [
+            field.AddItem(item_id),
+            field.Dialog(self.items.get_receive_dialog(item_id))
+        ]
         src = [
-            field.BranchIfEventBitSet(event_bit.CHOSE_RAGNAROK_ESPER, "RECEIVE_ITEM"),
-            esper_item_instructions,
+            field.BranchIfEventBitSet(event_bit.CHOSE_RAGNAROK_ESPER, "RECEIVE_SECONDARY")
+        ]
+
+        # Add reward one based on reward type
+        src += add_esper(self.reward1.id) if self.reward1.type == RewardType.ESPER else add_item(self.reward1.id)
+
+        src += [
             field.Branch("DELETE_GUARD"),
+            "RECEIVE_SECONDARY",
+        ]
 
-            "RECEIVE_ITEM",
-            field.AddItem(self.item),
-            field.Dialog(self.items.get_receive_dialog(self.item)),
+        # Add reward two based on reward type
+        src += [
+            add_esper(self.reward2.id) if self.reward2.type == RewardType.ESPER else add_item(self.reward2.id),
+        ]
 
+        src += [
             "DELETE_GUARD",
             field.FadeOutScreen(),
             field.WaitForFade(),
@@ -183,24 +212,17 @@ class NarsheWOR(Event):
             field.FinishCheck(),
             field.Return(),
         ]
+
         space = Write(Bank.CC, src, "narshe wor second weapon shop reward guard npc event")
         guard_event = space.start_address
 
         guard_npc.set_event_address(guard_event)
 
-    def weapon_shop_esper_mod(self, esper):
-        dialog_text = "This stone gives off an eerie aura!<line><choice> Leave it the stone “" + self.espers.get_name(esper) + "”"
+    def weapon_shop_esper_mod(self):
+        self.weapon_shop_mod("This stone gives off an eerie aura!")
+        self.behind_whelk_mod()
 
-        self.weapon_shop_mod(dialog_text, [
-            field.AddEsper(esper, sound_effect = False),
-        ])
-
-        self.esper_room_mod([
-            field.AddEsper(esper),
-            field.Dialog(self.espers.get_receive_esper_dialog(esper)),
-        ])
-
-    def weapon_shop_item_mod(self, item):
+    def weapon_shop_item_mod(self):
         magicite_npc_id = 0x11
         magicite_npc = self.maps.get_npc(0x18, magicite_npc_id)
         magicite_npc.sprite = 106
@@ -208,18 +230,9 @@ class NarsheWOR(Event):
         magicite_npc.split_sprite = 1
         magicite_npc.direction = direction.DOWN
 
-        import data.text
-        item_name = data.text.convert(self.items.get_name(item), data.text.TEXT1) # item names are stored as TEXT2, dialogs are TEXT1
-        dialog_text = "This gives off an eerie aura!<line><choice> Leave it “" + item_name + "”"
+        self.weapon_shop_mod("This gives off an eerie aura!")
+        self.behind_whelk_mod()
 
-        self.weapon_shop_mod(dialog_text, [
-            field.AddItem(item, sound_effect = False),
-        ])
-
-        self.esper_room_mod([
-            field.AddItem(item),
-            field.Dialog(self.items.get_receive_dialog(item)),
-        ])
 
     def cursed_shield_mod(self):
         self.dialogs.set_text(1523, f"“Cursed Shld”…{self.items.cursed_shield_battles}<end>")

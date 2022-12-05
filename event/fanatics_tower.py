@@ -1,3 +1,6 @@
+from constants.checks import FANATICS_TOWER_FOLLOWER, FANATICS_TOWER_LEADER
+from data.map_event import MapEvent
+from data.npc import NPC
 from event.event import *
 
 class FanaticsTower(Event):
@@ -7,24 +10,34 @@ class FanaticsTower(Event):
     def character_gate(self):
         return self.characters.STRAGO
 
+    def init_event_bits(self, space):
+        space.write([
+            field.SetEventBit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD),
+        ])
+
     def init_rewards(self):
-        self.reward1 = self.add_reward(RewardType.CHARACTER | RewardType.ESPER)
-        self.reward2 = self.add_reward(RewardType.ITEM)
+        self.reward1 = self.add_reward(FANATICS_TOWER_FOLLOWER)
+        self.reward2 = self.add_reward(FANATICS_TOWER_LEADER)
 
     def mod(self):
+        self.top_treasure_room_id = 0x16e
         self.strago_npc_id = 0x13
         self.strago_npc = self.maps.get_npc(0x16a, self.strago_npc_id)
 
         self.relm_event_mod()
-        self.tower_top_mod()
         self.magimaster_battle_mod()
 
-        if self.reward1.type == RewardType.CHARACTER:
+        if self.reward1.is_character():
             self.character_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ESPER:
+        elif self.reward1.is_esper():
             self.esper_mod(self.reward1.id)
-        elif self.reward1.type == RewardType.ITEM:
+        elif self.reward1.is_item():
             self.item_mod(self.reward1.id)
+
+        if self.reward2.is_esper():
+          self.tower_top_esper_mod()
+        elif self.reward2.is_item():
+          self.tower_top_item_mod()
 
         self.finish_magimaster_check_mod()
         self.finish_strago_check_mod()
@@ -121,12 +134,62 @@ class FanaticsTower(Event):
 
         space = Reserve(0xc5407, 0xc5408, "fanatics tower stop relm song before screen fade", field.NOP())
 
-    def tower_top_mod(self):
+    def tower_top_esper_mod(self):
+        space = Reserve(0xc5548, 0xc554a, "fanatics tower master kefka's treasure", field.NOP())
+        space = Reserve(0xc554d, 0xc554e, "fanatics tower long pause before magic master appears", field.NOP())
+
+        # Move the chest to inaccessible location, empty it..
+        chest = self.maps.get_chests(0x16e)[0]
+        chest.type = chest.EMPTY
+        chest.contents = 255
+        chest.x = 0
+        chest.y = 0
+
+        # This event flips the bit to trigger the MagiMaster fight outside,
+        # And also spawns the cultists during the cutscene
+        # We copy the relevant code from this event to event_space below
+        self.maps.delete_event(self.top_treasure_room_id, 7, 8)
+
+        # Place magicite in front of the chest
+        self.magicite_npc = NPC()
+        self.magicite_npc.sprite = 91 # Magicite
+        self.magicite_npc.palette = 2
+        self.magicite_npc.split_sprite = 1
+        self.magicite_npc.direction = direction.UP
+        self.magicite_npc.x = 7
+        self.magicite_npc.y = 8
+        self.magicite_npc.event_byte = npc_bit.event_byte(npc_bit.FANATICS_TOWER_SECONDARY_REWARD)
+        self.magicite_npc.event_bit = npc_bit.event_bit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD)
+
+        self.magicite_npc_id = self.maps.append_npc(self.top_treasure_room_id, self.magicite_npc)
+
+        event_space = Allocate(Bank.CC, 40, "Give fanatics tower esper subroutine", asm.NOP())
+        event_space.write([
+            Read(0xc5440, 0xc5441), # Set npc bit hex(730) true  (top treasure received)
+            Read(0xc5448, 0xc5449), # Set npc bit hex(1689) true (cultists outside treasure room)
+            field.AddEsper(self.reward2.id),
+            field.Dialog(self.espers.get_receive_esper_dialog(self.reward2.id)),
+            field.ClearEventBit(npc_bit.FANATICS_TOWER_SECONDARY_REWARD),
+            field.DeleteEntity(self.magicite_npc_id),
+            field.RefreshEntities(),
+            field.FinishCheck(),
+            field.Return(),
+        ])
+
+        # Re-using space from removed event above
+        space = Reserve(0xc5440, 0xc544a, "Call esper subroutine", asm.NOP())
+        space.write([
+            field.Call(event_space.start_address),
+            field.Return(),
+        ])
+        self.magicite_npc.set_event_address(space.start_address)
+
+    def tower_top_item_mod(self):
         space = Reserve(0xc5548, 0xc554a, "fanatics tower master kefka's treasure", field.NOP())
         space = Reserve(0xc554d, 0xc554e, "fanatics tower long pause before magic master appears", field.NOP())
 
         self.item = self.reward2.id
-        self.maps.set_chest_item(0x16e, 7, 7, self.item)
+        self.maps.set_chest_item(self.top_treasure_room_id, 7, 7, self.item)
 
     def magimaster_battle_mod(self):
         boss_pack_id = self.get_boss("MagiMaster")
