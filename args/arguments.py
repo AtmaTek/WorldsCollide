@@ -1,6 +1,6 @@
 
 class Arguments:
-    def __init__(self, args = []):
+    def __init__(self):
         import importlib
         self.groups = [
             "settings",
@@ -30,10 +30,8 @@ class Arguments:
         for group in self.group_modules.values():
             group.parse(self.parser)
 
-        import traceback
-        traceback.print_stack()
-        self.parser.parse_args(args = args, namespace = self)
-
+        self.parser.parse_args(namespace = self)
+        
         self.flags = ""
         self.seed_rng_flags = ""
         for group_name, group in self.group_modules.items():
@@ -56,12 +54,10 @@ class Arguments:
 
         import os
         self.website_link = None
-        
         if self.seed_id:
             # ignore any output_file argument and add given seed id to output name
             name, ext = os.path.splitext(self.input_file)
             self.output_file = f"{name}wc_{self.seed_id}{ext}"
-
             self.website_link = f"ff6wc.com/seed/{self.seed_id}"
         elif self.output_file is None:
             # if no output_file given add seed to output name
