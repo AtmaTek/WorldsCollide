@@ -13,13 +13,6 @@ class NarsheWOR(Event):
         self.reward1 = self.add_reward(NARSHE_WEAPON_SHOP)
         self.reward2 = self.add_reward(NARSHE_WEAPON_SHOP_MINES)
 
-        # This is to make sure you don't ever get an esper in the secondary slot and an item in the first.
-        # This ensures if either slot rolls an esper, the old man will pull one out.
-        if self.reward1.type == RewardType.ITEM:
-            secondary = self.reward2
-            self.reward2 = self.reward1
-            self.reward1 = secondary
-
     def init_event_bits(self, space):
         space.write(
             field.SetEventBit(event_bit.MET_LONE_WOLF_WOR),

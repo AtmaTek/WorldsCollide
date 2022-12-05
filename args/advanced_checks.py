@@ -40,7 +40,7 @@ esper_title = "Esper Checks"
 item_title = "Item Checks"
 
 def process(args):
-    from constants.check_presets import key_preset, NO_FREE_PROGRESSION_CLASSIC
+    from constants.check_presets import key_preset, NO_FREE_CHARACTERS_ESPERS
     args.character_rewards = []
     args.esper_item_rewards = []
     args.esper_rewards = []
@@ -48,7 +48,7 @@ def process(args):
     args._process_min_max("dragons_as_characters")
 
     if args.no_free_characters_espers:
-        args.check_preset = NO_FREE_PROGRESSION_CLASSIC.key
+        args.check_preset = NO_FREE_CHARACTERS_ESPERS.key
 
     if args.check_preset:
         check_preset = key_preset[args.check_preset]

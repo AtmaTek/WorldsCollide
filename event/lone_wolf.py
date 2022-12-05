@@ -4,6 +4,9 @@ from data.map_event import MapEvent
 from event.event import *
 from music.song_utils import get_character_theme
 
+CHAR_ITEM = RewardType.CHARACTER | RewardType.ITEM
+ESPER_ITEM = RewardType.ESPER | RewardType.ITEM
+
 class LoneWolf(Event):
     def name(self):
         return "Lone Wolf"
@@ -12,8 +15,15 @@ class LoneWolf(Event):
         return self.characters.MOG
 
     def init_rewards(self):
-        self.reward1 = self.add_reward(LONE_WOLF_CHASE)
-        self.reward2 = self.add_reward(LONE_WOLF_MOOGLE_ROOM)
+        import random
+        
+        # Ensure the two checks can only reward one character and one esper.
+        reward_char_type = bool(random.getrandbits(1))
+        reward1_type = CHAR_ITEM if reward_char_type else ESPER_ITEM
+        reward2_type = ESPER_ITEM if reward_char_type else CHAR_ITEM 
+        
+        self.reward1 = self.add_reward(LONE_WOLF_CHASE, reward1_type)
+        self.reward2 = self.add_reward(LONE_WOLF_MOOGLE_ROOM, reward2_type)
 
     def init_event_bits(self, space):
         space.write(

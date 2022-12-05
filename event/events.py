@@ -18,9 +18,7 @@ class Events():
         self.pathing = ""   #used for display but not in logic
         self.pathingdict = {}
 
-        events = self.mod()
-
-        self.validate(events)
+        self.mod()
 
     def mod(self):
         # generate list of events from files
@@ -65,6 +63,8 @@ class Events():
             from log import section
             section("Events", log_strings, [])
 
+        return events
+    
     def init_reward_slots(self, events):
         import random
         reward_slots = []
@@ -144,13 +144,13 @@ class Events():
             self.characters.set_character_path(slot.id, slot.check.gate_character)
             iteration += 1
 
-        if self.args.debug:
-            for event in events:
-                for reward in event.rewards:
-                    if reward.type == RewardType.CHARACTER:
-                        self.pathing = self.pathing + "\n" + event.name() + ": " + self.characters.get_name(reward.id) + "/ " + self.characters.get_default_name(reward.id)
-                        self.pathingdict[self.characters.get_default_name(reward.id)] = event.name()
-                self.print_pathing_tree()
+        # if self.args.debug:
+        #     for event in events:
+        #         for reward in event.rewards:
+        #             if reward.type == RewardType.CHARACTER:
+        #                 self.pathing = self.pathing + "\n" + event.name() + ": " + self.characters.get_name(reward.id) + "/ " + self.characters.get_default_name(reward.id)
+        #                 self.pathingdict[self.characters.get_default_name(reward.id)] = event.name()
+        #         self.print_pathing_tree()
 
         # get all reward slots still available
         reward_slots = [reward for event in events for reward in event.rewards if reward.id is None]
@@ -183,11 +183,6 @@ class Events():
 
         # choose the rest of the rewards, items given to events after all characters/events assigned
         self.choose_item_possible_rewards(reward_slots)
-
-    def validate(self, events):
-        char_esper_checks = []
-        for event in events:
-            char_esper_checks += [r for r in event.rewards if r.possible_types == (RewardType.CHARACTER)]
 
     def print_pathing_tree(self):
         pathway_with_chars_list = []
