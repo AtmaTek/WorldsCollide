@@ -38,8 +38,9 @@ class ObjectiveMetadataWriter:
     def write(self):
         import json        
         import args
-        file_name = f"{args.output_file}-objective.json"
+        file_name = f"{args.output_file}"
         metadata = self.get_objective_metadata()
+        print('Writing metadata to', file_name)
         with open(file_name, "w") as out_file:
             out_file.write(json.dumps(metadata, indent = 4))
 

@@ -73,6 +73,6 @@ class FlagMetadataWriter:
     def write(self):
         import args
         import json
-        file_name = f"{args.output_file}-flag.json"
+        file_name = f"{args.output_file}"
         with open(file_name, "w") as out_file:
             out_file.write(json.dumps(self.get_flag_metadata(), indent = 4))
