@@ -205,6 +205,23 @@ class Start(Event):
                 field.AddItem(tool, sound_effect = False),
             ]
 
+        from constants.items import id_name
+        from data.shop_item_tiers import tiers
+        from data.item import Item
+        junk = []
+        junk += tiers[Item.WEAPON][0]
+        junk += tiers[Item.SHIELD][0]
+        junk += tiers[Item.HELMET][0]
+        junk += tiers[Item.ARMOR][0]
+        junk += tiers[Item.RELIC][0]
+
+        start_junk = random.sample(junk, self.args.start_junk)
+
+        for junk_id in start_junk:
+            src += [
+                field.AddItem(id_name[junk_id], sound_effect = False)
+            ]
+
         if self.args.debug:
             src += [
                 field.AddItem("Dried Meat", sound_effect = False),
