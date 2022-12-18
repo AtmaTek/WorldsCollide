@@ -6,7 +6,7 @@ class Arguments:
             "objectives",
             "starting_party", "characters", "swdtechs", "blitzes", "lores", "rages", "dances", "steal", "sketch_control", "commands",
             "xpmpgp", "scaling", "bosses", "encounters", "boss_ai",
-            "espers", "natural_magic",
+            "espers", "natural_magic", "misc_magic",
             "starting_gold_items", "items", "shops", "chests",
             "graphics",
             "coliseum", "auction_house", "challenges", "bug_fixes", "misc",
