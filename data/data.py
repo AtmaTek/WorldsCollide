@@ -48,7 +48,7 @@ class Data:
         self.blitzes.mod()
 
         self.lores = lores.Lores(rom, args, self.characters)
-        self.lores.mod()
+        self.lores.mod(self.dialogs)
 
         self.rages = rages.Rages(rom, args, self.enemies)
         self.rages.mod()

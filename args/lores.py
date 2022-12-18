@@ -23,6 +23,9 @@ def parse(parser):
     lores.add_argument("-lel", "--lores-everyone-learns", action = "store_true",
                        help = "Lores learnable by characters without the Lore command")
 
+    lores.add_argument("-llr", "--lores-level-randomize", action = "store_true",
+                       help = "Level based lores will have the level randomized (L?, L1-L5)")
+
 def process(args):
     args._process_min_max("start_lores_random")
     args._process_min_max("lores_mp_random_value")
@@ -44,6 +47,8 @@ def flags(args):
     if args.lores_everyone_learns:
         flags += " -lel"
 
+    if args.lores_level_randomize:
+        flags += " -llr"
     return flags
 
 def options(args):
@@ -63,6 +68,7 @@ def options(args):
         ("Start Lores", start_lores),
         ("MP", mp),
         ("Everyone Learns", args.lores_everyone_learns),
+        ("Lx Level Random", args.lores_level_randomize)
     ]
 
 def menu(args):
