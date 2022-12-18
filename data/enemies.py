@@ -274,6 +274,21 @@ class Enemies():
 
         # NOTE: any remaining formations (due to extra_formations) are lost
 
+    def chupon_encounters(self, maps):
+        # find all packs that are randomly encountered in zones
+        packs = []
+        for zone in self.zones.zones:
+            if self.skip_shuffling_zone(maps, zone):
+                continue
+
+            for x in range(zone.PACK_COUNT):
+                if self.skip_shuffling_pack(zone.packs[x], zone.encounter_rates[x]):
+                    continue
+
+                packs.append(zone.packs[x])
+
+        self.packs.chupon_packs(packs)
+        
     def randomize_encounters(self, maps):
         # find all packs that are randomly encountered in zones
         packs = []
@@ -331,6 +346,8 @@ class Enemies():
 
         if self.args.random_encounters_shuffle:
             self.shuffle_encounters(maps)
+        elif self.args.random_encounters_chupon:
+            self.chupon_encounters(maps)
         elif not self.args.random_encounters_original:
             self.randomize_encounters(maps)
 
