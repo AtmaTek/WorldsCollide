@@ -6,6 +6,7 @@ import args
 class Animations:
     def __init__(self):
         self.health_animation_reflect_mod()
+        self.stray_flash_mod()
 
         if args.flashes_remove_most:
             flash_address_arrays = battle_animation_scripts.BATTLE_ANIMATION_FLASHES.values()
@@ -42,7 +43,11 @@ class Animations:
                 else:
                     # This is an error, reflecting a difference between the disassembly used to generate BATTLE_ANIMATION_FLASHES and the ROM
                     raise ValueError(f"Battle Animation Script Command at 0x{flash_address:x} (0x{animation_cmd[0]:x}) did not match an expected value.")
-    
+
+    def stray_flash_mod(self):
+        # port of https://www.romhacking.net/hacks/6740/
+        Write(0x10784b, 0xa7, "Flash tool position") #default: 0xaf
+
     def health_animation_reflect_mod(self):
         # Ref: https://www.ff6hacking.com/forums/thread-4145.html
         # Banon's Health command casts Cure 2 on the party with a unique animation.
