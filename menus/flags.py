@@ -4,12 +4,14 @@ import instruction.f0 as f0
 import args
 
 import menus.pregame_track_scroll_area as scroll_area
+from data.text.text2 import text_value
 
 class Flags(scroll_area.ScrollArea):
     MENU_NUMBER = 12
 
     def __init__(self):
         self.lines = []
+        self.submenus = {} # dictionary of submenus. key = line number, value = ScrollArea derived class
         if args.hide_flags:
             self.lines.append(scroll_area.Line("Flags Hidden", f0.set_blue_text_color))
         else:
@@ -22,6 +24,12 @@ class Flags(scroll_area.ScrollArea):
                         key, value = option
 
                         key = "  " + key.replace("&", "+")
+
+                        # if we're given a scroll area, save it as a sub-menu with a value of X …, where X is the number of items in the sub-menu
+                        if isinstance(value, scroll_area.ScrollArea):
+                            self.submenus[len(self.lines)] = value
+                            value = f"{value.number_items} {chr(text_value['…'])}"
+
                         value = str(value)
                         if value == "True":
                             value = "T"

@@ -42,6 +42,10 @@ class Item():
         self.learnable_spell = 0
         self.learnable_spell_rate = 0
 
+    def scale_price(self, factor):
+        self.price = int(self.price * factor)
+        self.price = max(min(self.price, 2**16 - 1), 0)
+
     def read(self):
         name_bytes = self.rom.get_bytes(self.name_addr, self.NAME_LENGTH)
         self.icon = value_text[name_bytes[0]]

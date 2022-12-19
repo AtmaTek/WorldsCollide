@@ -5,12 +5,17 @@ def _random_spell_table():
     from constants.spells import spell_id
 
     spell_table = list(range(len(spell_id)))
-    if args.no_ultima:
-        spell_table.remove(spell_id["Ultima"])
+    
+    for a_spell_id in args.remove_learnable_spell_ids:
+        spell_table.remove(a_spell_id)
+
     random.shuffle(spell_table)
 
-    space = Write(Bank.F0, spell_table, "learn spells random spell table")
-    return space.start_address, len(spell_table)
+    if len(spell_table) > 0:
+        space = Write(Bank.F0, spell_table, "learn spells random spell table")
+        return space.start_address, len(spell_table)
+    else:
+        return None, 0
 random_learn_spell_table, random_learn_spell_table_size = _random_spell_table()
 
 def _learn_random_spells():
@@ -27,60 +32,65 @@ def _learn_random_spells():
     learned_start = 0x30    # temporarily store learned_start_address in field/battle scratch ram
     spells_left = 0x32      # temporarily store number spells left to learn in field/battle scratch ram
 
-    src = [
-        asm.PHP(),
-        asm.XY16(),
-        asm.LDY(learned_start, asm.DIR),
-        asm.PHY(),                              # store value at $learned_start to be restored before returning
-        asm.LDA(spells_left, asm.DIR),
-        asm.PHA(),                              # store value at $spells_left to be restored before returning
+    if random_learn_spell_table_size > 0:
+        src = [
+            asm.PHP(),
+            asm.XY16(),
+            asm.LDY(learned_start, asm.DIR),
+            asm.PHY(),                              # store value at $learned_start to be restored before returning
+            asm.LDA(spells_left, asm.DIR),
+            asm.PHA(),                              # store value at $spells_left to be restored before returning
 
-        asm.LDY(learned_start_address, asm.IMM16),
-        asm.STY(learned_start, asm.DIR),        # $learned_start = start of character's learned spells
-        asm.LDY(character_count, asm.IMM16),    # y = number of characters remaining
+            asm.LDY(learned_start_address, asm.IMM16),
+            asm.STY(learned_start, asm.DIR),        # $learned_start = start of character's learned spells
+            asm.LDY(character_count, asm.IMM16),    # y = number of characters remaining
 
-        "CHARACTER_LOOP_START",
-        asm.PHY(),
-        asm.TDC(),
-        asm.LDA(field.LongCall.ARG_ADDRESS, asm.DIR),   # a = number of spells to learn
-        asm.STA(spells_left, asm.DIR),          # $spells_left = number of spells left to learn
-        asm.LDX(0x0000, asm.IMM16),             # x = spell table index
+            "CHARACTER_LOOP_START",
+            asm.PHY(),
+            asm.TDC(),
+            asm.LDA(field.LongCall.ARG_ADDRESS, asm.DIR),   # a = number of spells to learn
+            asm.STA(spells_left, asm.DIR),          # $spells_left = number of spells left to learn
+            asm.LDX(0x0000, asm.IMM16),             # x = spell table index
 
-        "SPELL_LOOP_START",
-        asm.LDA(START_ADDRESS_SNES + random_learn_spell_table, asm.LNG_X),
-        asm.TAY(),                              # y = id of next spell in table
-        asm.LDA(0xff, asm.IMM8),                # a = known spell value
-        asm.CMP(learned_start, asm.DIR_16_Y),   # compare with value at learned start address for character + spell id
-        asm.BEQ("NEXT_SPELL"),                  # branch if character already knows this spell
-        asm.STA(learned_start, asm.DIR_16_Y),   # learn spell
-        asm.DEC(spells_left, asm.DIR),          # decrement number of spells left to learn
-        asm.BEQ("NEXT_CHARACTER"),              # next character if number of spells to learn is 0
-        "NEXT_SPELL",
-        asm.INX(),                              # next spell in spell table
-        asm.CPX(random_learn_spell_table_size, asm.IMM16),
-        asm.BLT("SPELL_LOOP_START"),            # branch if spell index < len(spell table)
+            "SPELL_LOOP_START",
+            asm.LDA(START_ADDRESS_SNES + random_learn_spell_table, asm.LNG_X),
+            asm.TAY(),                              # y = id of next spell in table
+            asm.LDA(0xff, asm.IMM8),                # a = known spell value
+            asm.CMP(learned_start, asm.DIR_16_Y),   # compare with value at learned start address for character + spell id
+            asm.BEQ("NEXT_SPELL"),                  # branch if character already knows this spell
+            asm.STA(learned_start, asm.DIR_16_Y),   # learn spell
+            asm.DEC(spells_left, asm.DIR),          # decrement number of spells left to learn
+            asm.BEQ("NEXT_CHARACTER"),              # next character if number of spells to learn is 0
+            "NEXT_SPELL",
+            asm.INX(),                              # next spell in spell table
+            asm.CPX(random_learn_spell_table_size, asm.IMM16),
+            asm.BLT("SPELL_LOOP_START"),            # branch if spell index < len(spell table)
 
-        "NEXT_CHARACTER",
-        asm.PLY(),                              # y = characters remaining
-        asm.DEY(),
-        asm.BEQ("RETURN"),                      # return if zero characters remaining
+            "NEXT_CHARACTER",
+            asm.PLY(),                              # y = characters remaining
+            asm.DEY(),
+            asm.BEQ("RETURN"),                      # return if zero characters remaining
 
-        asm.A16(),
-        asm.LDA(learned_start, asm.DIR),        # a = start of learned spells for character
-        asm.CLC(),
-        asm.ADC(spell_count, asm.IMM16),        # add number of spells
-        asm.STA(learned_start, asm.DIR),        # $learned_start = start of learned spells for next character
-        asm.A8(),
-        asm.BRA("CHARACTER_LOOP_START"),        # learn spells with next character
+            asm.A16(),
+            asm.LDA(learned_start, asm.DIR),        # a = start of learned spells for character
+            asm.CLC(),
+            asm.ADC(spell_count, asm.IMM16),        # add number of spells
+            asm.STA(learned_start, asm.DIR),        # $learned_start = start of learned spells for next character
+            asm.A8(),
+            asm.BRA("CHARACTER_LOOP_START"),        # learn spells with next character
 
-        "RETURN",
-        asm.PLA(),
-        asm.STA(spells_left, asm.DIR),          # restore original value at $spells_left
-        asm.PLY(),
-        asm.STY(learned_start, asm.DIR),        # restore original value at $learned_start
-        asm.PLP(),
-        asm.RTL(),
-    ]
+            "RETURN",
+            asm.PLA(),
+            asm.STA(spells_left, asm.DIR),          # restore original value at $spells_left
+            asm.PLY(),
+            asm.STY(learned_start, asm.DIR),        # restore original value at $learned_start
+            asm.PLP(),
+            asm.RTL(),
+        ]
+    else: # no spells to learn
+        src = [
+            asm.RTL()
+        ]
     space = Write(Bank.F0, src, "learn spells learn random spells")
     return space.start_address
 learn_random_spells = _learn_random_spells()

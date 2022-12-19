@@ -1,5 +1,6 @@
 from data.rage import Rage
 from data.structures import DataBits, DataArray
+from data.ability_data import AbilityData
 
 class Rages():
     RAGE_COUNT = 256 # 255 available
@@ -15,6 +16,9 @@ class Rages():
     ATTACKS_DATA_END = 0xf47ff
     ATTACKS_DATA_SIZE = 2
 
+    ABILITY_DATA_START = 0x046ac0
+    ABILITY_DATA_END = 0x0478bf
+
     def __init__(self, rom, args, enemies):
         self.rom = rom
         self.args = args
@@ -22,11 +26,17 @@ class Rages():
 
         self.init_data = DataBits(self.rom, self.INITIAL_RAGES_START, self.INITIAL_RAGES_END)
         self.attack_data = DataArray(self.rom, self.ATTACKS_DATA_START, self.ATTACKS_DATA_END, self.ATTACKS_DATA_SIZE)
+        self.ability_data = DataArray(self.rom, self.ABILITY_DATA_START, self.ABILITY_DATA_END, AbilityData.DATA_SIZE)
 
         self.rages = []
         for rage_index in range(len(self.attack_data)):
             rage = Rage(rage_index, self.attack_data[rage_index])
             self.rages.append(rage)
+
+        self.abilities = []
+        for ability_index in range(len(self.ability_data)):
+            ability = AbilityData(ability_index, self.ability_data[ability_index])
+            self.abilities.append(ability)
 
     def start_random_rages(self):
         import random

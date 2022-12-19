@@ -2,24 +2,30 @@ import menus.pregame_track as pregame_track
 import menus.pregame as pregame
 import menus.track as track
 import menus.dance as dance
+import menus.rage as rage
 import menus.status as status
 import menus.final_lineup as final_lineup
 import menus.coliseum as coliseum
 import menus.sell as sell
+import menus.magic as magic
 
 class Menus:
-    def __init__(self, characters, dances):
+    def __init__(self, characters, dances, rages, enemies):
         self.characters = characters
         self.dances = dances
+        self.rages = rages
+        self.enemies = enemies
 
         self.pregame_track = pregame_track.PreGameTrack(self.characters)
         self.pregame_menu = pregame.PreGameMenu(self.pregame_track)
         self.track_menu = track.TrackMenu(self.pregame_track)
         self.dance_menu = dance.DanceMenu(self.dances)
+        self.rage_menu = rage.RageMenu(self.rages, self.enemies)
         self.status_menu = status.StatusMenu(self.characters)
         self.final_lineup_menu = final_lineup.FinalLineupMenu(self.characters)
         self.coliseum_menu = coliseum.ColiseumMenu()
         self.sell_menu = sell.SellMenu()
+        self.magic_menu = magic.MagicMenu()
 
         self.scrollbar_bugfix()
 
