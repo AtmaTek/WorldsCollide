@@ -25,6 +25,7 @@ class Arguments:
 
         self.parser.add_argument("-nro", dest = "no_rom_output", action = "store_true", help = "Do not output a modified rom file")
         self.parser.add_argument("-slog", dest = "stdout_log", action = "store_true", help = "Write log to stdout instead of file")
+        self.parser.add_argument("-hf", dest = "hide_flags", action = "store_true", help = "Hide Flags (no log, no flags menu)")
 
         for group in self.group_modules.values():
             group.parse(self.parser)
