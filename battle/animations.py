@@ -6,23 +6,55 @@ import args
 class Animations:
     def __init__(self):
         self.health_animation_reflect_mod()
+        self.stray_flash_mod()
+
+        # Flash removal
+        replace_flash_animation = [] # The background flash to replace with monster flashes
+        remove_flash_animation = [] # The background flash addresses to remove
 
         if args.flashes_remove_most:
-            flash_address_arrays = battle_animation_scripts.BATTLE_ANIMATION_FLASHES.values()
-            self.remove_battle_flashes_mod(flash_address_arrays)
+            # Replace Boss Death and Final Kefka
+            replace_flash_animation.extend(["Boss Death", "Final KEFKA Death"])
+            # And remove the rest
+            remove_flash_animation.extend(battle_animation_scripts.BATTLE_ANIMATION_FLASHES.keys())
+            # Also removing critical flash
             self.remove_critical_flash()
-
-        if args.flashes_remove_worst:
-            flash_address_arrays = []
-            animation_names = ["Boss Death", "Ice 3", "Fire 3", "Bolt 3", "Schiller", "R.Polarity", "X-Zone",
+        elif args.flashes_remove_worst:
+            replace_flash_animation.extend(["Boss Death"])
+            remove_flash_animation.extend(["Ice 3", "Fire 3", "Bolt 3", "Schiller", "R.Polarity", "X-Zone",
                                "Muddle", "Dispel", "Shock", "Bum Rush", "Quadra Slam", "Slash", "Flash", 
-                               "Step Mine", "Rippler", "WallChange", "Ultima", "ForceField"]
-            for name in animation_names:
-                flash_address_arrays.append(battle_animation_scripts.BATTLE_ANIMATION_FLASHES[name])
+                               "Step Mine", "Rippler", "WallChange", "Ultima", "ForceField"])
+
+        # Replace any specified above
+        flash_address_arrays = [battle_animation_scripts.BATTLE_ANIMATION_FLASHES[name] for name in replace_flash_animation]
+        if flash_address_arrays:
+            self.replace_bg_flash_with_monster_flash_mod(flash_address_arrays)
+        
+        # Remove any remainder specified above
+        flash_address_arrays = [battle_animation_scripts.BATTLE_ANIMATION_FLASHES[name] for name in remove_flash_animation if name not in replace_flash_animation]
+        if flash_address_arrays:
             self.remove_battle_flashes_mod(flash_address_arrays)
 
     def remove_critical_flash(self):
         space = Reserve(0x23410, 0x23413, "Critical hit screen flash", asm.NOP())
+
+    def replace_bg_flash_with_monster_flash_mod(self, flash_address_arrays):
+        REPLACEMENTS = {
+            0xAF: 0xB9, # Set background palette color subtraction (absolute) -> Set monster palettes color subtraction (absolute)
+            0xB0: 0xBA, # Set background palette color addition (absolute) -> Set monster palettes color addition (absolute)
+            0xB5: 0xBB, # Add color to background palette (relative) -> Add color to monster palettes (relative)
+            0xB6: 0xBC, # Subtract color from background palette (relative) -> Subtract color from monster palettes (relative)
+        }
+        for flash_addresses in flash_address_arrays:
+            # For each address in its array
+            for flash_address in flash_addresses:
+                # Read the current animation command at the address
+                animation_cmd = Read(flash_address, flash_address+1)
+                if(animation_cmd[0] in REPLACEMENTS.keys()):
+                    Write(flash_address, REPLACEMENTS[animation_cmd[0]], "BG flash to monster flash")
+                else:
+                    # This is an error, reflecting a difference between the disassembly used to generate BATTLE_ANIMATION_FLASHES and the ROM
+                    raise ValueError(f"Battle Animation Script Command at 0x{flash_address:x} (0x{animation_cmd[0]:x}) did not match an expected value.")
 
     def remove_battle_flashes_mod(self, flash_address_arrays):
         ABSOLUTE_CHANGES = [0xb0, 0xaf]
@@ -42,7 +74,11 @@ class Animations:
                 else:
                     # This is an error, reflecting a difference between the disassembly used to generate BATTLE_ANIMATION_FLASHES and the ROM
                     raise ValueError(f"Battle Animation Script Command at 0x{flash_address:x} (0x{animation_cmd[0]:x}) did not match an expected value.")
-    
+
+    def stray_flash_mod(self):
+        # port of https://www.romhacking.net/hacks/6740/
+        Write(0x10784b, 0xa7, "Flash tool position") #default: 0xaf
+
     def health_animation_reflect_mod(self):
         # Ref: https://www.ff6hacking.com/forums/thread-4145.html
         # Banon's Health command casts Cure 2 on the party with a unique animation.

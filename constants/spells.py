@@ -55,3 +55,7 @@ id_spell = {
     53  : "Life 3",
 }
 spell_id = {v: k for k, v in id_spell.items()}
+
+black_magic_ids = range(0, 24)
+gray_magic_ids = range(24, 45)
+white_magic_ids = range(45, 54)

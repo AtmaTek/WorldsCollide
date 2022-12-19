@@ -1,5 +1,5 @@
 # NOTE: (address - 1e80) * 0x8 + bit
-# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
+# e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible)
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
 
 DISABLE_SAVE_POINT_TUTORIAL = 0x133
@@ -181,6 +181,13 @@ DEFEATED_KEFKA_TOWER_DRAGON_S = 0x11e # custom, skull dragon location
 DEFEATED_ANCIENT_CASTLE_DRAGON = 0x11f # custom
 DEFEATED_PHOENIX_CAVE_DRAGON = 0x120 # custom
 DEFEATED_FANATICS_TOWER_DRAGON = 0x121 # custom
+
+# KT Battles
+DEFEATED_GUARDIAN = 0x0bc
+DEFEATED_INFERNO = 0x0bd
+DEFEATED_DOOM = 0x072
+DEFEATED_GODDESS = 0x073
+DEFEATED_POLTERGEIST = 0x074
 
 LEFT_WEIGHT_PUSHED_KEFKA_TOWER = 0x063
 RIGHT_WEIGHT_PUSHED_KEFKA_TOWER = 0x064

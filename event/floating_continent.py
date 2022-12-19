@@ -143,6 +143,13 @@ class FloatingContinent(Event):
         )
 
     def air_force_battle_mod(self):
+        if self.args.flashes_remove_most or self.args.flashes_remove_worst:
+            # Slow the scrolling background by modifying the ADC command.
+            space = Reserve(0x2b1b1, 0x2b1b3, "falling through clouds background movement")
+            space.write(
+                asm.ADC(0x0001, asm.IMM16) #default: 0x0006
+            )
+
         boss_pack_id = self.get_boss("Air Force")
         battle_background = 7 # sky, falling
 
