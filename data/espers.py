@@ -45,6 +45,11 @@ class Espers():
             self.espers.append(esper)
 
         self.available_espers = set(range(self.ESPER_COUNT))
+        self.starting_espers = []
+
+        if args.starting_espers_min > 0:
+            count = random.randint(args.starting_espers_min, args.starting_espers_max)
+            self.starting_espers = [self.get_random_esper() for _esp in range(count)]
 
     def receive_dialogs_mod(self, dialogs):
         self.receive_dialogs = [1133, 1380, 1381, 1134, 1535, 1082, 1091, 1092, 1136, 1534, 2618, 1093, 1087,\
@@ -141,23 +146,23 @@ class Espers():
                 learn_rate = Esper.LEARN_RATES[learn_rate_index]
                 esper.add_spell(get_spell(), learn_rate)
 
-    def remove_all_ultima(self):
-        ultima_id = self.spells.get_id("Ultima")
-        for esper in self.espers:
-            if esper.has_spell(ultima_id):
-                esper.remove_spell(ultima_id)
+    def remove_flagged_learnables(self):
+        for a_spell_id in self.args.remove_learnable_spell_ids:
+            for esper in self.espers:
+                if(esper.has_spell(a_spell_id)):
+                    esper.remove_spell(a_spell_id)
 
-    def remove_all_life(self):
-        life_id = self.spells.get_id("Life")
-        life2_id = self.spells.get_id("Life 2")
-        life3_id = self.spells.get_id("Life 3")
+    def replace_flagged_learnables(self):
         for esper in self.espers:
-            if esper.has_spell(life_id):
-                esper.remove_spell(life_id)
-            if esper.has_spell(life2_id):
-                esper.remove_spell(life2_id)
-            if esper.has_spell(life3_id):
-                esper.remove_spell(life3_id)
+            for a_spell_id in self.args.remove_learnable_spell_ids:
+                if(esper.has_spell(a_spell_id)):
+                    # Also exclude spells this Esper already knows, to avoid duplicates
+                    exclude_spell_ids = self.args.remove_learnable_spell_ids.copy()
+                    exclude_spell_ids.extend(esper.get_spell_ids())
+
+                    new_spell_id = self.spells.get_replacement(a_spell_id, exclude = exclude_spell_ids)
+                    esper.replace_spell(a_spell_id, new_spell_id)
+
 
     def clear_spells(self):
         for esper in self.espers:
@@ -202,7 +207,7 @@ class Espers():
             mp_percent = random.randint(self.args.esper_mp_random_percent_min,
                                         self.args.esper_mp_random_percent_max) / 100.0
             value = int(esper.mp * mp_percent)
-            esper.mp = max(min(value, 255), 1)
+            esper.mp = max(min(value, 254), 1)
 
     def equipable_random(self):
         from data.characters import Characters
@@ -271,15 +276,15 @@ class Espers():
         if self.args.esper_spells_random_rates or self.args.esper_spells_shuffle_random_rates:
             self.randomize_rates()
 
+        if len(self.starting_espers):
+            self.randomize_rates()
+
         if self.args.esper_spells_shuffle or self.args.esper_spells_shuffle_random_rates:
             self.shuffle_spells()
         elif self.args.esper_spells_random:
             self.randomize_spells()
         elif self.args.esper_spells_random_tiered:
             self.randomize_spells_tiered()
-
-        if self.args.no_ultima:
-            self.remove_all_ultima()
 
         if self.args.esper_bonuses_shuffle:
             self.shuffle_bonuses()
@@ -300,8 +305,14 @@ class Espers():
         espers_asm.equipable_mod(self)
 
         if self.args.permadeath:
-            self.remove_all_life()
             self.phoenix_life3()
+
+        if self.args.esper_spells_random or self.args.esper_spells_random_tiered:
+            # if random, replace the spells
+            self.replace_flagged_learnables()
+        else:
+            # otherwise (original or shuffled), remove them
+            self.remove_flagged_learnables()
 
         if self.args.esper_multi_summon:
             self.multi_summon()
@@ -345,8 +356,10 @@ class Espers():
         for entry_index in range(self.ESPER_COUNT):
             esper_index = self.esper_menu_order[entry_index]
             esper = self.espers[esper_index]
+            prefix = "*" if esper.id in self.starting_espers else ""
 
-            entry = [f"{esper.get_name():<{self.NAME_SIZE}}  {esper.mp:>3} MP"]
+            entry = [f"{prefix}{esper.get_name():<{self.NAME_SIZE}}  {esper.mp:>3} MP"]
+
             for spell_index in range(esper.spell_count):
                 spell_name = self.spells.get_name(esper.spells[spell_index].id)
                 learn_rate = esper.spells[spell_index].rate
@@ -375,6 +388,9 @@ class Espers():
                 rentries.append(entry)
             else:
                 lentries.append(entry)
+
+        lentries.append("")
+        lentries.append("* = Starting Esper")
 
         section_entries("Espers", lentries, rentries)
 

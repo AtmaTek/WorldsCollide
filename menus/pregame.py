@@ -1,5 +1,6 @@
-from memory.space import Bank, Write, Reserve, Allocate, Read
+from memory.space import START_ADDRESS_SNES, Bank, Write, Reserve, Allocate, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 
 class PreGameMenu:
     MENU_NUMBER = 9
@@ -8,6 +9,7 @@ class PreGameMenu:
 
     def __init__(self, pregame_track):
         self.common = pregame_track
+        self.invoke_flags_submenu = {}
         self.mod()
 
     def draw_options_mod(self):
@@ -46,10 +48,10 @@ class PreGameMenu:
 
     def initialize_mod(self):
         src = [
-            asm.JSR(self.common.initialize, asm.ABS),
+            asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
             asm.JSR(self.draw_options, asm.ABS),
-            asm.JSR(self.common.upload_bg123ab, asm.ABS),
+            asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
             asm.STA(0x0200, asm.ABS),
@@ -60,6 +62,7 @@ class PreGameMenu:
             asm.STA(0x26, asm.DIR),         # add fade in pregame menu to queue
             asm.JMP(0x3541, asm.ABS),       # set brightness and refresh screen
         ]
+        # called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame initialize")
         self.initialize = space.start_address
 
@@ -78,6 +81,14 @@ class PreGameMenu:
         ]
         space = Write(Bank.C3, src, "pregame invoke flags")
         self.invoke_flags = space.start_address
+
+    def invoke_flags_submenu_mod(self, submenu_idx):
+        src = [
+            asm.JSR(0x6a3c, asm.ABS),   # clear BG3 a (workaround for bizhawk snes9x core bug)
+            asm.JMP(self.common.invoke_flags_submenu[submenu_idx], asm.ABS),
+        ]
+        space = Write(Bank.C3, src, "pregame invoke flag submenu")
+        self.invoke_flags_submenu[submenu_idx] = space.start_address
 
     def sustain_mod(self):
         src = [
@@ -120,12 +131,21 @@ class PreGameMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            # if in a scroll area, sustain it
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
 
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.JSR(0x072d, asm.ABS),       # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),       # update cursor position
@@ -134,8 +154,9 @@ class PreGameMenu:
 
             asm.LDA(0x08, asm.DIR),         # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),        # a pressed?
-            asm.BEQ("RETURN"),              # branch if not
-
+            asm.BNE("A_PRESSED"),           # branch if so
+            asm.RTS(),
+            "A_PRESSED",
             asm.TDC(),
             asm.JSR(0x0eb2, asm.ABS),       # click sound
             asm.LDA(0x4b, asm.DIR),         # a = cursor index
@@ -144,36 +165,40 @@ class PreGameMenu:
             asm.JMP(options_table, asm.ABS_X_16),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
+            asm.LDA(0x09, asm.DIR),
             asm.BIT(0x80, asm.IMM8),        # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.BNE("EXIT_SCROLL_AREA"),    # branch if so
+
+        ]
+
+        for submenu_id in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_id, self.invoke_flags_submenu[submenu_id]))
+
+        src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
-            asm.STA(0x0200, asm.ABS),
-
-            "RETURN",
-            asm.RTS(),
         ]
+        src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.invoke_flags))
+        
+        # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "pregame sustain")
         self.sustain = space.start_address
 
     def initialize_config_menu_mod(self):
         src = [
-            asm.JSR(0x352f, asm.ABS),       # reset
-
+            c3.eggers_jump(0x352f),         # displaced code: reset
+            asm.STZ(0x4A, asm.DIR),         # displaced code: screen 1st
             asm.LDA(0xc0, asm.IMM8),        # hdma channels 6 and 7
             asm.TRB(0x43, asm.DIR),
-            asm.RTS(),
+            asm.RTL(),
         ]
-        space = Write(Bank.C3, src, "pregame initialize config menu reset uncondense")
+        space = Write(Bank.F0, src, "pregame initialize config menu reset uncondense")
         reset_uncondense = space.start_address
 
-        space = Reserve(0x31c7d, 0x31c7f, "pregame initialize config menu reset")
+        space = Reserve(0x31c7d, 0x31c81, "pregame initialize config menu reset", asm.NOP())
         space.write(
-            asm.JSR(reset_uncondense, asm.ABS),
+            asm.JSL(reset_uncondense + START_ADDRESS_SNES),
         )
 
     def exit_config_menu_mod(self):
@@ -235,6 +260,8 @@ class PreGameMenu:
         self.initialize_mod()
         self.invoke_objectives_menu_mod()
         self.invoke_flags_menu_mod()
+        for submenu_idx in self.common.flags.submenus.keys():
+            self.invoke_flags_submenu_mod(submenu_idx)
         self.sustain_mod()
 
         self.initialize_config_menu_mod()

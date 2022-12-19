@@ -47,23 +47,93 @@ class Spells:
 
         import random
         possible_spell_ids = [spell.id for spell in self.spells if spell.id not in exclude]
+        count = min(len(possible_spell_ids), count)
         return random.sample(possible_spell_ids, count)
+
+    def get_replacement(self, spell_id, exclude):
+        ''' get a random spell from the same tier as the given spell_id '''
+        import random
+        from data.esper_spell_tiers import tiers
+
+        same_tier = next((tier for tier in tiers if spell_id in tier), [])
+        replacements = [i for i in same_tier if i not in exclude]
+        replacement = random.choice(replacements) if len(replacements) else None
+        return replacement
 
     def no_mp_scan(self):
         scan_id = name_id["Scan"]
         self.spells[scan_id].mp = 0
 
+    def no_mp_warp(self):
+        warp_id = name_id["Warp"]
+        self.spells[warp_id].mp = 0
+
+    def ultima_254_mp(self):
+        ultima_id = name_id["Ultima"]
+        self.spells[ultima_id].mp = 254
+
+    def shuffle_mp(self):
+        mp = []
+        for spell in self.spells:
+            mp.append(spell.mp)
+
+        import random
+        random.shuffle(mp)
+        for spell in self.spells:
+            spell.mp = mp.pop()
+
+    def random_mp_value(self):
+        import random
+        for spell in self.spells:
+            spell.mp = random.randint(self.args.magic_mp_random_value_min, self.args.magic_mp_random_value_max)
+
+    def random_mp_percent(self):
+        import random
+        for spell in self.spells:
+            mp_percent = random.randint(self.args.magic_mp_random_percent_min,
+                                        self.args.magic_mp_random_percent_max) / 100.0
+            value = int(spell.mp * mp_percent)
+            spell.mp = max(min(value, 254), 0)
+
     def mod(self):
+        if self.args.magic_mp_shuffle:
+            self.shuffle_mp()
+        elif self.args.magic_mp_random_value:
+            self.random_mp_value()
+        elif self.args.magic_mp_random_percent:
+            self.random_mp_percent()
+
+        # Apply No MP Scan after any MP shuffle/rando
         if self.args.scan_all:
             self.no_mp_scan()
+        if self.args.warp_all:
+            self.no_mp_warp()
+
+        # Apply Ultima 254 MP after any MP shuffle/rando
+        if self.args.ultima_254_mp:
+            self.ultima_254_mp()
 
     def write(self):
+        if self.args.spoiler_log:
+            self.log()
+            
         for spell_index, spell in enumerate(self.spells):
             self.name_data[spell_index] = spell.name_data()
             self.ability_data[spell_index] = spell.ability_data()
 
         self.name_data.write()
         self.ability_data.write()
+
+    def log(self):
+        from log import section
+        
+        lcolumn = []
+        for spell in self.spells:
+            spell_name = spell.get_name()
+
+            lcolumn.append(f"{spell_name:<{self.NAME_SIZE}} {spell.mp:>3} MP")
+        
+        section("Spells", lcolumn, [])
 
     def print(self):
         for spell in self.spells:
