@@ -6,6 +6,7 @@ class RewardType(Flag):
     ESPER = auto()
     ITEM = auto()
 
+CHARACTER_ESPER_ONLY_REWARDS = 6
 class Reward:
     def __init__(self, event, possible_types):
         self.id = None

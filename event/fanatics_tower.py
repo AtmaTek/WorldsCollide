@@ -15,6 +15,7 @@ class FanaticsTower(Event):
         self.strago_npc_id = 0x13
         self.strago_npc = self.maps.get_npc(0x16a, self.strago_npc_id)
 
+        self.gau_magic_mod()
         self.relm_event_mod()
         self.tower_top_mod()
         self.magimaster_battle_mod()
@@ -31,6 +32,11 @@ class FanaticsTower(Event):
 
         self.log_reward(self.reward1)
         self.log_reward(self.reward2)
+
+    def gau_magic_mod(self):
+        # normally only the Fight command replaces magic, causing Gau to only have Item.
+        # NOP the logic that blanks out everything except Magic + Item
+        Reserve(0x2538c, 0x2538d, "fanatics tower magic cmd", field.NOP())
 
     def relm_event_mod(self):
         # normally there are 4 event tiles surrounding player when they enter map and if player steps on one

@@ -1,10 +1,12 @@
 from data.rage import Rage
 from data.structures import DataBits, DataArray
+from data.ability_data import AbilityData
 
 class Rages():
     RAGE_COUNT = 256 # 255 available
     DOOM_DRGN_RAGE_ID = 37
     NIGHTSHADE_RAGE_ID = 51
+    RHOBITE_RAGE_ID = 118
     PUGS_RAGE_ID = 255 # does not appear in rage list, cannot be used
 
     INITIAL_RAGES_START = 0x47aa0
@@ -14,6 +16,9 @@ class Rages():
     ATTACKS_DATA_END = 0xf47ff
     ATTACKS_DATA_SIZE = 2
 
+    ABILITY_DATA_START = 0x046ac0
+    ABILITY_DATA_END = 0x0478bf
+
     def __init__(self, rom, args, enemies):
         self.rom = rom
         self.args = args
@@ -21,11 +26,17 @@ class Rages():
 
         self.init_data = DataBits(self.rom, self.INITIAL_RAGES_START, self.INITIAL_RAGES_END)
         self.attack_data = DataArray(self.rom, self.ATTACKS_DATA_START, self.ATTACKS_DATA_END, self.ATTACKS_DATA_SIZE)
+        self.ability_data = DataArray(self.rom, self.ABILITY_DATA_START, self.ABILITY_DATA_END, AbilityData.DATA_SIZE)
 
         self.rages = []
         for rage_index in range(len(self.attack_data)):
             rage = Rage(rage_index, self.attack_data[rage_index])
             self.rages.append(rage)
+
+        self.abilities = []
+        for ability_index in range(len(self.ability_data)):
+            ability = AbilityData(ability_index, self.ability_data[ability_index])
+            self.abilities.append(ability)
 
     def start_random_rages(self):
         import random
@@ -66,6 +77,11 @@ class Rages():
             asm.BRA("EMPTY_COMMAND_SLOT"),
         )
 
+    def no_life(self):
+        from data.spell_names import name_id
+        # change Robite to cure 2 from life
+        self.rages[self.RHOBITE_RAGE_ID].attack2 = name_id["Cure 2"]
+
     def no_charm(self):
         # change nightshade charm to special attack (poison pod)
         self.rages[self.NIGHTSHADE_RAGE_ID].attack2 = 239
@@ -79,6 +95,9 @@ class Rages():
 
         if self.args.rages_no_charm:
             self.no_charm()
+
+        if self.args.permadeath:
+            self.no_life()
 
     def write(self):
         if self.args.spoiler_log:

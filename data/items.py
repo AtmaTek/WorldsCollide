@@ -155,6 +155,17 @@ class Items():
             value = int(item.price * price_percent)
             item.price = max(min(value, 2**16 - 1), 0)
 
+    def expensive_breakable_rods(self):
+        self.items[name_id["Poison Rod"]].scale_price(3)
+        self.items[name_id["Fire Rod"]].scale_price(4)
+        self.items[name_id["Ice Rod"]].scale_price(4)
+        self.items[name_id["Thunder Rod"]].scale_price(4)
+        self.items[name_id["Gravity Rod"]].scale_price(1.2)
+        self.items[name_id["Pearl Rod"]].scale_price(1.2)
+
+    def expensive_super_balls(self):
+        self.items[name_id["Super Ball"]].scale_price(2)
+
     def assign_values(self):
         from data.item_custom_values import custom_values
         for item in self.items:
@@ -198,14 +209,19 @@ class Items():
         if self.args.no_priceless_items:
             self.assign_values()
 
+        if self.args.shops_expensive_breakable_rods:
+            self.expensive_breakable_rods()
+
+        if self.args.shops_expensive_super_balls:
+            self.expensive_super_balls()
+
         if self.args.shop_prices_random_value:
             self.random_prices_value()
         elif self.args.shop_prices_random_percent:
             self.random_prices_percent()
 
-        if self.args.no_ultima:
-            from data.spell_names import name_id as spell_name_id
-            self.remove_learnable_spell(spell_name_id["Ultima"])
+        for a_spell_id in self.args.remove_learnable_spell_ids:
+            self.remove_learnable_spell(a_spell_id)
 
         if self.args.cursed_shield_battles_original:
             self.cursed_shield_battles = 256
