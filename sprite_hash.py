@@ -69,6 +69,6 @@ if __name__ == "__main__":
     import os, sys
     sys.path.append(os.path.dirname(__file__))
 
-    from args.arguments import Arguments
+    from arguments import Arguments
     args = Arguments()
     print(", ".join([entry.name for entry in args.sprite_hash]))

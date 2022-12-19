@@ -7,12 +7,16 @@ def parse(parser):
     coliseum = parser.add_argument_group("Coliseum")
 
     coliseum_opponents = coliseum.add_mutually_exclusive_group()
+    coliseum_opponents.title = 'Coliseum Opponents'
+
     coliseum_opponents.add_argument("-cos", "--coliseum-opponents-shuffle", action = "store_true",
                                      help = "Coliseum opponents shuffled")
     coliseum_opponents.add_argument("-cor", "--coliseum-opponents-random", action = "store_true",
                                      help = "Coliseum opponents randomized")
 
     coliseum_rewards = coliseum.add_mutually_exclusive_group()
+    coliseum_rewards.title = 'Coliseum Rewards'
+
     coliseum_rewards.add_argument("-crs", "--coliseum-rewards-shuffle", action = "store_true",
                                    help = "Coliseum rewards shuffled")
     coliseum_rewards.add_argument("-crr", "--coliseum-rewards-random", action = "store_true",

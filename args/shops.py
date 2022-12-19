@@ -5,6 +5,7 @@ def parse(parser):
     shops = parser.add_argument_group("Shops")
 
     shops_inventory = shops.add_mutually_exclusive_group()
+    shops_inventory.title = 'Shop Inventory'
     shops_inventory.add_argument("-sisr", "--shop-inventory-shuffle-random",
                                  default = None, type = int, metavar = "PERCENT", choices = range(101),
                                  help = "Shop inventories randomized based on type. All weapon shops randomized, all armor shops, etc...")
@@ -14,6 +15,7 @@ def parse(parser):
                                  help = "Shop inventories empty")
 
     shops_prices = shops.add_mutually_exclusive_group()
+    shops_prices.title = 'Shop Prices'
     shops_prices.add_argument("-sprv", "--shop-prices-random-value", default = None, type = int,
                               nargs = 2, metavar = ("MIN", "MAX"), choices = range(2**16),
                               help = "Each item cost set to random value within given range")
@@ -22,6 +24,7 @@ def parse(parser):
                               help = "Each item cost set to random percent of original within given range")
 
     shops_sell_fraction = shops.add_mutually_exclusive_group()
+    shops_sell_fraction.title = 'Shop Sell Fraction'
     shops_sell_fraction.add_argument("-ssf4", "--shop-sell-fraction4", action = "store_true",
                                      help = "Items sell for 1/4 their price")
     shops_sell_fraction.add_argument("-ssf8", "--shop-sell-fraction8", action = "store_true",

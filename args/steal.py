@@ -5,6 +5,7 @@ def parse(parser):
     steal = parser.add_argument_group("Steal")
 
     steal_chances = steal.add_mutually_exclusive_group()
+    steal_chances.title = 'Steal Chances'
     steal_chances.add_argument("-sch", "--steal-chances-higher", action = "store_true",
                          help = "Steal Rate is improved and rare steals are more likely")
     steal_chances.add_argument("-sca", "--steal-chances-always", action = "store_true",

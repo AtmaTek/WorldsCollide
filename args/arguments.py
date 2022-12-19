@@ -1,10 +1,11 @@
+
 class Arguments:
     def __init__(self):
         import importlib
         self.groups = [
             "settings",
             "objectives",
-            "starting_party", "characters", "swdtechs", "blitzes", "lores", "rages", "dances", "steal", "commands",  
+            "starting_party", "characters", "swdtechs", "blitzes", "lores", "rages", "dances", "steal", "commands",
             "xpmpgp", "scaling", "bosses", "encounters", "boss_ai",
             "espers", "natural_magic",
             "starting_gold_items", "items", "shops", "chests",
@@ -30,7 +31,7 @@ class Arguments:
             group.parse(self.parser)
 
         self.parser.parse_args(namespace = self)
-
+        
         self.flags = ""
         self.seed_rng_flags = ""
         for group_name, group in self.group_modules.items():
@@ -57,7 +58,6 @@ class Arguments:
             # ignore any output_file argument and add given seed id to output name
             name, ext = os.path.splitext(self.input_file)
             self.output_file = f"{name}wc_{self.seed_id}{ext}"
-
             self.website_link = f"ff6wc.com/seed/{self.seed_id}"
         elif self.output_file is None:
             # if no output_file given add seed to output name

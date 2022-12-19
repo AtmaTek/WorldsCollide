@@ -6,6 +6,7 @@ def parse(parser):
     items = parser.add_argument_group("Items")
 
     items_equipable = items.add_mutually_exclusive_group()
+    items_equipable.title = 'Equipable Items'
     items_equipable.add_argument("-ier", "--item-equipable-random",
                                  default = None, type = int, nargs = 2, metavar = ("MIN", "MAX"),
                                  choices = range(Characters.CHARACTER_COUNT + 1),
@@ -22,6 +23,7 @@ def parse(parser):
                                  help = "Shuffle character equipment. After randomization, characters have a %(metavar)s chance of being able to equip each item they could not previously equip. If %(metavar)s negative, characters have a -%(metavar)s chance of not being able to equip each item they could previously equip")
 
     items_equipable_relic = items.add_mutually_exclusive_group()
+    items_equipable_relic.title = 'Equipable Relics'
     items_equipable_relic.add_argument("-ierr", "--item-equipable-relic-random",
                                        default = None, type = int, nargs = 2, metavar = ("MIN", "MAX"),
                                        choices = range(Characters.CHARACTER_COUNT + 1),
