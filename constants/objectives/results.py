@@ -85,6 +85,8 @@ category_types = {
     ],
 }
 
+#Additional results
+category_types["Command"].append(ResultType(59, "Magitek Upgrade", "Magitek Upgrade", None))
 category_types["Auto"].append(ResultType(61, "Auto Dog Block", "Auto Dog Block", None))
 category_types["Auto"].append(ResultType(62, "Auto Life 3", "Auto Life 3", None))
 
