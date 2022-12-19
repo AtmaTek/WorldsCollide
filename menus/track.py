@@ -1,5 +1,6 @@
-from memory.space import Bank, Write, Reserve, Allocate, Read
+from memory.space import START_ADDRESS_SNES, Bank, Write, Reserve, Allocate, Read
 import instruction.asm as asm
+import instruction.c3 as c3
 
 class TrackMenu:
     MENU_NUMBER = 10
@@ -192,10 +193,10 @@ class TrackMenu:
 
     def initialize_mod(self):
         src = [
-            asm.JSR(self.common.initialize, asm.ABS),
+            asm.JSL(self.common.initialize + START_ADDRESS_SNES),
 
             asm.JSR(self.draw_options, asm.ABS),
-            asm.JSR(self.common.upload_bg123ab, asm.ABS),
+            asm.JSL(self.common.upload_bg123ab + START_ADDRESS_SNES),
 
             asm.LDA(self.MENU_NUMBER, asm.IMM8),
             asm.STA(0x0200, asm.ABS),
@@ -206,6 +207,7 @@ class TrackMenu:
             asm.STA(0x26, asm.DIR),     # add fade in menu to queue
             asm.JMP(0x3541, asm.ABS),   # set brightness and refresh screen
         ]
+        # called by C3 JSR jump table
         space = Write(Bank.C3, src, "track initialize")
         self.initialize = space.start_address
 
@@ -222,7 +224,8 @@ class TrackMenu:
         src = [
             asm.JSR(self.common.refresh_sprites, asm.ABS),
 
-            asm.LDA(0x0200, asm.ABS),
+            # if in a scroll-area menu, sustain the scroll area
+            asm.LDA(0x0200, asm.ABS), 
             asm.CMP(self.common.objectives.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.checks.MENU_NUMBER, asm.IMM8),
@@ -231,7 +234,15 @@ class TrackMenu:
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
             asm.CMP(self.common.flags.MENU_NUMBER, asm.IMM8),
             asm.BEQ("SUSTAIN_SCROLL_AREA"),
+        ]
 
+        for submenu_idx in self.common.flags.submenus.keys():
+            src += [
+                asm.CMP(self.common.flags.submenus[submenu_idx].MENU_NUMBER, asm.IMM8),
+                asm.BEQ("SUSTAIN_SCROLL_AREA"),
+            ]
+
+        src += [
             asm.JSR(0x072d, asm.ABS),   # handle d-pad
             asm.LDY(self.common.cursor_positions, asm.IMM16),
             asm.JSR(0x0640, asm.ABS),   # update cursor position
@@ -252,8 +263,9 @@ class TrackMenu:
             "HANDLE_B",
             asm.LDA(0x09, asm.DIR),     # load buttons pressed this frame
             asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BEQ("RETURN"),          # return if not
-
+            asm.BNE("B_PRESSED"),       # return if not
+            asm.RTS(),
+            "B_PRESSED",
             asm.LDA(0x04, asm.IMM8),    # a = initialize main menu command
             asm.STA(0x27, asm.DIR),     # add initialize main menu to queue
             asm.LDA(self.common.FADE_OUT_COMMAND, asm.IMM8),
@@ -261,19 +273,23 @@ class TrackMenu:
             asm.RTS(),
 
             "SUSTAIN_SCROLL_AREA",
-            asm.LDA(0x0d, asm.DIR),
-            asm.BIT(0x80, asm.IMM8),    # b pressed?
-            asm.BNE("EXIT_SCROLL_AREA"),
+            asm.LDA(0x09, asm.DIR),
+            asm.BIT(0x80, asm.IMM8),     # b pressed?
+            asm.BNE("EXIT_SCROLL_AREA"), # branch if so
+        ]
+
+        for submenu_idx in self.common.flags.submenus.keys():
+            src.extend(self.common.get_submenu_src(submenu_idx, self.common.invoke_flags_submenu[submenu_idx]))
+
+        src += [
             asm.JMP(self.common.sustain_scroll_area, asm.ABS),
 
             "EXIT_SCROLL_AREA",
-            asm.JSR(self.common.exit_scroll_area, asm.ABS),
-            asm.LDA(self.MENU_NUMBER, asm.IMM8),
-            asm.STA(0x0200, asm.ABS),
-
-            "RETURN",
-            asm.RTS(),
         ]
+
+        src.extend(self.common.get_scroll_area_exit_src(self.MENU_NUMBER, self.common.invoke_flags))
+
+        # Called by C3 JSR jump table
         space = Write(Bank.C3, src, "track sustain")
         self.sustain = space.start_address
 

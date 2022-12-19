@@ -122,8 +122,10 @@ class BurningHouse(Event):
                 field_entity.Turn(direction.DOWN),
             ),
             field.Call(field.HEAL_PARTY_HP_MP_STATUS),
-            field.Call(field.FADE_IN_SCREEN_AND_GATHER_AFTER_INN),
+            field.FadeInScreen(8),
+            field.Pause(2.00),
             field.FinishCheck(),
+            field.Call(field.GATHER_AFTER_INN),
             field.Return(),
         ]
         space = Write(Bank.CB, src, "burning house wake up")

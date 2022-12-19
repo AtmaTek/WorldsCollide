@@ -33,12 +33,22 @@ def parse(parser):
                         help = "%(metavar)s shops will contain dried meat")
     shops.add_argument("-npi", "--no-priceless-items", action = "store_true",
                        help = "Assign values to items which normally sell for 1 gold. Recommended with random inventory")
-    shops.add_argument("-snbr", "--shops-no-breakable-rods", action = "store_true",
+    breakable_rods = shops.add_mutually_exclusive_group()
+    breakable_rods.add_argument("-snbr", "--shops-no-breakable-rods", action = "store_true",
                        help = "Poison, Fire, Ice, Thunder, Gravity, and Pearl Rods not sold in shops")
+    breakable_rods.add_argument("-sebr", "--shops-expensive-breakable-rods", action = "store_true",
+                       help = "Poison, Fire, Ice, Thunder, Gravity, and Pearl Rods base price increased")
+
     shops.add_argument("-snes", "--shops-no-elemental-shields", action = "store_true",
                        help = "Flame, Ice, and Thunder Shields not sold in shops")
-    shops.add_argument("-snsb", "--shops-no-super-balls", action = "store_true",
+
+    super_balls = shops.add_mutually_exclusive_group()
+    super_balls.add_argument("-snsb", "--shops-no-super-balls", action = "store_true",
                        help = "Super Balls not sold in shops")
+    super_balls.add_argument("-sesb", "--shops-expensive-super-balls", action = "store_true",
+                       help = "Super Balls base price increase")
+    
+
     shops.add_argument("-snee", "--shops-no-exp-eggs", action = "store_true",
                        help = "Exp. Eggs not sold in shops")
     shops.add_argument("-snil", "--shops-no-illuminas", action = "store_true",
@@ -78,12 +88,20 @@ def flags(args):
         flags += f" -sdm {args.shop_dried_meat}"
     if args.no_priceless_items:
         flags += " -npi"
+
     if args.shops_no_breakable_rods:
         flags += " -snbr"
+    elif args.shops_expensive_breakable_rods:
+        flags += " -sebr"
+
     if args.shops_no_elemental_shields:
         flags += " -snes"
+
     if args.shops_no_super_balls:
         flags += " -snsb"
+    elif args.shops_expensive_super_balls:
+        flags += " -sesb"
+
     if args.shops_no_exp_eggs:
         flags += " -snee"
     if args.shops_no_illuminas:
@@ -114,6 +132,18 @@ def options(args):
     elif args.shop_sell_fraction0:
         sell_fraction = "0"
 
+    breakable_rods = "Available"
+    if args.shops_no_breakable_rods:
+        breakable_rods = "No"
+    elif args.shops_expensive_breakable_rods:
+        breakable_rods = "Expensive"
+
+    super_balls = "Available"
+    if args.shops_no_super_balls:
+        super_balls = "No"
+    elif args.shops_expensive_super_balls:
+        super_balls = "Expensive"
+
     result = [("Inventory", inventory)]
     if args.shop_inventory_shuffle_random:
         result.append(("Random Percent", f"{args.shop_inventory_shuffle_random_percent}%"))
@@ -123,9 +153,9 @@ def options(args):
         ("Sell Fraction", sell_fraction),
         ("Dried Meat", args.shop_dried_meat),
         ("No Priceless Items", args.no_priceless_items),
-        ("No Breakable Rods", args.shops_no_breakable_rods),
+        ("Breakable Rods", breakable_rods),
         ("No Elemental Shields", args.shops_no_elemental_shields),
-        ("No Super Balls", args.shops_no_super_balls),
+        ("Super Balls", super_balls),
         ("No Exp. Eggs", args.shops_no_exp_eggs),
         ("No Illuminas", args.shops_no_illuminas),
     ])

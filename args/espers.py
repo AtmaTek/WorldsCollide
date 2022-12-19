@@ -1,3 +1,12 @@
+from data.espers import Espers
+from event.event_reward import CHARACTER_ESPER_ONLY_REWARDS
+
+# If all 27 espers are allocated at start, there will be logic errors when it comes to
+# assigning characters to character/esper only checks.
+# We would have to ensure that a character is assigned to the {6} char/esper only rewards.
+# We could account for this in the logic, but it would gentrify the routing logic a bit much.
+MAX_STARTING_ESPERS = Espers.ESPER_COUNT - CHARACTER_ESPER_ONLY_REWARDS
+
 def name():
     return "Espers"
 
@@ -6,7 +15,13 @@ def parse(parser):
     from data.characters import Characters
     espers = parser.add_argument_group("Espers")
 
+    esper_start = espers.add_mutually_exclusive_group()
+    esper_start.add_argument("-stesp", "--starting-espers", default = [0, 0], type = int,
+                                nargs = 2, metavar = ("MIN", "MAX"), choices = range(MAX_STARTING_ESPERS + 1),
+                                help = "Party starts with %(metavar) random espers")
+
     esper_spells = espers.add_mutually_exclusive_group()
+
     esper_spells.add_argument("-esrr", "--esper-spells-random-rates", action = "store_true",
                               help = "Original esper spells with random learn rates")
     esper_spells.add_argument("-ess", "--esper-spells-shuffle", action = "store_true",
@@ -30,7 +45,7 @@ def parse(parser):
     esper_mp.add_argument("-emps", "--esper-mp-shuffle", action = "store_true",
                           help = "Esper MP costs shuffled")
     esper_mp.add_argument("-emprv", "--esper-mp-random-value", default = None, type = int,
-                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(129),
+                          nargs = 2, metavar = ("MIN", "MAX"), choices = range(255),
                           help = "Each esper's MP cost set to random value within given range")
     esper_mp.add_argument("-emprp", "--esper-mp-random-percent", default = None, type = int,
                           nargs = 2, metavar = ("MIN", "MAX"), choices = range(201),
@@ -50,6 +65,7 @@ def parse(parser):
                         help = "Espers can be summoned multiple times in battle")
 
 def process(args):
+    args._process_min_max("starting_espers")
     args._process_min_max("esper_spells_random")
     args._process_min_max("esper_mp_random_value")
     args._process_min_max("esper_mp_random_percent")
@@ -65,6 +81,9 @@ def process(args):
 
 def flags(args):
     flags = ""
+
+    if args.starting_espers_min or args.starting_espers_max:
+        flags += f" -stesp {args.starting_espers_min} {args.starting_espers_max}"
 
     if args.esper_spells_random_rates:
         flags += " -esrr"
@@ -133,6 +152,7 @@ def options(args):
         equipable = f"Balanced Random {args.esper_equipable_balanced_random_value}"
 
     result = []
+    result.append(("Starting Espers", f"{args.starting_espers_min}-{args.starting_espers_max}"))
     result.append(("Spells", spells))
     result.append(("Bonuses", bonuses))
     if args.esper_bonuses_random:
