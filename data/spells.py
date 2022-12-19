@@ -64,6 +64,10 @@ class Spells:
         scan_id = name_id["Scan"]
         self.spells[scan_id].mp = 0
 
+    def no_mp_warp(self):
+        warp_id = name_id["Warp"]
+        self.spells[warp_id].mp = 0
+
     def ultima_254_mp(self):
         ultima_id = name_id["Ultima"]
         self.spells[ultima_id].mp = 254
@@ -102,6 +106,8 @@ class Spells:
         # Apply No MP Scan after any MP shuffle/rando
         if self.args.scan_all:
             self.no_mp_scan()
+        if self.args.warp_all:
+            self.no_mp_warp()
 
         # Apply Ultima 254 MP after any MP shuffle/rando
         if self.args.ultima_254_mp:
