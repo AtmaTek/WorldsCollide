@@ -51,7 +51,10 @@ class FigaroCastleWOR(Event):
         self.log_reward(self.reward)
 
     def add_gating_condition(self):
-        self.dialogs.set_text(2379, "SIGFRIED: Pretty dangerous from here on. Wait here.<end>")
+        if self.args.npc_dialog_tips:
+            self.dialogs.set_text(2379, "I won't budge from this spot until you have recruited <EDGAR>!<end>")
+        else:
+            self.dialogs.set_text(2379, "SIGFRIED: Pretty dangerous from here on. Wait here.<end>")
 
         space = Reserve(0xa7778, 0xa7781, "figaro cave siegfried enters", field.NOP())
         space.write(
