@@ -186,8 +186,47 @@ class Dialogs():
         #### NPC dialog tip mod
         import args
         if args.npc_dialog_tips:
+
+            # clear out vanilla dialog to make room for tips
+            for lines in range(0,49): # Narshe intro, Terra's flashback, Locke's intro
+                self.set_text(lines,"")
+            for lines in range(113,145): # Figaro Castle 1st Kefka sequence, Locke and Terra dialog
+                self.set_text(lines,"")
+            for lines in range(248,267): # Vargas and Sabin intro
+                self.set_text(lines,"")
+            for lines in range(370,407): # South Figaro Locke scenario
+                self.set_text(lines,"")
+            for lines in range(667,684): # Phantom Train
+                self.set_text(lines,"")
+            for lines in range(724,736): # Phantom Train end
+                self.set_text(lines,"")
+            for lines in range(783,803): # Crescent Mountain scene
+                self.set_text(lines,"")
+            for lines in range(837,874): # Narshe Battle
+                self.set_text(lines,"")
+            for lines in range(879,917): # After Narshe Battle
+                self.set_text(lines,"")
+            for lines in range(1073,1133): # Ramuh at Zozo
+                self.set_text(lines,"")
+            for lines in range(1372,1380): # Ifrit & Shiva
+                self.set_text(lines,"")
+            for lines in range(1387,1403): # Magitek Room Cid sequence
+                self.set_text(lines,"")
+            for lines in range(1410,1422): # After Magitek Factory
+                self.set_text(lines,"")
+            for lines in range(1635,1655): # Sealed Gate
+                self.set_text(lines,"")
+            for lines in range(1656,1675): # After Sealed Gate
+                self.set_text(lines,"")
+            for lines in range(1959,2003): # Thamasa Strago intro, Burning House intro
+                self.set_text(lines,"")
+            for lines in range(2005,2027): # Thamasa after Burning House
+                self.set_text(lines,"")
+            for lines in range(2136,2162): # Floating Continent statues scene
+                self.set_text(lines,"")
+
             self.set_text(81, "The Figaro Throne reward exists in both worlds!<end>")
-            self.set_text(82, "MasterPug doesn't grant any XP. Too bad…<end>")
+            self.set_text(82, "MasterPug doesn't grant any XP or MP. Too bad…<end>")
             self.set_text(83, "Blue Drgn uses Water magic. Use Imp gear to absorb it.<end>")
             self.set_text(85, "Open a hidden stairwell in the Ancient Castle by walking 5 steps south of the queen's throne and pressing “A”.<end>")
             self.set_text(87, "Use a combination of RunningShoes and Wall Ring to be completely safe from Tentacles.<end>")
@@ -203,9 +242,9 @@ class Dialogs():
             self.set_text(176, "An old clock.<end>")
             self.set_text(177, "An old clock.<end>")
             self.set_text(179, "Towns sell different things between worlds, even if they look the same.<end>")
-            self.set_text(180, "South Figaro has more free chests than any other town! The mansion's basement is open right from the setart.<end>")
+            self.set_text(180, "South Figaro has more free chests than any other town! The mansion's basement is open right from the start.<end>")
             self.set_text(181, "If you enter Mt. Kolts from the south and exit from the north, the airship will follow you to the northern exit.<end>")
-            self.set_text(182, "If you land a Pummel on Vargas, the fight will end immediately. No XP from him if you do it that though!<end>")
+            self.set_text(182, "If you land a Pummel on Vargas, the fight will end immediately. No XP from him if you do that though!<end>")
             self.set_text(183, "There are 2 hidden paths in Mt. Kolts that lead to treasure chests.<end>")
             self.set_text(184, "Equip relics to gain a variety of abilities!<end>")
             self.set_text(185, "Most Blitz moves utilize a character's MagPwr instead of Vigor. The 2 Blitzes that use Vigor are Pummel and Suplex.<end>")
@@ -246,8 +285,10 @@ class Dialogs():
             self.set_text(610, "Run from some battles by pressing (and holding) both the L and R Buttons.<page>This can take time, but will be fast in a preemptive strike/side attack.<page>Stock up on Smoke Bombs/Warp Stones and use them to escape.<end>")
             self.set_text(611, "In fights, “X” cycles character turns in order. “Y” cycles to the last character that had their ATB filled.<end>")
             self.set_text(612, "When selecting a spell, press the L or R Button to select multiple targets.<page>Sometimes, this causes the damage to be lower than a single target attack, so be careful!<end>")
+            self.set_text(613, "Press left or right in battle to choose 'Row' or 'Defense.' In Short command menus, hold L or R.<page>Defense cuts damage in half until the next turn.<end>")
             self.set_text(614, "Damage is more severe when caught in a pincer attack! Enemies that hit you from behind deal double damage.<end>")
-            self.set_text(616, "In the back row, damage and attack power are halved.<page>Change rows using the Main Menu: press left on the Control Pad, then press “A”.<page>Maximize character's Fight damage by placing them in the front row. Characters not using Fight should be kept in the back.<end>")
+            self.set_text(615, "If you turn the ATB meter off, you'll be able to see a character's max HP value in battle.<end>")
+            self.set_text(616, "In the back row, damage and attack power are halved.<page>Change rows using the Main Menu: press left on the Control Pad, then press “A”.<page>Maximize character's Fight damage by placing them in the front row. Keep characters not using Fight in the back.<end><end>")
             self.set_text(619, "Use a curative spell or item on an undead creature for maximum damage.<page>This will not work on some bosses under specific flags.<end>")
             self.set_text(621, "3-way attack indicates a fire, ice and lightning attack.<page>If an enemy nullifies or absorbs ANY ONE of those elements, they will nullify/absorb all the damage.<page>This applies to attacks like Maduin and Tritoch summons.<end>")
             self.set_text(622, "Use Rflect on your party to change enemy scripts - try it against SrBehemoth or Red Dragon.<end>")
@@ -303,9 +344,9 @@ class Dialogs():
             self.set_text(989, "If the Falcon allows you to “Search the Skies”, select that to start the Doom Gaze spot's fight immediately.<end>")
             self.set_text(990, "Hold R or L to turn the Airship faster.<end>")
             self.set_text(991, "Hold R or L to turn the Airship faster.<end>")
-            self.set_text(992, "Sniper and Hawk Eye both have a 50% chance to deal 150% damage / 300% damage against floating units.<end>")
+            self.set_text(992, "Sniper and Hawk Eye both have a 50% chance to deal 150% damage to enemies.<page>They'll deal 300% damage against floating ones. You can cast Float on enemies to make them vulnerable to this.<end>")
             self.set_text(993, "Fixed Dice ignores enemy defense and deals damage based on character level and the dice rolls.<end>")
-            self.set_text(994, "Hold Y when flying to strafe. You won't trigger the Search the Skies encounter while moving this.<page>Avoid that encounter entirely by flying to where your destination would be in the World of Balance, then switching to the World of Ruin and landing. Check your minimap to learn where locations are in both worlds.<end>")
+            self.set_text(994, "Hold Y when flying to strafe. You won't trigger the Search the Skies encounter while doing this.<page>Avoid that encounter entirely by flying to where your destination would be in the World of Balance, then switching to the World of Ruin and landing. Check your minimap to learn where locations are in both worlds.<end>")
             self.set_text(1012, "ValiantKnife deals bonus damage equal to the difference between the wielder's max HP and current HP.<end>")
             self.set_text(1014, "The Kohlingen Inn reward appears in both worlds.<end>")
             self.set_text(1016, "You might not expect it, but Dice and Fixed Dice gain Jump damage bonuses.<end>")
@@ -320,8 +361,8 @@ class Dialogs():
             self.set_text(1034, "Want physical damage? Go for Atlas Armlet or Hero Ring. Magic user? Equip 2 Earrings, 2 Hero Rings, or 1 of each.<end>")
             self.set_text(1036, "Bring Warp Stones if you venture into Zozo - both Mt. Zozo and Zozo Tower are long climbs down.<end>")
             self.set_text(1038, "In Zozo, the thieves will give you clues to solving the clock puzzle. Remember, they're all liars!<end>")
-            self.set_text(1039, "Breaking elemental shields cast tier 3 spells that ignore defense and Rflect status.<end>")
-            self.set_text(1040, "Breaking Rods cast tier 2 spells that ignore defense and Rflect status.<end>")
+            self.set_text(1039, "Breaking elemental shields cast tier 3 spells that ignore defense and Reflect status.<end>")
+            self.set_text(1040, "Breaking Rods cast tier 2 spells that ignore defense and Reflect status.<end>")
             self.set_text(1041, "The Auction House will always have 2 high tier items or Espers at 20000 GP and 10000 GP.<end>")
             self.set_text(1042, "Quick is a great defensive spell. After casting it, enemy ATB is frozen until your caster completes 2 turns.<page>Enemies won't be able to counter your first turn actions. Damage your enemy one turn, then heal up the next.<end>")
             self.set_text(1206, "Oh my hero, so far away now. Will I ever see your smile?<line>Love goes away, like night into day. It's just a fading dream…<page>I'm the darkness, you're the stars. Our love is brighter than the sun. For eternity, for me there can be,<page>only you, my chosen one…<line>Must I forget you? Our solemn promise? Will autumn take the place of spring?<page>What shall I do? I'm lost without you. Speak to me once more!<page>…here you pick up the flowers.<line>Climb the stairs to the balcony high atop the castle. Raise the flowers to the stars.<end>")
@@ -337,8 +378,8 @@ class Dialogs():
             self.set_text(1365, "Danger…<end>")
             self.set_text(1367, "Aura Lance has stronger battle power, but Pearl Lance can proc the Pearl spell.<end>")
             self.set_text(1368, "Tempest has a 50% chance of casting Wind Slash instead of its regular attack. Try it with Offering.<end>")
-            self.set_text(1507, "Level 42 yet?<end>")
-            self.set_text(1521, "The other reward you didn't pick is in the Narshe Mines World of Balance.<end>")
+            self.set_text(1507, "Is your Blitz user Level 42 yet?<end>")
+            self.set_text(1521, "The other reward you didn't pick is in the Narshe Mines World of Balance, past the Whelk check.<end>")
             self.set_text(1522, "Gogo and Umaro can't uncurse the Cursed Shld, so don't try it with them!<end>")
             self.set_text(1551, "Offering makes Fight swing 4 untargettable times with a 100% hit rate and 1/2 damage for each attack.<end>")
             self.set_text(1552, "Certain weapons drain MP to guarantee a critical hit. These criticals won't occur with Offering equipped, however.<end>")
@@ -377,15 +418,17 @@ class Dialogs():
             self.set_text(1605, "Doom is more accurate at hitting enemies than X-Zone, but is only single target.<end>")
             self.set_text(1607, "Flare ignores enemy defense, although it takes a long time to cast.<end>")
             self.set_text(1608, "Sure!<end>")
-            self.set_text(1734, "If you're looking for Lone Wolf, recruit Mog first and come back here!<end>")
+            self.set_text(1734, "If you're looking for Lone Wolf, recruit Mog first and come back here (in the World of Balance)!<end>")
             self.set_text(1748, "If you should perish, you'll be able to play from your last save. You can save a game anywhere on the world map.<end>")
             self.set_text(1750, "Use Osmose on enemies if you need to recover MP mid-fight.<end>")
             self.set_text(1751, "Mirage Vests will provide Image status at the start of every tier.<end>")
+            self.set_text(1763, "Learning new dances is as simple as winning a battle in new terrain without dancing.<end>")
             self.set_text(1766, "Dance chances, in order of their listing in the Skills menu:<line>7/16, 6/16, 2/16, 1/16<page>Think about those odds when Dancing!<end>")
             self.set_text(2082, "Pearl Wind heals the party for the same amount of HP the caster has.<end>")
             self.set_text(2083, "Try dodging Burning House flames by running past them the same moment they start moving towards you.<end>")
             self.set_text(2084, "Blow Fish is a great early Lore - unblockable 1000 damage!<end>")
             self.set_text(2085, "Characters won't learn Lores if they have the Dark status. Use Eyedrops or Remedy before the battle ends!<end>")
+            self.set_text(2117, "General Leo...<line>Play as him with the help of custom graphics!<end>")
             self.set_text(2201, "The Tzen Thief in World of Balance will mention a glowing stone if he is selling an Esper. However, he won't tell you that here in the World of Ruin.<end>")
             self.set_text(2202, "Gigantos is weak to instant death and only uses physical damage. Use Phantom to be safe.<end>")
             self.set_text(2203, "Monster in a box fights CAN be run from. But sometimes it's better to save before opening them if you're looking for Gigantos (EXP) or PM Stalkers (MP).<end>")
@@ -415,9 +458,9 @@ class Dialogs():
             self.set_text(2279, "Summon Ragnarok to Morph dragons for a 1/8 instant kill chance.<end>")
             self.set_text(2280, "If affected by party-wide status effects (like Train), Unicorn is a great summon (casts Remedy on everyone).<end>")
             self.set_text(2281, "Odin and Raiden are instant death attacks on all enemies. Summon Sraphim and Starlet for a party-wide heal.<end>")
-            self.set_text(2282, "Phunbaba's BabaBreath will send up to 2 of your characters back to the airship.<page>You'll have at least 1 character remaining in the party afterwards.<end>")
+            self.set_text(2282, "Phunbaba's BabaBreath will send up to 2 of your characters back to the airship.<page>BabaBreath is also prioritized to be used on Wounded characters.<page>You'll have at least 1 character remaining in the party afterwards.<end>")
             self.set_text(2306, "Queue up attacks as you summon Palidor for extra damage.<end>")
-            self.set_text(2323, "Set Battle Speed to 1 before fighting Zone Eater. This will save you time if it decides to use Demi instead of Engulf. But don't forget sure to change it back after!<end>")
+            self.set_text(2323, "Set Battle Speed to 1 before fighting Zone Eater. This will save you time if it decides to use Demi instead of Engulf. But don't forget to change it back after!<end>")
             self.set_text(2324, "Use Mimic to re-use items like Super Balls, elemental shields, or strong throws like Excalibur. You can “Mimic” Mimic to keep using the same throw indefinitely.<end>")
             self.set_text(2326, "Flare, Hyper Drive, and Ultima all can be Runic'ed.<end>")
             self.set_text(2327, "Got money? GP Rain deals more damage with higher levels, and ignores all enemy defenses.<end>")
@@ -467,7 +510,7 @@ class Dialogs():
             self.set_text(2455, "Slots' Lagomorph can heal Dark, Sleep, and Poison.<end>")
             self.set_text(2457, "Slots RNG starts off the same in each battle. If you can use H-Bomb turn 1 in a battle, it'll work in every battle if nothing has affected the RNG.<end>")
             self.set_text(2532, "SwdTech 2 and 6 deal more damage with higher MagPwr (instead of Vigor).<end>")
-            self.set_text(2533, "Buy Rust Aid in Zozo for 1000 GP to gain access to Mt. Zozo.<end>")
+            self.set_text(2533, "Buy Rust-Rid in Zozo for 1000 GP to gain access to Mt. Zozo.<end>")
             self.set_text(2536, "If the Retort bug fix flag is disabled, try KO'ing your SwdTech user, reviving them, and then using Retort.<end>")
             self.set_text(2537, "What shall I talk about?<page><choice> (Narshe)<line><choice> (The Veldt)<line><choice> (Doma Castle)<line><choice> (Nothing, thanks!)<end>")
             self.set_text(2538, "Storm Drgn is weak to Bolt attacks, despite its name.<end>")
@@ -481,12 +524,14 @@ class Dialogs():
             self.set_text(2679, "Higher Stamina will increase the amount of damage you take from Poison each turn, as well as the amount of HP healed by Regen each turn.<end>")
             self.set_text(2681, "Save time by arranging your item menu during battle animations. Group up items you want to sell.<end>")
             self.set_text(2682, "Use Economizer with an Esper like Bahamut or Lore like GrandTrain to quickly break open a seed.<end>")
+            self.set_text(2684, "Sketch, if done successfully, can do one of two things depending on the enemy.<end>")
             self.set_text(2691, "Super Balls can help win a few fights if under-leveled. Also, seek undead enemies and kill them with Revivify/Fenix Down.<end>")
             self.set_text(2692, "Memorizing good Rages will help break open seeds quicker.<end>")
             self.set_text(2694, "Learn which attacks ignore enemy defense. Some examples are Flare, Bum Rush, and SwdTech 7.<end>")
             self.set_text(2695, "Use X-Magic on the second turn of Quick and you'll still have full ATB after the X-Magic.<end>")
             self.set_text(2696, "Use Tents/Sleeping Bags in multiparty dungeons when not on a save point by moving onto a save point, then immediately switching to a different party and going into the menu.<end>")
             self.set_text(2699, "Avoid counter attacks by not attacking with weak party members. Use X/Y to skip their turn if needed.<end>")
+            self.set_text(2702, "Have you heard? The fourth Ultros fight with Chupon doesn't give you anything. Not even XP.<end>")
             self.set_text(2726, "You can save some frames by closing the command menu before a battle ends. I like to use Defend on everyone.<end>")
             self.set_text(2746, "The Auction House is always a bit of a gamble, isn't it?<end>")
             self.set_text(2747, "In the World of Ruin, you can eventually buy out every item in the Auction House for 90000 GP.<page>Watch out for Imp Robots though - they'll just waste your time.<end>")
@@ -497,6 +542,19 @@ class Dialogs():
             self.set_text(2915, "This is Figaro Castle.<end>")
             self.set_text(2920, "If Edgar leads your party, all the shops in Figaro Castle are 1/2 off.<end>")
             self.set_text(2921, "This discount works in South Figaro World of Ruin too!<end>")
+
+            # conditional flags for character gating
+            if args.character_gating:
+                self.set_text(749, "The Veldt check reward will not appear on a back or pincer attack, nor will it appear after several battles against formations with many enemies. Ensure you have Dried Meat, less than 3 characters in the party, and recruited <GAU> when doing this check.<end>")
+                self.set_text(1051, "Haven't seen any rewards here. Might want to check the top of the building after recruiting <TERRA>!<end>")
+                self.set_text(1065, "This place is dangerous! Visit me in the World of Ruin after recruiting <CYAN>!<end>")
+                self.set_text(1196, "Have you recruited Maria, I mean, <CELES> yet?<end>")
+                self.set_text(1333, "No one gets in without recruiting General <CELES>!<end>")
+                #adjusted in event\figaro_castle_wor.py
+                #self.set_text(2379, "I won't budge from this spot until you have recruited <EDGAR>!<end>")
+                self.set_text(2436, "You can enter the Phoenix Cave as long as you have at least 2 characters.<page><LOCKE> also needs to be recruited to get the reward at the end.<end>")
+                self.set_text(2685, "<RELM>'s checks include Esper Mountain near Thamasa in the World of Balance, and right here in Owzer's Mansion in the World of Ruin.<end>")
+
         #### end of NPC dialog tip mod
 
     def write(self):
