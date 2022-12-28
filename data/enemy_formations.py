@@ -108,6 +108,32 @@ class EnemyFormations():
         self.formations[456].enemy_x_positions[0] = 1 # painting
         self.formations[456].enemy_x_positions[1] = 1 # demon
 
+    def randomize_marshal_minion(self):
+        # adjust lobo positions to allow larger randomized enemy sprites to fit
+        self.formations[bosses.name_formation["Marshal"]].enemy_y_positions[0] -= 2
+        self.formations[bosses.name_formation["Marshal"]].enemy_y_positions[1] -= 2
+
+        # Enemy id's are the same as rage IDs.
+        from constants.rages import rage_id
+        import random
+        possible_minions = [
+            rage_id["Red Wolf"],
+            rage_id["Covert"],
+            rage_id["Ogor"],
+            rage_id["Tap Dancer"],
+            rage_id["Sky Cap"],
+            rage_id["Dueller"],
+            rage_id["Fortis"],
+            rage_id["Tyranosaur"],
+            rage_id["PlutoArmor"],
+            rage_id["Barb-e"],
+            rage_id["Retainer"]
+        ]
+        random_minion = random.choice(possible_minions)
+        self.formations[bosses.name_formation["Marshal"]].enemy_ids[0] = random_minion
+        self.formations[bosses.name_formation["Marshal"]].enemy_ids[1] = random_minion
+
+
     def add_chupon(self):
         # Add Chupon (Coliseum) to an unused formation for use with random_encounters_chupon
         self.formations[self.CHUPON].enemy_ids[0] = 64 # Chupon (Coliseum)
@@ -145,6 +171,10 @@ class EnemyFormations():
             # move chadarnook to left edge of screen, somewhat misaligns on the original owzer's mansion battle background
             # but it looks better than having chadarnook's left edge showing on all the other battle backgrounds
             self.set_chadarnook_position_left_screen()
+
+        # Randomize the minions that appear with Marshal
+        if not self.args.boss_marshal_keep_lobos:
+            self.randomize_marshal_minion()
 
         if self.args.random_encounters_chupon:
             self.add_chupon()

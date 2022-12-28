@@ -33,6 +33,8 @@ def parse(parser):
                         help = "Boss battles award experience")
     bosses.add_argument("-bnu", "--boss-no-undead", action = "store_true",
                         help = "Undead status removed from bosses")
+    bosses.add_argument("-bmkl", "--boss-marshal-keep-lobos", action = "store_true",
+                        help = "Don't replace the Marshal's Lobos with randomized enemies")
 
 def process(args):
     if args.mix_bosses_dragons:
@@ -69,6 +71,8 @@ def flags(args):
         flags += " -be"
     if args.boss_no_undead:
         flags += " -bnu"
+    if args.boss_marshal_keep_lobos:
+        flags += " -bmkl"
 
     return flags
 
@@ -95,6 +99,7 @@ def options(args):
         ("Normalize & Distort Stats", args.boss_normalize_distort_stats),
         ("Boss Experience", args.boss_experience),
         ("No Undead", args.boss_no_undead),
+        ("Marshal Keep Lobos", args.boss_marshal_keep_lobos),
     ]
 
 def menu(args):

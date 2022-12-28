@@ -36,6 +36,7 @@ check_bit = [
     NameBit("Lete River", event_bit.RODE_RAFT_LETE_RIVER),
     NameBit("Lone Wolf Chase", event_bit.CHASING_LONE_WOLF7),
     NameBit("Lone Wolf Moogle Room", event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
+    NameBit("Narshe Moogle Defense", event_bit.FINISHED_MOOGLE_DEFENSE),
     NameBit("Magitek Factory Trash", event_bit.GOT_IFRIT_SHIVA),
     NameBit("Magitek Factory Guard", event_bit.DEFEATED_NUMBER_024),
     NameBit("Magitek Factory Finish", event_bit.DEFEATED_CRANES),

@@ -177,6 +177,16 @@ class Items():
             if item.learnable_spell == spell:
                 item.remove_learnable_spell()
 
+    def moogle_starting_equipment(self):
+        # Give the moogles in Moogle Defense starting armor and helmets. Keeping vanilla weapons
+        from data.shop_item_tiers import tiers
+        from data.item import Item
+        from data.characters import Characters
+
+        for index in range(Characters.FIRST_MOOGLE, Characters.LAST_MOOGLE + 1):
+            self.characters.characters[index].init_body = random.choice(tiers[Item.ARMOR][1])
+            self.characters.characters[index].init_head = random.choice(tiers[Item.HELMET][1])
+
     def mod(self):
         not_relic_condition = lambda x : x != Item.RELIC
         if self.args.item_equipable_random:
@@ -248,6 +258,8 @@ class Items():
         self.receive_dialogs = {}
         for item_id in self.GOOD:
             self.add_receive_dialog(item_id)
+
+        self.moogle_starting_equipment()
 
     def write(self):
         for item in self.items:

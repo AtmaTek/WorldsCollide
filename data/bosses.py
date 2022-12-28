@@ -52,6 +52,7 @@ dragon_enemy_name = {
 }
 
 normal_pack_name = {
+    262 : "Marshal",
     274 : "Rizopas",
     302 : "Leader",
     313 : "Kefka (Narshe)",
@@ -112,6 +113,7 @@ statue_enemy_name = {
 }
 
 normal_formation_name = {
+    4   : "Marshal",
     79  : "Rizopas",
     354 : "MagiMaster",
     387 : "Ultros 3",
@@ -153,6 +155,7 @@ normal_formation_name = {
     505 : "Kefka (Narshe)",
 }
 normal_enemy_name = {
+    100 : "Marshal",
     340 : "Piranha",
     341 : "Rizopas",
     358 : "MagiMaster",
@@ -222,7 +225,6 @@ normal_enemy_name = {
 }
 
 removed_pack_name = {
-    262 : "Marshal",
     265 : "Officer",
     266 : "Merchant",
     321 : "M-TekArmor",
@@ -233,7 +235,6 @@ removed_pack_name = {
     385 : "Phunbaba 2",
 }
 removed_formation_name = {
-    4   : "Marshal",
     40  : "Officer",
     43  : "Merchant",
     434 : "M-TekArmor",
@@ -244,7 +245,6 @@ removed_formation_name = {
     421 : "Phunbaba 2",
 }
 removed_enemy_name = {
-    100 : "Marshal",
     373 : "Officer",
     314 : "Merchant",
     276 : "Tritoch (Vicks/Wedge/Terra)",

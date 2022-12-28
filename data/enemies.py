@@ -125,7 +125,7 @@ class Enemies():
         self.enemies[ultros3_id].hp = self.enemies[ultros3_id].hp // 2
 
         # increase hp of some early bosses (especially ones which are normally not fought with a full party)
-        hp4x = ["Leader"]
+        hp4x = ["Leader", "Marshal"]
         hp3x = ["Rizopas", "Piranha", "TunnelArmr"]
         hp2x = ["Ipooh", "GhostTrain", "Kefka (Narshe)", "Dadaluma", "Ifrit", "Shiva", "Number 024",
                 "Number 128", "Left Blade", "Right Blade", "Left Crane", "Right Crane", "Nerapa"]

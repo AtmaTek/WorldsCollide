@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from constants.commands import *
 import random
 import args
@@ -24,6 +25,25 @@ class Commands:
                 command_list.remove(exclude_command)
             except ValueError:
                 pass
+
+        from data.characters import Characters
+        # Give the Moogles for Moogle Defense randomized commands
+        # Copy the list minus any exclusions
+        possible_moogle_commands = command_list.copy()
+        # randomize commands for Moogles during Moogle Defense from the non-excluded set
+        # Remove Morph to ensure only 1 character gets Morph
+        # Remove Rage to avoid any issues with Randomized Atma weapon
+        # Remove X-Magic as they won't have any Magic
+        # Remove Blitz, SwdTech, Dance, and Lore because they won't have abilities within unless a party member does
+        moogle_exclusions = [morph_id, name_id["Rage"], name_id["X Magic"], name_id["Blitz"], name_id["SwdTech"], name_id["Lore"], name_id["Dance"]]
+        for exclude in moogle_exclusions:
+            try:
+                possible_moogle_commands.remove(exclude)
+            except ValueError:
+                pass
+        if len(possible_moogle_commands) > 0:
+            for index in range(Characters.FIRST_MOOGLE, Characters.LAST_MOOGLE + 1):
+                self.characters[index].commands[1] = random.choice(possible_moogle_commands)
 
         # if suplex a train condition exists, guarantee blitz
         import objectives
@@ -62,7 +82,6 @@ class Commands:
                 command_set.discard(args.character_commands[index])
 
         # apply the commands to the characters
-        from data.characters import Characters
         for index in range(len(args.character_commands[ : -2])):
             self.characters[index].commands[1] = args.character_commands[index]
         self.characters[Characters.GAU].commands[0] = args.character_commands[-2] # rage

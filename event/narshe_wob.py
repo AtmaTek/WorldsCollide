@@ -8,7 +8,6 @@ class NarsheWOB(Event):
         space.write(
             field.SetEventBit(event_bit.MET_ARVIS),
             field.SetEventBit(event_bit.NARSHE_GUARDS_SAW_TERRA_ON_BRIDGE),
-            field.SetEventBit(event_bit.TERRA_FELL_HOLE_NARSHE),
             field.SetEventBit(event_bit.NARSHE_SECRET_ENTRANCE_ACCESS),
             field.SetEventBit(event_bit.TERRA_AGREED_TO_OPEN_SEALED_GATE),
 

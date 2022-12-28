@@ -25,6 +25,39 @@ def _add_esper_increment():
     space.write(asm.JMP(increment_found, asm.ABS))
 _add_esper_increment()
 
+class RemoveDeath(_Instruction):
+    def __init__(self, character):
+        import instruction.field as field
+
+        self.current_status = 0x1614 # character status effects address
+        self.death_mask = field.Status.DEATH >> 8
+        # add a special command specifically for removing death. 
+        # This is used in special events (like Moogle Defense), where we want to revive even with permadeath
+        # Code based on C0/AE2D - AE44 (gen. act. 88 to Remove status effects)
+        src = [
+            asm.JSR(0x9dad, asm.ABS),
+            asm.CPY(0x0250, asm.IMM16),
+            asm.BCS("DONE"),
+            asm.A16(),
+            asm.LDA(self.current_status, asm.ABS_Y),
+            asm.AND(~self.death_mask, asm.IMM16), # clear the DEATH bit
+            asm.STA(self.current_status, asm.ABS_Y),
+            asm.TDC(),
+            asm.A8(),
+            "DONE",
+            asm.LDA(0x02, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
+        ]
+        space = Write(Bank.C0, src, "custom remove_death command")
+        address = space.start_address
+
+        opcode = 0x6f
+        _set_opcode_address(opcode, address)
+
+        RemoveDeath.__init__ = lambda self, character : super().__init__(opcode, character)
+        self.__init__(character)
+
+
 class ToggleWorlds(_Instruction):
     def __init__(self):
         fade_load_map = 0xab47

@@ -26,7 +26,7 @@ def show_original_names():
     import data.text as text
     from data.characters import Characters
 
-    space = Allocate(Bank.C3, 190, "characters show original names")
+    space = Allocate(Bank.C3, 195, "characters show original names")
     original_names_table = space.next_address
     for index in range(Characters.CHARACTER_COUNT):
         name = Characters.DEFAULT_NAME[index]
@@ -39,6 +39,8 @@ def show_original_names():
     space.write(
         asm.JSR(0x3519, asm.ABS),   # y = address of character data in sram (+0x1600)
         asm.LDA(0x0000, asm.ABS_Y), # a = character index
+        asm.CMP(Characters.CHARACTER_COUNT, asm.IMM8), # is it not a normal character (ex: moogles)?
+        asm.BGE("RETURN"),
         asm.STA(0x4202, asm.ABS),
         asm.LDA(Characters.NAME_SIZE, asm.IMM8),
         asm.STA(0x4203, asm.ABS),
@@ -56,6 +58,7 @@ def show_original_names():
         asm.BNE("LOOP_START"),      # branch if length counter not zero
         asm.STZ(0x2180, asm.ABS),   # store null
         asm.JMP(0x7fd9, asm.ABS),   # call draw string
+        "RETURN",
         asm.RTS(),
     )
 

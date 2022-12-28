@@ -1,6 +1,7 @@
 # NOTE: (address - 1e80) * 0x8 + bit
 # e.g. (1eb7 - 1e80) * 0x8 + 0x1 = 1b9 (airship visible) 
 #      (1f43 - 1e80) * 0x8 + 0x3 = 61b (characters on narshe battlefield)
+# Note: all are +0x300 from what you'll find in FF6 Tools
 
 SOLDIER_DOORWAY_ARVIS_HOUSE = 0x688
 SHADOW_SOUTH_FIGARO_PUB = 0x305
@@ -85,6 +86,7 @@ TEMP_NPC = 0x5f7 # used in many places (doma wor, veldt cave wob, ebot's rock, s
 LONE_WOLF_MOG_NARSHE_CLIFF = 0x640
 LONE_WOLF_NARSHE_CLIFF_BRIDGE = 0x641
 STORES_NARSHE = 0x600
+ARVIS_INTRO = 0x603
 WHELK_GUARD_NARSHE_WOB = 0x604
 WHELK_GUARD_TRITOCH_NARSHE_WOB = 0x605 # mine, replacing tritoch in narshe mines beginning
 BACK_DOOR_ARVIS_HOUSE = 0x606
@@ -104,6 +106,8 @@ BROWN_SOLDIER5_BATTLE_NARSHE_WOB = 0x626
 BROWN_SOLDIER6_BATTLE_NARSHE_WOB = 0x627
 BANON_DURING_BATTLE_NARSHE_WOB = 0x628
 BANON_BEFORE_BATTLE_NARSHE_WOB = 0x62c # mine, using cid at imperial banquet npc bit
+TERRA_COLLAPSED_NARSHE_WOB = 0x631
+MARSHAL_NARSHE_WOB = 0x6c8 # mine, otherwise unused
 SAVE_POINT_SNOWFIELD_NARSHE_WOB = 0x633
 IFRIT_SHIVA_MAGITEK_FACTORY = 0x646
 SABIN_COLLAPSING_HOUSE = 0x66c

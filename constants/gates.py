@@ -36,6 +36,7 @@ character_checks = {
     "Mog" : [
         "Lone Wolf Chase",
         "Lone Wolf Moogle Room",
+        "Narshe Moogle Defense",
     ],
     "Relm" : [
         "Esper Mountain",

@@ -7,7 +7,7 @@ DISABLE_CHOCOBO_TUTORIAL = 0x134
 
 VICKS_BROKE_WHELK_GATE = 0x12c
 NARSHE_GUARDS_SAW_TERRA_ON_BRIDGE = 0x12d
-TERRA_FELL_HOLE_NARSHE = 0x12e
+FINISHED_MOOGLE_DEFENSE = 0x12e # custom, used to be terra fell in narshe cave hole
 MET_ARVIS = 0x001 # characters no longer ride mtek armor in mines when set
 DEFEATED_WHELK = 0x135
 NAMED_EDGAR = 0x004

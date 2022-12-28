@@ -14,6 +14,10 @@ class Characters():
     TERRA, LOCKE, CYAN, SHADOW, EDGAR, SABIN, CELES, STRAGO, RELM, SETZER, MOG, GAU, GOGO, UMARO = range(CHARACTER_COUNT)
     SOLDIER, IMP, GENERAL_LEO, BANON_DUNCAN, ESPER_TERRA, MERCHANT, GHOST, KEFKA = range(CHARACTER_COUNT, 22)
 
+    # Moogle character indexes
+    FIRST_MOOGLE = 0x12
+    LAST_MOOGLE = 0x1B
+
     DEFAULT_NAME = ["TERRA", "LOCKE", "CYAN", "SHADOW", "EDGAR", "SABIN", "CELES", "STRAGO", "RELM", "SETZER", "MOG", "GAU", "GOGO", "UMARO"]
 
     INIT_DATA_START = 0x2d7ca0
@@ -183,7 +187,7 @@ class Characters():
         return self.DEFAULT_NAME[character]
 
     def get_sprite(self, character):
-        return self.characters[character].sprite
+        return self.character_sprites.character_sprites[character].id
 
     def get_random_esper_item_sprite(self):
         sprites = [self.SOLDIER, self.IMP, self.MERCHANT, self.GHOST]

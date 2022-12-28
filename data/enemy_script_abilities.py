@@ -119,6 +119,14 @@ class EnemyScriptAbilities:
 
         leader_script.replace(nothing_nothing_special0, nothing_nothing_special1)
 
+    def marshal_scale_mod(self):
+        marshal_script = self.enemy_scripts.get_script("Marshal")
+
+        # make Marshal special attack one tier stronger
+        battle_special0_special0 = ai_instr.RandomAttack(name_id["Battle"], SPECIAL0, SPECIAL0)
+        battle_special1_special1 = ai_instr.RandomAttack(name_id["Battle"], SPECIAL1, SPECIAL1)
+        marshal_script.replace(battle_special0_special0, battle_special1_special1)
+
     def whelk_scale_mod(self):
         whelk_script = self.enemy_scripts.get_script("Whelk")
 
@@ -254,6 +262,7 @@ class EnemyScriptAbilities:
         self.piranha_scale_mod()
         self.leader_scale_mod()
         self.whelk_scale_mod()
+        self.marshal_scale_mod()
 
         self.flameeater_reflect_mod()
         self.stooges_reflect_mod()

@@ -7,7 +7,7 @@ ENABLE_MORPH_COMMAND = 0x42
 MAGIC_POINTS_AFTER_BATTLE = 0x43
 DEFEATED_DOOM_GAZE = 0x48
 
-BOSS_DEFEATED_START = 0x68
+BOSS_DEFEATED_START = 0x68 # start at unused 0x1dd6
 BOSS_DEFEATED_BITS = {}
 from data.bosses import normal_formation_name
 for index, formation in enumerate(normal_formation_name):

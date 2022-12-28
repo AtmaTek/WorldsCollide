@@ -830,6 +830,11 @@ class LoadPartyMembers(_Instruction):
         # caseword bits = characters in party
         super().__init__(0xde)
 
+class LoadCreatedCharacters(_Instruction):
+    def __init__(self):
+        # caseword bits = characters created
+        super().__init__(0xdf)
+
 class LoadRecruitedCharacters(_Instruction):
     def __init__(self):
         # caseword bits = characters recruited
@@ -1007,3 +1012,21 @@ class DeleteRotatingPyramids(_Instruction):
 class InvokeFinalLineup(_Instruction):
     def __init__(self):
         super().__init__(0x9d)
+
+class AverageLevel(_Instruction):
+    def __init__(self, character):
+        super().__init__(0x77, character)
+
+class RestoreHp(_Instruction):
+    def __init__(self, character, amount):
+        # Modify actor A's Hit Points. B is the amount, however, bit 0x80 tells it to subtract. The amount in 0x7F is a power of 2 to add/subtract.
+        # So, for instance, 8B 01 04 would Add (high bit clear) to Locke (character 01) 16 HP (2^4). Clear as mud?
+        # Caveats (1) if the parameter is 7F, it just sets the HP to maximum. (2) No matter how much is subtracted, it can't end up below 1 HP.
+        super().__init__(0x8b, character, amount)
+
+class RestoreMp(_Instruction):
+    def __init__(self, character, amount):
+        # Modify actor A's Magic Points. B is the amount, however, bit 0x80 tells it to subtract. The amount in 0x7F is a power of 2 to add/subtract.
+        # This command appears to have been a copy/paste of the Hit Points, however, they did not code the powers of 2 part, so in reality, the only 
+        # thing this can do is set MP to max via the 7F second parameter.
+        super().__init__(0x8c, character, amount)

@@ -230,7 +230,9 @@ class NarsheBattle(Event):
 
             field.FreeScreen(),
             field.LoadMap(0x1e, direction.DOWN, default_music = True,
-                          x = 60, y = 37, fade_in = True, entrance_event = True),
+                          x = 60, y = 37, fade_in = False, entrance_event = True),
+            field.FadeInScreen(4),
+            field.WaitForFade(),
 
             field.FinishCheck(),
             field.Return(),
