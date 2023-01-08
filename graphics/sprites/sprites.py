@@ -155,6 +155,21 @@ id_sprite = {
     158 : "Chen-HoxNorf-Touhou",
     159 : "Selphie-HoxNorf-FF8",
     160 : "Sora-HoxNorf-KH",
+    
+    200 : "Flandre-HoxNorf-Touhou",
+    201 : "Porom-Devout-HoxNorf-FF4",
+    202 : "Remilia-HoxNorf-Touhou",
+    203 : "Reisen-HoxNorf-Touhou",
+    204 : "Cid-doubledown-FF6",
+    205 : "Golbez_TAY-HoxNorf-FF4",
+    206 : "Palom_Magus-HoxNorf-FF4",
+    207 : "Patchouli-HoxNorf-Touhou",
+    208 : "Suwako-HoxNorf-Touhou",
+    209 : "Eiko_Miko-ScarabEnigma-FF9",
+    
+    # FFT
+    300 : "Alma-HoxNorf-FFT",
+    301 : "Orlandeau-ctrlxz-FFT",
 }
 
 def get_path(id_):

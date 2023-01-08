@@ -64,12 +64,16 @@ def options(args):
     elif args.lores_mp_random_percent:
         mp = f"Random Percent {args.lores_mp_random_percent_min}-{args.lores_mp_random_percent_max}%"
 
-    return [
+    lvl_x_spells = "Random" if args.lores_level_randomize else "Original"
+    opts = [
         ("Start Lores", start_lores),
         ("MP", mp),
         ("Everyone Learns", args.lores_everyone_learns),
-        ("Lx Level Random", args.lores_level_randomize)
+        ("L.x Spells", lvl_x_spells)
     ]
+    
+    
+    return opts
 
 def menu(args):
     entries = options(args)

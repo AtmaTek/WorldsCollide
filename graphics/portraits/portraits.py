@@ -104,6 +104,14 @@ id_portrait = {
     110 : "Chen-HoxNorf-Touhou",
     111 : "Selphie-CtrlxZ-FF8",
     112 : "Sora-HoxNorf-KH",
+    200 : "Flandre-HoxNorf-Touhou",
+    201 : 'Golbez_TAY-HoxNorf-FF4',
+    202 : 'Palom_Magus-HoxNorf-FF4',
+    203 : "Remilia-HoxNorf-Touhou",
+    204 : "Reisen-HoxNorf-Touhou",
+    205 : 'Patchouli-HoxNorf-Touhou',
+    206 : 'Suwako-HoxNorf-Touhou',
+    207 : 'Eiko-jameswhite89-FF9',
 }
 
 def get_bin_path(id_):

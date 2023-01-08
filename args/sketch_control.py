@@ -23,10 +23,24 @@ def flags(args):
     return flags
 
 def options(args):
+    abilities = "Improved" if args.sketch_control_improved_abilities else "Original"
+    accuracy = "100%" if args.sketch_control_improved_stats else "Original"
+    stats = "Character" if args.sketch_control_improved_stats else "Original"
 
+    sketch_abilities = ("Sketch Ability", abilities)
+    sketch_stats = ("Sketch Stats", stats)
+    sketch_accuracy = ("Sketch Accuracy", accuracy)
+
+    control_abilities = ("Control Ability", abilities)
+    control_stats = ("Control Stats", stats)
+        
     return [
-        ("Improved Stats", args.sketch_control_improved_stats),
-        ("Improved Abilities", args.sketch_control_improved_abilities),
+        sketch_abilities,
+        sketch_accuracy,
+        sketch_stats,
+        ("", ""),
+        control_abilities,
+        control_stats,
     ]
 
 def menu(args):

@@ -80,3 +80,20 @@ class Sprite:
 
         from graphics.ppm import write_ppm6
         write_ppm6(OUTPUT_WIDTH, OUTPUT_HEIGHT, BITS_PER_VALUE, rgb_values, output_file)
+
+    def get_ppm(self, pose):
+        import graphics.poses as poses
+        pose_values = self.tile_matrix(pose)
+
+        OUTPUT_WIDTH = SpriteTile.COL_COUNT * len(pose[0])
+        OUTPUT_HEIGHT = SpriteTile.ROW_COUNT * len(pose)
+        BITS_PER_VALUE = 8
+
+        rgb_values = []
+        for row_index in range(OUTPUT_HEIGHT):
+            for col_index in range(OUTPUT_WIDTH):
+                color_id = pose_values[row_index][col_index]
+                rgb_values.extend(self.palette.colors[color_id].rgb)
+
+        from graphics.ppm import get_ppm
+        return get_ppm(OUTPUT_WIDTH, OUTPUT_HEIGHT, BITS_PER_VALUE, rgb_values)

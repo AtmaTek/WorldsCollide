@@ -36,7 +36,6 @@ check_bit = [
     NameBit("Lete River", event_bit.RODE_RAFT_LETE_RIVER),
     NameBit("Lone Wolf Chase", event_bit.CHASING_LONE_WOLF7),
     NameBit("Lone Wolf Moogle Room", event_bit.GOT_BOTH_REWARDS_LONE_WOLF),
-    NameBit("Narshe Moogle Defense", event_bit.FINISHED_MOOGLE_DEFENSE),
     NameBit("Magitek Factory Trash", event_bit.GOT_IFRIT_SHIVA),
     NameBit("Magitek Factory Guard", event_bit.DEFEATED_NUMBER_024),
     NameBit("Magitek Factory Finish", event_bit.DEFEATED_CRANES),
@@ -67,15 +66,14 @@ check_bit = [
     NameBit("Whelk Gate", event_bit.DEFEATED_WHELK),
     NameBit("Zone Eater", event_bit.RECRUITED_GOGO_WOR),
     NameBit("Zozo Tower", event_bit.GOT_ZOZO_REWARD),
+    NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),         # 59
+    NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),      # 60
+    NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),            # 61
+    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),      # 62
+    NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),        # 63
+    NameBit("Narshe Moogle Defense", event_bit.FINISHED_MOOGLE_DEFENSE), # 64,
 ]
 
-check_bit += [                                                          # Index
-    NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),        # 59
-    NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),     # 60
-    NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),           # 61
-    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),     # 62
-    NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),       # 63
-]
 
 quest_bit = [
     NameBit("Defeat Sealed Cave Ninja", event_bit.DEFEATED_NINJA_CAVE_TO_SEALED_GATE),
@@ -90,8 +88,10 @@ quest_bit = [
     NameBit("Win A Coliseum Match", event_bit.WON_A_COLISEUM_MATCH),
 ]
 
+from constants.objectives.boss_ids import boss_objective_ids
+
 boss_bit = []
-for formation_id in sorted(normal_formation_name, key = normal_formation_name.get):
+for formation_id in boss_objective_ids:
     boss_bit.append(NameBit(normal_formation_name[formation_id], battle_bit.boss_defeated(formation_id)))
 
 dragon_bit = []

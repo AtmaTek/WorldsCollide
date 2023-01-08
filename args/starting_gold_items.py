@@ -45,15 +45,21 @@ def flags(args):
     return flags
 
 def options(args):
-    return [
+    opts = [
         ("Start Gold", args.gold),
         ("Start Moogle Charms", args.start_moogle_charms),
         ("Start Sprint Shoes", args.start_sprint_shoes),
         ("Start Warp Stones", args.start_warp_stones),
         ("Start Fenix Downs", args.start_fenix_downs),
         ("Start Tools", args.start_tools),
-        ("Start Junk", args.start_junk),
     ]
+    
+    if args.start_junk != 0:
+        opts += [
+            ("Start Junk", args.start_junk)
+        ]
+
+    return opts
 
 def menu(args):
     return (name(), options(args))
