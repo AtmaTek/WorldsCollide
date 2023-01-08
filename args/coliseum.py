@@ -74,14 +74,16 @@ def options(args):
         rewards = "Random"
 
     rewards_visible = "Original"
-    if args.coliseum_rewards_visible_random:
-        rewards_visible = f"{args.coliseum_rewards_visible_random_min}-{args.coliseum_rewards_visible_random_max}"
+    if not args.coliseum_rewards_menu:
+        rewards_visible = "F"
+    else:
+        if args.coliseum_rewards_visible_random:
+            rewards_visible = f"{args.coliseum_rewards_visible_random_min}-{args.coliseum_rewards_visible_random_max}"
 
     return [
         ("Opponents", opponents),
         ("Rewards", rewards),
         ("Rewards Visible", rewards_visible),
-        ("Rewards Menu", args.coliseum_rewards_menu),
         ("No Exp. Eggs", args.coliseum_no_exp_eggs),
         ("No Illuminas", args.coliseum_no_illuminas),
     ]
