@@ -884,6 +884,10 @@ def BranchIfEsperNotFound(esper, destination):
     from instruction.field.custom import LoadEsperFound
     return LoadEsperFound(esper), BranchIfEventBitClear(event_bit.multipurpose(0), destination)
 
+def BranchIfPartyEmpty(party, destination):
+    from instruction.field.custom import LoadPartiesWithCharacters
+    return LoadPartiesWithCharacters(), BranchIfEventBitClear(event_bit.multipurpose(party-1), destination)
+
 class _InvokeBattle(_Instruction):
     def __init__(self, pack, background, battle_sound, battle_animation):
         self.pack = pack

@@ -101,6 +101,58 @@ class LoadEsperFound(_Instruction):
         LoadEsperFound.__init__ = lambda self, esper : super().__init__(opcode, esper)
         self.__init__(esper)
 
+class LoadPartiesWithCharacters(_Instruction):
+    ''' Sets bits 0-2 in event word when those parties have characters.'''
+    def __init__(self):
+        import data.event_bit as event_bit
+        result_byte = event_bit.address(event_bit.multipurpose(0))
+        src = [
+            asm.STZ(result_byte, asm.ABS),
+            asm.LDX(0x0000, asm.IMM16),
+            "START_CHARACTER_LOOP",
+            asm.LDA(0x1850, asm.ABS_X), # load the character data 
+            asm.AND(0x47, asm.IMM8),    # isolate the enabled bit and party bits (note: there are 3 party bits, but we only use 2.)
+            "CHECK_PARTY_1",
+            asm.CMP(0x41, asm.IMM8),
+            asm.BNE("CHECK_PARTY_2"),
+            # character enabled and in party 1
+            asm.LDA(result_byte, asm.ABS),
+            asm.ORA(0x01, asm.IMM8), # set bit 0 in the result to indicate party 1 has an enabled character
+            asm.STA(result_byte, asm.ABS),
+            asm.BRA("NEXT_CHARACTER"),
+            "CHECK_PARTY_2",
+            asm.CMP(0x42, asm.IMM8),
+            asm.BNE("CHECK_PARTY_3"),
+            # character enabled and in party 2
+            asm.LDA(result_byte, asm.ABS),
+            asm.ORA(0x02, asm.IMM8), # set bit 1 in the result to indicate party 2 has an enabled character 
+            asm.STA(result_byte, asm.ABS),
+            asm.BRA("NEXT_CHARACTER"),
+            "CHECK_PARTY_3",
+            asm.CMP(0x43, asm.IMM8),
+            asm.BNE("NEXT_CHARACTER"),
+            # character enabled and in party 3
+            asm.LDA(result_byte, asm.ABS),
+            asm.ORA(0x04, asm.IMM8), # set bit 2 in the result to indicate party 3 has an enabled character
+            asm.STA(result_byte, asm.ABS),
+            # end of loop iteration -- increment X for another go
+            "NEXT_CHARACTER",
+            asm.INX(),
+            asm.CPX(0x000f, asm.IMM16), # did we check all 16 characters?
+            asm.BNE("START_CHARACTER_LOOP"), # if not, check the next one
+            asm.LDA(0x01, asm.IMM8),        # command size
+            asm.JMP(0x9b5c, asm.ABS),       # next command
+        ]
+
+        space = Write(Bank.C0, src, "custom load parties with characters instruction")
+        address = space.start_address
+
+        opcode = 0xe5
+        _set_opcode_address(opcode, address)
+
+        LoadPartiesWithCharacters.__init__ = lambda self : super().__init__(opcode)
+        self.__init__()
+
 class RecruitCharacter(_Instruction):
     def __init__(self, character):
         recruit_character_function = START_ADDRESS_SNES + c0.recruit_character

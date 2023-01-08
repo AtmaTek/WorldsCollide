@@ -122,6 +122,8 @@ class NarsheMoogleDefense(Event):
             "ADD_1",
             field.Call(self.add_moogle_to_party[0]),
             "ADD_0",
+            # this line fixes the issue in which the party appears twice if spot 0 is empty before recruiting
+            field.HideEntity(field_entity.PARTY0),
         ]
 
         # For parties 2 and 3, just iterate 4 times each
@@ -211,6 +213,19 @@ class NarsheMoogleDefense(Event):
             field.AddItem("Force Armor", sound_effect = False),
             field.AddItem("Force Shld", sound_effect = False),
             field.AddItem("Flash", sound_effect = False),
+            field.AddItem("Chain Saw", sound_effect = False),
+            field.AddItem("Ninja Star", sound_effect = False),
+            field.AddItem("Tack Star", sound_effect = False),
+            field.AddItem("White Cape", sound_effect = False),
+            field.AddItem("Jewel Ring", sound_effect = False),
+            field.AddItem("Fairy Ring", sound_effect = False),
+            field.AddItem("Barrier Ring", sound_effect = False),
+            field.AddItem("MithrilGlove", sound_effect = False),
+            field.AddItem("Guard Ring", sound_effect = False),
+            field.AddItem("RunningShoes", sound_effect = False),
+            field.AddItem("Wall Ring", sound_effect = False),
+            field.AddItem("Cherub Down", sound_effect = False),
+            field.AddItem("Cure Ring", sound_effect = False),
             field.AddItem("Hero Ring", sound_effect = True),
             field.Return()
         ]
@@ -369,6 +384,39 @@ class NarsheMoogleDefense(Event):
 
         # Change logic for moogle party selection to account for any party variation
         self.add_moogles_to_parties()
+
+        # Add party size checks around the addition of parties 2 and 3 to the map
+        src = [
+            field.BranchIfPartyEmpty(2, "RETURN"), # if there's no party 2, there's no party 3
+            Read(0xcaa23, 0xcaa26), # displaced code -- place party 2 on map
+            field.BranchIfPartyEmpty(3, "RETURN"),
+            Read(0xcaa27, 0xcaa2a), # displaced code -- place party 3 on map
+            "RETURN", 
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, "Check for Party 2 and 3 sizes before placing")
+        place_parties = space.start_address
+
+        space = Reserve(0xcaa23, 0xcaa2a, "place party 2 and 3 on map", field.NOP())
+        space.write(
+            field.Call(place_parties),
+        )
+
+        src = [
+            field.BranchIfPartyEmpty(2, "RETURN"), # if there's no party 2, there's no party 3
+            Read(0xcaa3a, 0xcaa48), # displaced code -- position party 2 on map
+            field.BranchIfPartyEmpty(3, "RETURN"),
+            Read(0xcaa49, 0xcaa57), # displaced code -- position party 3 on map
+            "RETURN",
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, "Position party 2")
+        position_parties = space.start_address
+
+        space = Reserve(0xcaa3a, 0xcaa57, "position party 2 on map", field.NOP())
+        space.write(
+            field.Call(position_parties),
+        )
 
         # Clear use of event_bit.12E (TERRA_COLLAPSED_NARHSE_WOB) and event_bit.003 (moogle defense) at cc/aaab so that we can reuse 12E 
         # and so that 003 doesn't cause issues at WoB Narshe entrance
