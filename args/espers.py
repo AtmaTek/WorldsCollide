@@ -64,6 +64,9 @@ def parse(parser):
     espers.add_argument("-ems", "--esper-multi-summon", action = "store_true",
                         help = "Espers can be summoned multiple times in battle")
 
+    espers.add_argument("-emi", "--esper-mastered-icon", action = "store_true",
+                        help = "Add an icon to show when all spells have been learned from an esper")
+
 def process(args):
     args._process_min_max("starting_espers")
     args._process_min_max("esper_spells_random")
@@ -116,6 +119,9 @@ def flags(args):
     if args.esper_multi_summon:
         flags += " -ems"
 
+    if args.esper_mastered_icon:
+        flags += " -emi"
+
     return flags
 
 def options(args):
@@ -160,6 +166,7 @@ def options(args):
     result.append(("MP", mp))
     result.append(("Equipable", equipable))
     result.append(("Multi Summon", args.esper_multi_summon))
+    result.append(("Mastered Icon", args.esper_mastered_icon))
     return result
 
 def menu(args):

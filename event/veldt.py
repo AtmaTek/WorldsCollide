@@ -376,7 +376,7 @@ class Veldt(Event):
             # overwrite step 4. of rage tutorial after sabin/cyan/gau event
             esper_dialog_id = 182
             gau_char_arrives_dialog_id = esper_dialog_id
-            self.dialogs.set_multi_line_battle_text(esper_dialog_id, "      Received the Magicite<line>              “" + self.espers.get_name(self.reward.id) + ".“<wait for key><end>")
+            self.dialogs.set_multi_line_battle_text(esper_dialog_id, "      Received the Magicite<line>              “" + self.espers.get_name(self.reward.id) + ".\"<wait for key><end>")
 
         # overwrite battle event $0d, fed gau dried meat for first time
         space = Reserve(0x10aa21, 0x10ac5e, "veldt gau/char fed dried meat", battle_event.NOP())

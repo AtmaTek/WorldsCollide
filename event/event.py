@@ -60,6 +60,17 @@ class Event():
             self.log_change(original_boss_name, boss_name)
         return pack_id
 
+    # return the boss in place of the given boss_name
+    # example
+    # get_replacement_formation("Goddess")
+    # if you fight Ultros in the Goddess location, return Ultros
+    def get_replacement_formation(self, boss_name):
+        from data.bosses import pack_name
+        replacement = self.get_boss(boss_name, False)
+        location_boss = pack_name[replacement]
+        formation_id = self.enemies.formations.get_id(location_boss)
+        return self.enemies.formations.formations[formation_id]
+
     def log_reward(self, reward, prefix = "", suffix = ""):
         reward_string = prefix
         if reward.type == RewardType.CHARACTER:

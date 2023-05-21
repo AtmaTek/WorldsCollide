@@ -49,6 +49,8 @@ def parse(parser):
     items.add_argument("-saw", "--stronger-atma-weapon", action = "store_true",
                        help = "Atma Weapon moved to higher tier and divisor reduced from 64 to 32")
 
+
+
 def process(args):
     args._process_min_max("item_equipable_random")
     if args.item_equipable_balanced_random is not None:
@@ -107,6 +109,7 @@ def flags(args):
 
     if args.stronger_atma_weapon:
         flags += " -saw"
+
 
     return flags
 

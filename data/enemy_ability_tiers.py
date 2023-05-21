@@ -568,31 +568,33 @@ cure = [
         name_id["Cure"],
     ],
     [ # tier 1
-        name_id["Cure"],
+        name_id["Cure 2"],
     ],
     [ # tier 2
-        name_id["Cure"],
         name_id["Cure 2"],
+        name_id["Sun Bath"],
     ],
     [ # tier 3
         name_id["Cure 2"],
+        name_id["Sun Bath"],
     ],
     [ # tier 4
-        name_id["Cure 2"],
+        name_id["Sun Bath"],
+        name_id["Ice Rabbit"],
     ],
     [ # tier 5
         name_id["Sun Bath"],
+        name_id["Ice Rabbit"],
+        name_id["Cure 3"],
     ],
     [ # tier 6
-        name_id["Sun Bath"],
         name_id["Ice Rabbit"],
+        name_id["Cure 3"],
     ],
     [ # tier 7
-        name_id["Sun Bath"],
-        name_id["Ice Rabbit"],
+        name_id["Cure 3"],
     ],
     [ # tier 8
-        name_id["Ice Rabbit"],
         name_id["Cure 3"],
     ],
     [ # tier 9

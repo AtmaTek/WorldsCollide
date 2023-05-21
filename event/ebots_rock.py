@@ -25,6 +25,8 @@ class EbotsRock(Event):
         self.hidon_mod()
         self.hidon_battle_mod()
 
+        self.warp_to_chest_mod()
+
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
         elif self.reward.type == RewardType.ESPER:
@@ -195,3 +197,27 @@ class EbotsRock(Event):
             field.AddItem(item),
             field.Dialog(self.items.get_receive_dialog(item)),
         ])
+
+    def warp_to_chest_mod(self):
+        # If the player has sufficient Coral, make teleports have only 3 locations: Boss, Save, and Exit
+        CORAL_EVENT_WORD = 0x07
+        NORMAL_LOGIC_ADDR = 0xb6f0e # Normal Ebot's Cave branch logic location in ROM
+        GO_TO_CHEST_ADDR = 0xb6fb5 # The address in ROM of the event instruction to go to Chest
+        GO_TO_SAVE_ADDR = 0xb6fa3 # The address in ROM of the event instruction to go to Save point
+        GO_TO_EXIT_ADDR = 0xb6fac # the address in ROM of the event instruction to go to the exit
+        NUM_CORAL_ADDR = 0xb7109 # The address of the number of coral that the chest checks
+        num_coral = Read(NUM_CORAL_ADDR, NUM_CORAL_ADDR+1)[0]
+
+        src = [
+            field.BranchIfEventWordEqual(CORAL_EVENT_WORD, num_coral, NORMAL_LOGIC_ADDR), #coral count == 21, branch to regular logic
+            field.BranchIfEventWordLess(CORAL_EVENT_WORD, num_coral, NORMAL_LOGIC_ADDR),  #coral count  < 21, branch to regular logic
+            # else, we've > 21
+            field.BranchRandomly(GO_TO_CHEST_ADDR), # 50% chance to go to chest
+            field.BranchRandomly(GO_TO_SAVE_ADDR),  # 50% chance to go to save
+            field.Branch(GO_TO_EXIT_ADDR),      # else, go to entrance
+        ]
+        space = Write(Bank.CB, src, "Coral check to branch")
+        check_coral = space.start_address
+
+        space = Reserve(0xb6f01, 0xb6f04, "Call Ebot's Cave branch logic")
+        space.write(field.Call(check_coral))

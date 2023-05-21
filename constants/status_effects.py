@@ -49,3 +49,10 @@ class D:
         7   : "Float",
     }
     name_id = {v: k for k, v in id_name.items()}
+
+class PhantasmOvercast:
+    id_name = {
+        1   : "Overcast",
+        6   : "Phantasm",
+    }
+    name_id = {v: k for k, v in id_name.items()}

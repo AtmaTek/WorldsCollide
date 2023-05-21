@@ -1,6 +1,127 @@
 from memory.space import Bank, Reserve, Allocate, Write
 import instruction.asm as asm
 
+def mastered_mod(espers):
+    # Ported with mods from https://www.ff6hacking.com/forums/thread-4181.html
+    # Mods from Madsuir's original:
+    #   1. Rather than using the space at the right, I replace the ... before the MP
+    #   2. Using F0 freespace
+    #   3. Displaced code is different to deconflict with equipable_mod
+    from data.text.text2 import text_value
+    space = Reserve(0x487b0, 0x487be, "add star icon for text2 to unused space")
+    space.write(
+        0x18,0x00,0x3C,0x18,0xFF,0x18,0xFF,0x7E,0x7E,0x3C,0xFF,0x7E,0xFF,0x66 # raw hex for star icon
+    )
+
+    MASTERED_ICON = 0x7f # points to the star icon created above
+    SPELL_OFFSET_STORAGE_RAM = 0x0203 # free Menu RAM location used to calculate character spell offset once per Skills menu
+    src = [
+        asm.PHX(), # save X
+        asm.TDC(), # clear A
+        asm.LDA(0x28, asm.DIR), # load slot ID (0-3)
+        asm.TAX(),
+        asm.LDA(0x69, asm.DIR_X), # load actor ID in slot
+        asm.XBA(),
+        asm.LDA(0x36, asm.IMM8), # 54 spells
+        asm.A16(),
+        asm.STA(0x004202, asm.LNG), #prepare multiplication (actor ID * 54)
+        asm.NOP(),
+        asm.NOP(),
+        asm.NOP(),
+        asm.NOP(),
+        asm.LDA(0x004216, asm.LNG), #load multiplication result
+        asm.STA(SPELL_OFFSET_STORAGE_RAM, asm.ABS), #store it
+        asm.A8(),
+        asm.PLX(), # restore X
+        asm.JSL(0xc20006), # get actor stats -- displaced code
+        asm.RTL(),
+    ]
+    space = Write(Bank.F0, src, "set spell offset")
+    set_spell_offset = space.start_address_snes
+
+    space = Reserve(0x31b64, 0x31b67, "calculate actor's spells starting RAM offset")
+    space.write(
+        asm.JSL(set_spell_offset),
+    )
+
+    src = [
+        asm.PHX(),
+        asm.PHY(),
+        asm.TDC(), # clear A
+        asm.STA(0xfb, asm.DIR),
+        asm.LDA(0x7e9d89, asm.LNG_X), # load esper ID
+        asm.A16(),
+        asm.STA(0xfc, asm.DIR), # save it
+        asm.ASL(), # x2
+        asm.STA(0xfe, asm.DIR), # save it
+        asm.ASL(), # x4
+        asm.ASL(), # x8
+        asm.CLC(),
+        asm.ADC(0xfe, asm.DIR), # x10
+        asm.CLC(),
+        asm.ADC(0xfc, asm.DIR), # x11
+        asm.TAX(),
+        asm.STZ(0xfc, asm.DIR),
+        asm.LDY(0x0005, asm.IMM16), # 5 spells max per esper
+        asm.A8(),
+        "LOOP",
+        asm.TDC(), # clear A
+        asm.LDA(0xd86e01, asm.LNG_X), # esper spell
+        asm.CMP(0xff, asm.IMM8), # no spell?
+        asm.BEQ("NO_ESPER"), # exit if no esper
+        asm.STA(0xfc, asm.DIR), # save spell ID
+        asm.A16(),
+        asm.LDA(SPELL_OFFSET_STORAGE_RAM, asm.ABS), # load current character spell offset
+        asm.CLC(),
+        asm.ADC(0xfc, asm.DIR), # spell offset + spell ID
+        asm.PHX(),
+        asm.TAX(), # set X as spell learnt percentage
+        asm.A8(),
+        asm.LDA(0x1a6e, asm.ABS_X), # load spell learnt percentage
+        asm.PLX(),
+        asm.CMP(0xff, asm.IMM8), # compare learnt rate to 100%
+        asm.BNE("NOT_MASTERED"), # branch if not 100%
+        asm.INX(),
+        asm.INX(),
+        asm.DEY(),
+        asm.BNE("LOOP"),
+        "NO_ESPER",
+        asm.INC(0xfb, asm.DIR), # set esper as mastered
+        "NOT_MASTERED",
+        asm.PLY(),
+        asm.PLX(),
+        asm.LDA(0x7e9d89, asm.LNG_X), # load esper ID -- displaced code
+        asm.RTL(),
+    ]
+    space = Write(Bank.F0, src, "check mastered")
+    check_mastered = space.start_address_snes
+
+    space = Reserve(0x3552e, 0x35531, "check if current esper is mastered")
+    space.write(
+        asm.JSL(check_mastered),
+    )
+
+    src = [
+        asm.LDA(0xfb, asm.DIR), # load mastered esper byte
+        asm.BEQ("NOT_MASTERED"), # branch if not mastered
+        asm.LDA(MASTERED_ICON, asm.IMM8), #load our mastered icon
+        asm.BRA("RETURN"),
+        "NOT_MASTERED",
+        asm.LDA(text_value['…'], asm.IMM8), # load the normal icon
+        "RETURN",
+        asm.STA(0x2180, asm.ABS), # add to string -- displaced code
+        asm.RTL(),
+    ]
+
+    space = Write(Bank.F0, src, "add esper learned icon")
+    add_icon = space.start_address_snes
+
+    space = Reserve(0x3553f, 0x35543, "set icon for mastered espers", asm.NOP())
+    space.write(
+        asm.JSL(add_icon),
+    )
+
+
 def equipable_mod(espers):
     from data.characters import Characters
 

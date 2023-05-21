@@ -10,7 +10,14 @@ def parse(parser):
     steal_chances.add_argument("-sca", "--steal-chances-always", action = "store_true",
                          help = "Steal will always succeed if enemy has an item")
 
+    steal.add_argument("-ssd", "--shuffle-steals-drops", default = None, type = int,
+                          metavar = "PERCENT", choices = range(101),
+                          help="Shuffle items stolen and dropped with randomized percent")
+
 def process(args):
+    if args.shuffle_steals_drops is not None:
+        args.shuffle_steals_drops_random_percent = args.shuffle_steals_drops
+        args.shuffle_steals_drops = True
     pass
 
 def flags(args):
@@ -20,19 +27,27 @@ def flags(args):
         flags += " -sch"
     if args.steal_chances_always:
         flags += " -sca"
+    if args.shuffle_steals_drops:
+        flags += f" -ssd {args.shuffle_steals_drops_random_percent}"
 
     return flags
 
 def options(args):
+    result = []
+
     steal_chances = "Original"
     if args.steal_chances_higher:
         steal_chances = "Higher"
     if args.steal_chances_always:
         steal_chances = "Always"
 
-    return [
-        ("Chances", steal_chances),
-    ]
+    result.append(("Chances", steal_chances))
+
+    result.append(("Shuffle", args.shuffle_steals_drops))
+    if args.shuffle_steals_drops:
+        result.append(("Random Percent", f"{args.shuffle_steals_drops_random_percent}%"))
+
+    return result
 
 def menu(args):
     return (name(), options(args))

@@ -29,9 +29,10 @@ class Enemies():
     SRBEHEMOTH2_ID = 127
     INVINCIBLE_GUARDIAN_ID = 273
 
-    def __init__(self, rom, args):
+    def __init__(self, rom, args, items=[]):
         self.rom = rom
         self.args = args
+        self.items = items
 
         self.enemy_data = DataArray(self.rom, self.DATA_START, self.DATA_END, self.DATA_SIZE)
         self.enemy_name_data = DataArray(self.rom, self.NAMES_START, self.NAMES_END, self.NAME_SIZE)
@@ -305,6 +306,54 @@ class Enemies():
 
         self.packs.randomize_packs(packs, boss_percent)
 
+    def randomize_loot(self):
+        for enemy in self.enemies:
+            self.set_common_steal(enemy.id, self.items.get_random())
+            self.set_rare_steal(enemy.id, self.items.get_random())
+            self.set_common_drop(enemy.id, self.items.get_random())
+            self.set_rare_drop(enemy.id, self.items.get_random())
+
+    def shuffle_steals_drops_random(self):
+        import random
+        from data.bosses import final_battle_enemy_name
+
+        # Assemble the list of steals and drops
+        steals_drops = []
+        for enemy in self.enemies:
+            if len(enemy.name) > 0:
+                loot_list = [enemy.steal_common, enemy.steal_rare]
+                if enemy.id not in final_battle_enemy_name.keys():
+                    loot_list += [enemy.drop_common, enemy.drop_rare]
+                steals_drops.extend(loot_list)
+
+        # Randomize the requested number
+        random_percent = self.args.shuffle_steals_drops_random_percent / 100.0
+        number_random = int(random_percent * len(steals_drops))
+        which_random = [a for a in range(len(steals_drops))]
+        random.shuffle(which_random)
+        for id in range(number_random):
+            steals_drops[which_random[id]] = self.items.get_random()
+
+        # Shuffle list & reassign to enemies
+        random.shuffle(steals_drops)
+        for enemy in self.enemies:
+            if len(enemy.name) > 0:
+                self.set_common_steal(enemy.id, steals_drops.pop(0))
+                self.set_rare_steal(enemy.id, steals_drops.pop(0))
+                if enemy.id not in final_battle_enemy_name.keys():
+                    self.set_common_drop(enemy.id, steals_drops.pop(0))
+                    self.set_rare_drop(enemy.id, steals_drops.pop(0))
+
+    def pad_enemy_packs(self):
+        from data.enemy_battle_groups import unused_event_battle_groups
+        for pack in self.packs.packs:
+            if pack.FORMATION_COUNT == 2:
+                # pack formation 0, 0 is Lobo -- it fills out unused spaces. Id 0, though, is MIAB Lobo, which we want to keep.
+                if (pack.formations == [0, 0] and pack.id > 0) or (pack.id in unused_event_battle_groups):
+                    # Add random formations to the empty pack
+                    this_formation = self.formations.get_random_normal()
+                    pack.formations = [this_formation, this_formation]
+
     def set_escapable(self):
         import random
 
@@ -329,6 +378,13 @@ class Enemies():
     def mod(self, maps):
         if self.args.boss_normalize_distort_stats:
             self.boss_normalize_distort_stats()
+
+        if self.args.shuffle_steals_drops:
+            self.shuffle_steals_drops_random()
+
+        if self.args.chest_random_monsters_enemy > 0:
+            # add more random groups to the otherwise limited event battle groups (all that's available for MIAB)
+            self.pad_enemy_packs()
 
         if self.args.permadeath:
             self.remove_fenix_downs()

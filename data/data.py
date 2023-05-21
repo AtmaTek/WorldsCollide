@@ -38,7 +38,7 @@ class Data:
         self.maps = maps.Maps(rom, args, self.items)
         self.maps.mod(self.characters)
 
-        self.enemies = enemies.Enemies(rom, args)
+        self.enemies = enemies.Enemies(rom, args, self.items)
         self.enemies.mod(self.maps)
 
         self.swdtechs = swdtechs.SwdTechs(rom, args, self.characters)

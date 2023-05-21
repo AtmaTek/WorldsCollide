@@ -358,6 +358,6 @@ class EnemyScriptCommands:
         self.hp_check_command_mod()
         self.hp_conditions_mod()
 
-        scaling_space = Allocate(Bank.C4, 944, "enemy script get random tiered ability")
+        scaling_space = Allocate(Bank.C4, 946, "enemy script get random tiered ability")
         if self.args.ability_scaling:
             self.random_tiered_ability_mod(scaling_space)

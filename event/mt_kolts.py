@@ -21,6 +21,7 @@ class MtKolts(Event):
         self.shadow_vargas_mod()
         self.vargas_battle_mod()
         self.entrance_exit_mod()
+        self.vargas_trigger_mod()
 
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
@@ -138,6 +139,29 @@ class MtKolts(Event):
         new_event.y = 59
         new_event.event_address = exit_move_airship - EVENT_CODE_START
         self.maps.add_event(0x64, new_event)
+
+    def vargas_trigger_mod(self):
+        # Vargas appears on the map 0x62 via 2 tile triggers. With B-Dash, players can outpace him leading to soft-locks.
+        # Change the 2 event tile triggers to a different location.
+        old_event = self.maps.get_event(0x62, 10, 32) # get existing event
+
+        self.maps.delete_event(0x62, 10, 32) # vargas event tile (left)
+        self.maps.delete_event(0x62, 11, 32) # vargas event tile (right)
+
+        from data.map_event import MapEvent
+        # add event tile to earlier on the path
+        new_event = MapEvent()
+        new_event.x = 21
+        new_event.y = 19
+        new_event.event_address = old_event.event_address
+        self.maps.add_event(0x62, new_event)
+
+        # add event tile to bottom right of stairs
+        new_event = MapEvent()
+        new_event.x = 21
+        new_event.y = 20
+        new_event.event_address = old_event.event_address
+        self.maps.add_event(0x62, new_event)
 
     def character_mod(self, character):
         boss_pack_id = self.get_boss("Vargas")

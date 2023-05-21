@@ -101,7 +101,16 @@ class BarenFalls(Event):
             field.Branch(exit_function),
         )
 
+    def character_music_mod(self, character):
+        from music.song_utils import get_character_theme
+
+        space = Reserve(0xbc0ff, 0xbc100, "Play Song Gau")
+        space.write([
+            field.StartSong(get_character_theme(character)),
+        ])
+
     def character_mod(self, character):
+        self.character_music_mod(character)
         gau_npc_id = 0x10
         gau_npc = self.maps.get_npc(0x09f, gau_npc_id)
         gau_npc.sprite = character

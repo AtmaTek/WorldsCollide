@@ -304,6 +304,9 @@ class Espers():
             self.equipable_balanced_random()
         espers_asm.equipable_mod(self)
 
+        if self.args.esper_mastered_icon:
+            espers_asm.mastered_mod(self)
+
         if self.args.permadeath:
             self.phoenix_life3()
 

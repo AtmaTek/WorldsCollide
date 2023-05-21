@@ -6,7 +6,7 @@ from data.npc import NPC
 from data.chests import Chests
 
 import data.map_events as events
-from data.map_event import MapEvent
+from data.map_event import MapEvent, LongMapEvent
 
 import data.map_exits as exits
 from data.map_exit import ShortMapExit, LongMapExit
@@ -18,6 +18,7 @@ class Maps():
     MAP_COUNT = 416
 
     EVENT_PTR_START = 0x40000
+    LONG_EVENT_PTR_START = events.LongMapEvents.POINTER_START_ADDR_LONG
     ENTRANCE_EVENTS_START_ADDR = 0x11fa00
 
     SHORT_EXIT_PTR_START = 0x1fbb00
@@ -32,6 +33,7 @@ class Maps():
         self.npcs = npcs.NPCs(rom)
         self.chests = Chests(self.rom, self.args, items)
         self.events = events.MapEvents(rom)
+        self.long_events = events.LongMapEvents(rom)
         self.exits = exits.MapExits(rom)
         self.world_map_event_modifications = world_map_event_modifications.WorldMapEventModifications(rom)
         self.world_map = WorldMap(rom, args)
@@ -55,6 +57,10 @@ class Maps():
             events_ptr_address = self.EVENT_PTR_START + map_index * self.rom.SHORT_PTR_SIZE
             events_ptr = self.rom.get_bytes(events_ptr_address, self.rom.SHORT_PTR_SIZE)
             self.maps[map_index]["events_ptr"] = events_ptr[0] | (events_ptr[1] << 8)
+
+            # LONG EVENTS INITIALIZATION: Vanilla code has no long events.
+            # Set initial offset to the vanilla value for each map.
+            self.maps[map_index]["long_events_ptr"] = self.maps[0]["events_ptr"]
 
             short_exit_ptr_address = self.SHORT_EXIT_PTR_START + map_index * self.rom.SHORT_PTR_SIZE
             short_exit_ptr = self.rom.get_bytes(short_exit_ptr_address, self.rom.SHORT_PTR_SIZE)
@@ -137,6 +143,41 @@ class Maps():
         last_event_id = first_event_id + self.get_event_count(map_id)
         self.events.delete_event(first_event_id, last_event_id, x, y)
 
+    ### LONG EVENTS ###
+    def get_long_event_count(self, map_id):
+        return (self.maps[map_id + 1]["long_events_ptr"] - self.maps[map_id][
+            "long_events_ptr"]) // LongMapEvent.DATA_SIZE
+
+    def print_long_events(self, map_id):
+        first_event_id = (self.maps[map_id]["long_events_ptr"] - self.maps[0][
+            "long_events_ptr"]) // LongMapEvent.DATA_SIZE
+
+        self.long_events.print_range(first_event_id, self.get_event_count(map_id))
+
+    def get_long_event(self, map_id, x, y):
+        first_event_id = (self.maps[map_id]["long_events_ptr"] - self.maps[0][
+            "long_events_ptr"]) // LongMapEvent.DATA_SIZE
+        last_event_id = first_event_id + self.get_event_count(map_id)
+        return self.long_events.get_event(first_event_id, last_event_id, x, y)
+
+    def add_long_event(self, map_id, new_event):
+        for map_index in range(map_id + 1, self.MAP_COUNT):
+            self.maps[map_index]["long_events_ptr"] += LongMapEvent.DATA_SIZE
+
+        event_id = (self.maps[map_id]["long_events_ptr"] - self.maps[0][
+            "long_events_ptr"]) // LongMapEvent.DATA_SIZE
+        self.long_events.add_event(event_id, new_event)
+
+    def delete_long_event(self, map_id, x, y):
+        for map_index in range(map_id + 1, self.MAP_COUNT):
+            self.maps[map_index]["long_events_ptr"] -= LongMapEvent.DATA_SIZE
+
+        first_event_id = (self.maps[map_id]["long_events_ptr"] - self.maps[0][
+            "long_events_ptr"]) // LongMapEvent.DATA_SIZE
+        last_event_id = first_event_id + self.get_event_count(map_id)
+        self.long_events.delete_event(first_event_id, last_event_id, x, y)
+    ### LONG EVENTS ###
+
     def get_short_exit_count(self, map_id):
         return (self.maps[map_id + 1]["short_exits_ptr"] - self.maps[map_id]["short_exits_ptr"]) // ShortMapExit.DATA_SIZE
 
@@ -188,17 +229,54 @@ class Maps():
         compressed = compress(decompressed)
         self.rom.set_bytes(tilemaps_start + tilemap_addr, compressed)
 
+    def _fix_Cid_timer_glitch(self):
+        from memory.space import Bank, Write
+        import instruction.field as field
+        from event.event import EVENT_CODE_START
+        # If you start Cid's timer and then leave, the timer can affect event tile, NPC and objective triggering
+        # Write some LongMapEvents to turn off the Cid timer when exiting to the world map.
+        HORIZ = 0
+        VERT = 128
+
+        # LONG EVENT #1: play the lore sound effect on some horizontal tiles on the Blackjack
+        src = [
+            field.BranchIfEventBitSet(0x1b5, "SetBit"),
+            field.ResetTimer(0),
+            field.SetEventBit(0x1b5),
+            "SetBit",
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, 'Reset Cid event timer')
+
+        map_id = 0x18c  # Cid's Island, Outside
+
+        new_event_data = [(16, 1, 14, VERT), (15, 1, 14, VERT),  # (x, y, length, direction)
+                          (0, 1, 14, VERT), (1, 1, 14, VERT),    # Include 2 layers to make sure it doesn't get skipped
+                          (0, 1, 3, HORIZ), (0, 2, 3, HORIZ),
+                          (7, 0, 2, HORIZ), (7, 1, 2, HORIZ),
+                          (12, 1, 3, HORIZ), (12, 2, 3, HORIZ)]
+        for i in range(len(new_event_data)):
+            new_le = LongMapEvent()
+            new_le.x = new_event_data[i][0]
+            new_le.y = new_event_data[i][1]
+            new_le.size = new_event_data[i][2]
+            new_le.direction = new_event_data[i][3]
+            new_le.event_address = space.start_address - EVENT_CODE_START
+            self.add_long_event(map_id, new_le)
+
     def mod(self, characters):
         self.npcs.mod(characters)
         self.chests.mod()
         self.world_map.mod()
 
         self._fix_imperial_camp_boxes()
+        self._fix_Cid_timer_glitch()
 
     def write(self):
         self.npcs.write()
         self.chests.write()
         self.events.write()
+        self.long_events.write()
         self.exits.write()
         self.world_map_event_modifications.write()
 
@@ -217,6 +295,13 @@ class Maps():
             events_ptr_bytes[0] = cur_map["events_ptr"] & 0xff
             events_ptr_bytes[1] = (cur_map["events_ptr"] & 0xff00) >> 8
             self.rom.set_bytes(events_ptr_start, events_ptr_bytes)
+
+            # LONG EVENTS
+            long_events_ptr_start = self.LONG_EVENT_PTR_START + cur_map["id"] * self.rom.SHORT_PTR_SIZE
+            long_events_ptr_bytes = [0x00] * self.rom.SHORT_PTR_SIZE
+            long_events_ptr_bytes[0] = cur_map["long_events_ptr"] & 0xff
+            long_events_ptr_bytes[1] = (cur_map["long_events_ptr"] & 0xff00) >> 8
+            self.rom.set_bytes(long_events_ptr_start, long_events_ptr_bytes)
 
             short_exits_ptr_start = self.SHORT_EXIT_PTR_START + cur_map["id"] * self.rom.SHORT_PTR_SIZE
             short_exits_bytes = [0x00] * self.rom.SHORT_PTR_SIZE

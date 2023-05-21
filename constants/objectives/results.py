@@ -90,6 +90,7 @@ category_types["Command"].append(ResultType(59, "Magitek Upgrade", "Magitek Upgr
 category_types["Item"].append(ResultType(60, "Sprint Shoes", "Sprint Shoes", None))
 category_types["Auto"].append(ResultType(61, "Auto Dog Block", "Auto Dog Block", None))
 category_types["Auto"].append(ResultType(62, "Auto Life 3", "Auto Life 3", None))
+category_types["Auto"].append(ResultType(63, "Auto Overcast", "Auto Overcast", None))
 
 categories = list(category_types.keys())
 

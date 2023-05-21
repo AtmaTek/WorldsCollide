@@ -13,6 +13,7 @@ class ScalingFunctions():
         self.ced_mod()
         self.checks_mod()
         self.time_mod()
+        self.bosses_dragons_mod()
 
         if args.level_scaling_average:
             self.level = self.party_average_level
@@ -24,6 +25,8 @@ class ScalingFunctions():
             self.level = self.ced
         elif args.level_scaling_checks:
             self.level = self.checks
+        elif args.level_scaling_bosses_dragons:
+            self.level = self.bosses_dragons
         elif args.level_scaling_time:
             self.level = self.time
         else:
@@ -39,6 +42,8 @@ class ScalingFunctions():
             self.hp_mp = self.ced
         elif args.hp_mp_scaling_checks:
             self.hp_mp = self.checks
+        elif args.hp_mp_scaling_bosses_dragons:
+            self.hp_mp = self.bosses_dragons
         elif args.hp_mp_scaling_time:
             self.hp_mp = self.time
         else:
@@ -54,6 +59,8 @@ class ScalingFunctions():
             self.xp_gp = self.ced
         elif args.xp_gp_scaling_checks:
             self.xp_gp = self.checks
+        elif args.xp_gp_scaling_bosses_dragons:
+            self.xp_gp = self.bosses_dragons
         elif args.xp_gp_scaling_time:
             self.xp_gp = self.time
         else:
@@ -216,6 +223,27 @@ class ScalingFunctions():
         ]
         space = Write(Bank.C2, src, "scaling function checks")
         self.checks = space.start_address
+
+    def bosses_dragons_mod(self):
+        # output: 16 bit a = bosses completed
+
+        import data.event_word as event_word
+        boss_complete_address = event_word.address(event_word.BOSSES_DEFEATED)
+        dragons_defeated_address = event_word.address(event_word.DRAGONS_DEFEATED)
+
+        src = [
+            asm.PHP(),
+            asm.AXY16(),
+
+            asm.LDA(boss_complete_address, asm.ABS),  # a = bosses defeated
+            asm.CLC(),
+            asm.ADC(dragons_defeated_address, asm.ABS), # a = bosses + dragons defeated
+
+            asm.PLP(),
+            asm.RTS(),
+        ]
+        space = Write(Bank.C2, src, "scaling function bosses")
+        self.bosses_dragons = space.start_address
 
     def time_mod(self):
         # output: 16 bit a = game time in minutes

@@ -27,6 +27,7 @@ def parse(parser):
 
 def process(args):
     from constants.spells import black_magic_ids, white_magic_ids, gray_magic_ids, spell_id
+    from data.esper_spell_tiers import top_spells
 
     # If no_ultima is on, add it to our exclude list for downstream use
     # If permadeath is on, add it to our exclude list for downstream use
@@ -50,6 +51,8 @@ def process(args):
                 args.remove_learnable_spell_ids.extend(black_magic_ids)
             elif a_spell_id == 'gray' or a_spell_id == 'grey':
                 args.remove_learnable_spell_ids.extend(gray_magic_ids)
+            elif a_spell_id == 'top':
+                args.remove_learnable_spell_ids.extend(top_spells)
             else:
                 spell_ids_lower = {k.lower():v for k,v in spell_id.items()}
                 if a_spell_id in spell_ids_lower:
@@ -109,6 +112,13 @@ def options(args):
     ]
         
     return opts
+def _format_spells_log_entries(spell_ids):
+    from constants.spells import id_spell
+    spell_entries = []
+    for spell_id in spell_ids:
+        spell_entries.append(("", id_spell[spell_id]))
+    return spell_entries
+
 def _format_spells_log_entries(spell_ids):
     from constants.spells import id_spell
     spell_entries = []

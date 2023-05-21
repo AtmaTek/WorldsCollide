@@ -25,8 +25,8 @@ class Character():
         self.init_magic_evasion = init_data[14]
         self.init_right_hand    = init_data[15]
         self.init_left_hand     = init_data[16]
-        self.init_body          = init_data[17]
-        self.init_head          = init_data[18]
+        self.init_body          = init_data[18] # https://discord.com/channels/666661907628949504/931737764205047858/1069220818300698675
+        self.init_head          = init_data[17]
         self.init_relic1        = init_data[19]
         self.init_relic2        = init_data[20]
         self._init_run_success  = init_data[21] & 0x03
@@ -51,8 +51,8 @@ class Character():
         init_data[14]    = self.init_magic_evasion
         init_data[15]    = self.init_right_hand
         init_data[16]    = self.init_left_hand
-        init_data[17]    = self.init_body
-        init_data[18]    = self.init_head
+        init_data[18]    = self.init_body
+        init_data[17]    = self.init_head
         init_data[19]    = self.init_relic1
         init_data[20]    = self.init_relic2
         init_data[21]    = self._init_run_success

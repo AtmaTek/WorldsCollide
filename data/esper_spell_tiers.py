@@ -80,3 +80,7 @@ tier_s_distribution = [
     (name_id["Quick"],  0.3),
     (name_id["Ultima"], 0.1),
 ]
+
+top_spells = tiers[7]
+top_spells.extend(tiers[6])
+top_spells.extend(tiers[2])

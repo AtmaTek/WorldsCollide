@@ -13,6 +13,7 @@ class Permadeath:
         if args.permadeath:
             self.remove_status_mod(remove_status_space)
             self.heal_hp_mod(heal_hp_space)
+            self.coliseum_mod()
 
     def remove_status_mod(self, space):
         # change remove status effects field command to never remove death
@@ -47,3 +48,8 @@ class Permadeath:
         space.write(
             asm.JMP(death_or_max_hp, asm.ABS),
         )
+
+    def coliseum_mod(self):
+        # don't revive permadeath characters by retaining the wound bit
+        space = Reserve(0x227f3, 0x227f3, "coliseum permadeath")
+        space.write(0xad) # default: 0x2d, which clears the wound bit

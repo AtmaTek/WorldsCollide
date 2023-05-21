@@ -109,14 +109,31 @@ class MoblizWOR(Event):
         self.dialogs.set_text(2307, "You're not gonna take <" + char_default_name + "> away, are you?<end>")
         self.dialogs.set_text(2315, "I'm not gonna cry.<line>If I do, <" + char_default_name + ">'ll feel sad…<end>")
 
-        space = Reserve(0xc4cca, 0xc4cd9, "mobliz wor add character to party before phunbaba 4 if room available", field.NOP())
-        space.write(
+        src = [
             # check for 4 party members in case phunbaba 3 was not the previous boss and no bababreath happened
-            field.BranchIfPartySize(4, space.end_address + 1),
+            field.BranchIfPartySize(4, "RETURN"),
 
             field.CreateEntity(character),
             field.AddCharacterToParty(character, 1),
             field.RefreshEntities(),
+        ]
+        if self.args.start_average_level:
+            src += [
+                # Average character level via field command - example ref: CC/3A2C
+                field.AverageLevel(character),
+                field.RestoreHp(character, 0x7f), # restore all HP
+                field.RestoreMp(character, 0x7f), # restore all MP
+            ]
+        src += [
+            "RETURN",
+            field.Return(),
+        ]
+        space = Write(Bank.CC, src, "character joins before Mobliz battle")
+        add_character = space.start_address
+
+        space = Reserve(0xc4cca, 0xc4cd9, "mobliz wor add character to party before phunbaba 4 if room available", field.NOP())
+        space.write(
+            field.Call(add_character),
         )
 
         boss_pack_id = self.get_boss("Phunbaba 4")

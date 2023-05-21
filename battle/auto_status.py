@@ -10,6 +10,7 @@ class _AutoStatus:
         auto_b_status_effects = ["Condemned", "Image", "Mute", "Berserk", "Muddle", "Seizure", "Sleep"]
         auto_c_status_effects = ["Float", "Regen", "Slow", "Haste", "Shell", "Safe", "Reflect"]
         auto_d_status_effects = ["Life 3", "Dog Block"]
+        auto_phantasm_overcast_status_effects = ["Overcast"]
 
         auto_addresses = []
         for status in auto_b_status_effects:
@@ -18,6 +19,9 @@ class _AutoStatus:
             auto_addresses.append(self.auto_status(status, status_effects.C))
         for status in auto_d_status_effects:
             auto_addresses.append(self.auto_status(status, status_effects.D))
+        for status in auto_phantasm_overcast_status_effects:
+            auto_addresses.append(self.auto_status(status, status_effects.PhantasmOvercast))
+        
 
         src = [
             # original replaced code
@@ -64,6 +68,9 @@ class _AutoStatus:
         elif status_effects_group == status_effects.D:
             status_address = 0x1615 
             opcode = asm.ABS_Y
+        elif status_effects_group == status_effects.PhantasmOvercast:
+            status_address = 0x3e4d
+            opcode = asm.ABS_X
 
         src = []
         if auto_status_name in objectives.results:

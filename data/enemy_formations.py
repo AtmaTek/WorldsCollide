@@ -182,4 +182,4 @@ class EnemyFormations():
     def print_scripts(self):
         for formation_index, formation in enumerate(self.formations):
             if formation.enable_event_script:
-                print("{}: script {}".format(formation_index, hex(formation.event_script)))
+                print("{} {}: script {}".format(formation_index, self.get_name(formation_index), hex(formation.event_script)))

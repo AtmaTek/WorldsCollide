@@ -11,12 +11,13 @@ class Item():
     ITEM_TYPE_COUNT = 7
     TOOL, WEAPON, ARMOR, SHIELD, HELMET, RELIC, ITEM = range(ITEM_TYPE_COUNT)
 
-    def __init__(self, id, rom):
+    def __init__(self, id, rom, desc_data):
         self.rom = rom
 
         self.id = id
         self.name_addr = self.NAMES_START_ADDR + self.id * self.NAME_LENGTH
         self.data_addr = self.DATA_START_ADDR + self.id * self.DATA_SIZE
+        self.desc_data = desc_data
 
         self.read()
 
@@ -42,6 +43,9 @@ class Item():
         self.learnable_spell = 0
         self.learnable_spell_rate = 0
 
+    def get_desc_data(self):
+        return text.get_bytes(self.desc, text.TEXT2)
+
     def scale_price(self, factor):
         self.price = int(self.price * factor)
         self.price = max(min(self.price, 2**16 - 1), 0)
@@ -50,6 +54,7 @@ class Item():
         name_bytes = self.rom.get_bytes(self.name_addr, self.NAME_LENGTH)
         self.icon = value_text[name_bytes[0]]
         self.name = text.get_string(name_bytes[1:], text.TEXT2).rstrip('\0')
+        self.desc = text.get_string(self.desc_data, text.TEXT2).rstrip('\0')
 
         data = self.rom.get_bytes(self.data_addr, self.DATA_SIZE)
         self.type                   = data[0] & 0x07

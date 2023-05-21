@@ -142,7 +142,16 @@ class FanaticsTower(Event):
             field.InvokeBattle(boss_pack_id),
         )
 
+    def character_music_mod(self, character):
+        from music.song_utils import get_character_theme
+
+        space = Reserve(0xc5327, 0xc5328, "Play Song Relm")
+        space.write([
+            field.StartSong(get_character_theme(character)),
+        ])
+
     def character_mod(self, character):
+        self.character_music_mod(character)
         self.strago_npc.sprite = character
         self.strago_npc.palette = self.characters.get_palette(character)
 

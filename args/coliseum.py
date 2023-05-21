@@ -7,16 +7,20 @@ def parse(parser):
     coliseum = parser.add_argument_group("Coliseum")
 
     coliseum_opponents = coliseum.add_mutually_exclusive_group()
-    coliseum_opponents.add_argument("-cos", "--coliseum-opponents-shuffle", action = "store_true",
-                                     help = "Coliseum opponents shuffled")
-    coliseum_opponents.add_argument("-cor", "--coliseum-opponents-random", action = "store_true",
-                                     help = "Coliseum opponents randomized")
+    coliseum_opponents.add_argument("-cor", "--coliseum-opponents-random", nargs='?', const=100, default = None, type = int,
+                                    metavar = "PERCENT", choices = range(101),
+                                    help = "Coliseum opponents original with a given percent randomized")
+    coliseum_opponents.add_argument("-cosr", "--coliseum-opponents-shuffle-random", default = None, type = int,
+                                    metavar = "PERCENT", choices = range(101),
+                                    help = "Coliseum opponents shuffled and then given percent randomized")
 
     coliseum_rewards = coliseum.add_mutually_exclusive_group()
-    coliseum_rewards.add_argument("-crs", "--coliseum-rewards-shuffle", action = "store_true",
-                                   help = "Coliseum rewards shuffled")
-    coliseum_rewards.add_argument("-crr", "--coliseum-rewards-random", action = "store_true",
-                                   help = "Coliseum rewards randomized")
+    coliseum_rewards.add_argument("-crr", "--coliseum-rewards-random", nargs='?', const=100, default = None, type = int,
+                                    metavar = "PERCENT", choices = range(101),
+                                    help = "Coliseum rewards original with a given percent randomized")
+    coliseum_rewards.add_argument("-crsr", "--coliseum-rewards-shuffle-random", default = None, type = int,
+                                    metavar = "PERCENT", choices = range(101),
+                                    help = "Coliseum rewards shuffled and then a given percent randomized")
 
     coliseum.add_argument("-crvr", "--coliseum-rewards-visible-random", default = None, type = int,
                           nargs = 2, metavar = ("MIN", "MAX"), choices = range(ITEM_COUNT),
@@ -34,16 +38,15 @@ def process(args):
 
 def flags(args):
     flags = ""
+    if args.coliseum_opponents_random:
+        flags += f" -cor {args.coliseum_opponents_random}"
+    elif args.coliseum_opponents_shuffle_random:
+        flags += f" -cor {args.coliseum_opponents_shuffle_random}"
 
-    if args.coliseum_opponents_shuffle:
-        flags += " -cos"
-    elif args.coliseum_opponents_random:
-        flags += " -cor"
-
-    if args.coliseum_rewards_shuffle:
-        flags += " -crs"
-    elif args.coliseum_rewards_random:
-        flags += " -crr"
+    if args.coliseum_rewards_random:
+        flags += f" -crr {args.coliseum_rewards_random}"
+    elif args.coliseum_rewards_shuffle_random:
+        flags += f" -crr {args.coliseum_rewards_shuffle_random}"
 
     if args.coliseum_rewards_visible_random:
         flags += f" -crvr {args.coliseum_rewards_visible_random_min} {args.coliseum_rewards_visible_random_max}"
@@ -62,15 +65,11 @@ def options(args):
     result = []
 
     opponents = "Original"
-    if args.coliseum_opponents_shuffle:
-        opponents = "Shuffle"
-    elif args.coliseum_opponents_random:
+    if args.coliseum_opponents_random:
         opponents = "Random"
 
     rewards = "Original"
-    if args.coliseum_rewards_shuffle:
-        rewards = "Shuffle"
-    elif args.coliseum_rewards_random:
+    if args.coliseum_rewards_random:
         rewards = "Random"
 
     rewards_visible = "Original"

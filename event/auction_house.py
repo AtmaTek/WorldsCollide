@@ -44,12 +44,16 @@ class AuctionHouse(Event):
         return "Auction House"
 
     def init_rewards(self):
-        if self.args.no_free_characters_espers:
+        # determine reward possibilities based on flags (reward1 = 10K, reward2 = 20K)
+        if self.args.no_free_characters_espers or self.args.auction_max_espers == 0:
             self.reward1 = self.add_reward(RewardType.ITEM)
             self.reward2 = self.add_reward(RewardType.ITEM)
         else:
-            self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
             self.reward2 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
+            if self.args.auction_max_espers == 1:
+                self.reward1 = self.add_reward(RewardType.ITEM)
+            else: #auction_max_espers == 2:
+                self.reward1 = self.add_reward(RewardType.ESPER | RewardType.ITEM)
 
     def mod(self):
         self.requirements_mod()
@@ -118,9 +122,9 @@ class AuctionHouse(Event):
 
     def get_reward_announce_dialog(self, name, start_price, item):
         if item:
-            reward_dialog = '“' + name + '“!'
+            reward_dialog = '“' + name + '”!' #https://discord.com/channels/666661907628949504/666811452350398493/1085018091844554832
         else:
-            reward_dialog = 'The Magicite, “' + name + '“!'
+            reward_dialog = 'The Magicite, “' + name + '”!'
 
         # keep auctioneer dialog somewhat centered with new esper/item names
         # looks like about 32 characters on a line (32 is just an estimate, it is not monospace)

@@ -52,6 +52,7 @@ def options(args):
         ("Start Warp Stones", args.start_warp_stones),
         ("Start Fenix Downs", args.start_fenix_downs),
         ("Start Tools", args.start_tools),
+        ("Start Junk", args.start_junk),
     ]
     
     if args.start_junk != 0:
