@@ -7,12 +7,15 @@ import objectives
 
 class _AutoStatus:
     def __init__(self):
+        auto_a_status_effects = ["Dark", "Clear", "Imp"]
         auto_b_status_effects = ["Condemned", "Image", "Mute", "Berserk", "Muddle", "Seizure", "Sleep"]
         auto_c_status_effects = ["Float", "Regen", "Slow", "Haste", "Shell", "Safe", "Reflect"]
         auto_d_status_effects = ["Life 3", "Dog Block"]
         auto_phantasm_overcast_status_effects = ["Overcast"]
 
         auto_addresses = []
+        for status in auto_a_status_effects:
+            auto_addresses.append(self.auto_status(status, status_effects.A))
         for status in auto_b_status_effects:
             auto_addresses.append(self.auto_status(status, status_effects.B))
         for status in auto_c_status_effects:
@@ -59,7 +62,10 @@ class _AutoStatus:
             status_bit = 1 << status_effects_group.name_id["Dance"]
         else:
             status_bit = 1 << status_effects_group.name_id[status_name]
-        if status_effects_group == status_effects.B:
+        if status_effects_group == status_effects.A:
+            status_address = 0x1614
+            opcode = asm.ABS_Y
+        elif status_effects_group == status_effects.B:
             status_address = 0x3c6c
             opcode = asm.ABS_X
         elif status_effects_group == status_effects.C:

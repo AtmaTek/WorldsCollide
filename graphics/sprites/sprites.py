@@ -288,6 +288,15 @@ id_sprite = {
     333 : "Toadette (Explorer)-HoxNorf-Mario",
     334 : "Blaze-HoxNorf-Sonic",
     335 : "Xion-Kzinssie-KH",
+    336 : "Tohka (Spirit)-HoxNorf-DAL",
+    337 : "Satori-HoxNorf-Touhou",
+    338 : "Lenna (Dancer)-HoxNorf-FF5",
+    339 : "Lenna (Time Mage)-HoxNorf-FF5",
+    340 : "Lenna (Ranger)-HoxNorf-FF5",
+    341 : "Ness-Badass-Mother",
+    342 : "Doom Guy-JamesWhite89-Doom",
+    343 : "Cleon-HoxNorf-PB4",
+    344 : "Koishi-HoxNorf-Touhou",
 }
 
 def get_path(id_):

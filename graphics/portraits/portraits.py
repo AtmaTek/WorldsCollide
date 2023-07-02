@@ -287,6 +287,17 @@ id_portrait = {
     378 : "Xion-Kzinssie-KH",
     379 : "Gerad-Tsushiy_Gens-FF6",
     380 : "Gau (Suit)-Tsushiy_Gens-FF6",
+    381 : "Tohka (Spirit)-HoxNorf-DAL",
+    382 : "Satori-HoxNorf-Touhou",
+    383 : "Lenna (Dancer)-JamesWhite89-FF5",
+    384 : "Lenna (Time Mage)-JamesWhite89-FF5",
+    385 : "Lenna (Ranger)-JamesWhite89-FF5",
+    386 : "Bubble Dragon-Peebs-BB",
+    387 : "Ness-Unknown-Mother",
+    388 : "Doom Guy-JamesWhite89-Doom",
+    389 : "Cleon-HoxNorf-PB4",
+    390 : "Koishi-HoxNorf-Touhou",
+    391 : "Reimu3-HoxNorf-Touhou",
 }
 
 def get_bin_path(id_):

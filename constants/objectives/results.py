@@ -91,6 +91,9 @@ category_types["Item"].append(ResultType(60, "Sprint Shoes", "Sprint Shoes", Non
 category_types["Auto"].append(ResultType(61, "Auto Dog Block", "Auto Dog Block", None))
 category_types["Auto"].append(ResultType(62, "Auto Life 3", "Auto Life 3", None))
 category_types["Auto"].append(ResultType(63, "Auto Overcast", "Auto Overcast", None))
+category_types["Auto"].append(ResultType(64, "Auto Dark", "Auto Dark", None))
+category_types["Auto"].append(ResultType(65, "Auto Clear", "Auto Clear", None))
+category_types["Auto"].append(ResultType(66, "Auto Imp", "Auto Imp", None))
 
 categories = list(category_types.keys())
 
