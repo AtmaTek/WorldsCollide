@@ -141,6 +141,7 @@ class NarsheMoogleDefense(Event):
         space = Reserve(0xca905, 0xcaa03, "moogle defense party creation", field.NOP())
         space.write(
             src,
+            field.SetEventBit(event_bit.CONTINUE_MUSIC_DURING_BATTLE), # cause locke's theme to keep playing through battles
             field.Branch(space.end_address + 1), # skip nops
         )
 

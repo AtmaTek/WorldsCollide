@@ -27,7 +27,7 @@ text_value = {
               '<dirk icon>'         : 0xd8,
               '<sword icon>'        : 0xd9,
               '<lance icon>'        : 0xda,
-              '<knife icon>'        : 0xdb,
+              '<katana icon>'       : 0xdb,
               '<rod icon>'          : 0xdc,
               '<brush icon>'        : 0xdd,
               '<stars icon>'        : 0xde,

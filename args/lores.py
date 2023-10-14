@@ -66,10 +66,10 @@ def options(args):
 
     lvl_x_spells = "Random" if args.lores_level_randomize else "Original"
     opts = [
-        ("Start Lores", start_lores),
-        ("MP", mp),
-        ("Everyone Learns", args.lores_everyone_learns),
-        ("L.x Spells", lvl_x_spells)
+        ("Start Lores", start_lores, "start_lores"),
+        ("MP", mp, "lores_mp"),
+        ("Everyone Learns", args.lores_everyone_learns, "lores_everyone_learns"),
+        ("L.x Spells", lvl_x_spells, "lvl_x_spells")
     ]
     
     
@@ -78,14 +78,14 @@ def options(args):
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         try:
             if key == "Start Lores":
                 value = value.replace("Random ", "")
             elif key == "MP":
                 value = value.replace("Random Value ", "")
                 value = value.replace("Random Percent ", "")
-            entries[index] = (key, value)
+            entries[index] = (key, value, unique_name)
         except:
             pass
     return (name(), entries)

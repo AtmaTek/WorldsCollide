@@ -54,6 +54,9 @@ class OperaHouseWOB(Event):
         self.ultros_battle_mod()
         self.after_battle_mod()
 
+        if not self.args.fixed_encounters_original:
+            self.fixed_battles_mod()
+
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
             self.character_music_mod(self.reward.id)
@@ -97,6 +100,25 @@ class OperaHouseWOB(Event):
             "BEGIN",
             field.Call(initialize),
         )
+
+    def fixed_battles_mod(self):
+        # The rafters have 5 fixed battles, all with the same pack (281)
+        # to increase the variety of encounters, we are adding 1 more and swapping 2 of the rats to it
+        # 414 is an otherwise unused encounter
+
+        replaced_encounters = [
+            (414, 0xAC37B), 
+            (414, 0xAC3B4),
+        ]
+        for pack_id_address in replaced_encounters:
+            pack_id = pack_id_address[0]
+            # first byte of the command is the pack_id
+            invoke_encounter_pack_address = pack_id_address[1]+1
+            space = Reserve(invoke_encounter_pack_address, invoke_encounter_pack_address, "rat invoke fixed battle (battle byte)")
+            space.write(
+                # subtrack 256 since WC stores fixed encounter IDs starting at 256
+                pack_id - 0x100
+            )
 
     def performance_mod(self):
         # change celes to party leader

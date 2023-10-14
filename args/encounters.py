@@ -57,33 +57,33 @@ def options(args):
     elif args.random_encounters_chupon:
         random_encounters = "Chupon"
 
-    result.append(("Random Encounters", random_encounters))
+    result.append(("Random Encounters", random_encounters, "random_encounters"))
     if args.random_encounters_random is not None:
-        result.append(("Boss Percent", f"{args.random_encounters_random}%"))
+        result.append(("Boss Percent", f"{args.random_encounters_random}%", "random_encounters_random"))
 
     fixed_encounters = "Original"
     if args.fixed_encounters_random is not None:
         fixed_encounters = "Random"
 
-    result.append(("Fixed Encounters", fixed_encounters))
+    result.append(("Fixed Encounters", fixed_encounters, "fixed_encounters"))
     if args.fixed_encounters_random is not None:
-        result.append(("Boss Percent", f"{args.fixed_encounters_random}%"))
+        result.append(("Boss Percent", f"{args.fixed_encounters_random}%", "fixed_encounters_random"))
 
     escapable = "Original"
     if args.encounters_escapable_random is not None:
         escapable = f"{args.encounters_escapable_random}%"
 
-    result.append(("Escapable", escapable))
+    result.append(("Escapable", escapable, "escapable"))
     return result
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         if key == "Random Encounters":
-            entries[index] = ("Random", value)
+            entries[index] = ("Random", value, unique_name)
         elif key == "Fixed Encounters":
-            entries[index] = ("Fixed", value)
+            entries[index] = ("Fixed", value, unique_name)
     return (name(), entries)
 
 def log(args):

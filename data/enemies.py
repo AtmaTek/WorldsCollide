@@ -344,16 +344,6 @@ class Enemies():
                     self.set_common_drop(enemy.id, steals_drops.pop(0))
                     self.set_rare_drop(enemy.id, steals_drops.pop(0))
 
-    def pad_enemy_packs(self):
-        from data.enemy_battle_groups import unused_event_battle_groups
-        for pack in self.packs.packs:
-            if pack.FORMATION_COUNT == 2:
-                # pack formation 0, 0 is Lobo -- it fills out unused spaces. Id 0, though, is MIAB Lobo, which we want to keep.
-                if (pack.formations == [0, 0] and pack.id > 0) or (pack.id in unused_event_battle_groups):
-                    # Add random formations to the empty pack
-                    this_formation = self.formations.get_random_normal()
-                    pack.formations = [this_formation, this_formation]
-
     def set_escapable(self):
         import random
 
@@ -381,10 +371,6 @@ class Enemies():
 
         if self.args.shuffle_steals_drops:
             self.shuffle_steals_drops_random()
-
-        if self.args.chest_random_monsters_enemy > 0:
-            # add more random groups to the otherwise limited event battle groups (all that's available for MIAB)
-            self.pad_enemy_packs()
 
         if self.args.permadeath:
             self.remove_fenix_downs()

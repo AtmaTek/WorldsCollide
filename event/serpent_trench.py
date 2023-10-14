@@ -22,7 +22,34 @@ class SerpentTrench(Event):
         elif self.reward.type == RewardType.ITEM:
             self.item_mod(self.reward.id)
 
+        if not self.args.fixed_encounters_original:
+            self.fixed_battles_mod()
+
         self.log_reward(self.reward)
+
+    def fixed_battles_mod(self):
+        # Serpents Trench has 3 fixed encounters: 
+        #  275 - encountered once (first battle)
+        #  276 - encountered 3 times
+        #  277 - encountered 3 times
+        # to increase the variety of encounters, we are adding 4 more and swapping 2 of the 276 and 2 of the 277s
+        # 410 - 413 are otherwise unused fixed encounters
+
+        replaced_encounters = [
+            (410, 0xA8BB7), 
+            (411, 0xA8C25),
+            (412, 0xA8BD0),
+            (413, 0xA8C6C),
+        ]
+        for pack_id_address in replaced_encounters:
+            pack_id = pack_id_address[0]
+            # first byte of the command is the pack_id
+            invoke_encounter_pack_address = pack_id_address[1]+1
+            space = Reserve(invoke_encounter_pack_address, invoke_encounter_pack_address, "serpent trench invoke fixed battle (battle byte)")
+            space.write(
+                # subtrack 256 since WC stores fixed encounter IDs starting at 256
+                pack_id - 0x100
+            )
 
     def cave_mod(self):
         self.maps.delete_event(0x0a7, 12, 22)

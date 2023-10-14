@@ -47,14 +47,14 @@ def flags(args):
 
 def options(args):
     return [
-        ("Sketch", args.fix_sketch),
-        ("Evade", args.fix_evade),
-        ("Vanish/Doom", args.fix_vanish_doom),
-        ("Retort", args.fix_retort),
-        ("Jump", args.fix_jump),
-        ("Boss Skip", args.fix_boss_skip),
-        ("Enemy Damage Counter", args.fix_enemy_damage_counter),
-        ("Capture", args.fix_capture),
+        ("Sketch", args.fix_sketch, "fix_sketch"),
+        ("Evade", args.fix_evade, "fix_evade"),
+        ("Vanish/Doom", args.fix_vanish_doom, "fix_vanish_doom"),
+        ("Retort", args.fix_retort, "fix_retort"),
+        ("Jump", args.fix_jump, "fix_jump"),
+        ("Boss Skip", args.fix_boss_skip, "fix_boss_skip"),
+        ("Enemy Damage Counter", args.fix_enemy_damage_counter, "fix_enemy_damage_counter"),
+        ("Capture", args.fix_capture, "fix_capture"),
     ]
 
 def menu(args):

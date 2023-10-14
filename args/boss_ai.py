@@ -31,10 +31,10 @@ def flags(args):
 
 def options(args):
     return [
-        ("Doom Gaze No Escape", args.doom_gaze_no_escape),
-        ("Wrexsoul No Zinger", args.wrexsoul_no_zinger),
-        ("MagiMaster No Ultima", args.magimaster_no_ultima),
-        ("Chadarnook More Demon", args.chadarnook_more_demon),
+        ("Doom Gaze No Escape", args.doom_gaze_no_escape, "doom_gaze_no_escape"),
+        ("Wrexsoul No Zinger", args.wrexsoul_no_zinger, "wrexsoul_no_zinger"),
+        ("MagiMaster No Ultima", args.magimaster_no_ultima, "magimaster_no_ultima"),
+        ("Chadarnook More Demon", args.chadarnook_more_demon, "chadarnook_more_demon"),
     ]
 
 def menu(args):

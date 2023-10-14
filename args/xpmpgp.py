@@ -33,10 +33,10 @@ def flags(args):
 
 def options(args):
     return [
-        ("Experience Multiplier", args.xp_mult),
-        ("Magic Points Multiplier", args.mp_mult),
-        ("Gold Multiplier", args.gp_mult),
-        ("No Exp Party Divide", args.no_exp_party_divide),
+        ("Experience Multiplier", args.xp_mult, "xp_mult"),
+        ("Magic Points Multiplier", args.mp_mult, "mp_mult"),
+        ("Gold Multiplier", args.gp_mult, "gp_mult"),
+        ("No Exp Party Divide", args.no_exp_party_divide, "no_exp_party_divide"),
     ]
 
 def menu(args):
@@ -44,12 +44,12 @@ def menu(args):
 
     entries = options(args)
     for index in range(3):
-        key, value = entries[index]
+        key, value, unique_name = entries[index]
 
         key = key.replace(" Multiplier", "")
         value = str(value) + 'x'
 
-        entries[index] = (key, value)
+        entries[index] = (key, value, unique_name)
 
     return (short_name, entries)
 

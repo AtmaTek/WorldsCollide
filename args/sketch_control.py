@@ -27,18 +27,17 @@ def options(args):
     accuracy = "100%" if args.sketch_control_improved_stats else "Original"
     stats = "Character" if args.sketch_control_improved_stats else "Original"
 
-    sketch_abilities = ("Sketch Ability", abilities)
-    sketch_stats = ("Sketch Stats", stats)
-    sketch_accuracy = ("Sketch Accuracy", accuracy)
+    sketch_abilities = ("Sketch Ability", abilities, "sketch_abilities")
+    sketch_stats = ("Sketch Stats", stats, "sketch_stats")
+    sketch_accuracy = ("Sketch Accuracy", accuracy, "sketch_accuracy")
 
-    control_abilities = ("Control Ability", abilities)
-    control_stats = ("Control Stats", stats)
+    control_abilities = ("Control Ability", abilities, "control_abilities")
+    control_stats = ("Control Stats", stats, "control_stats")
         
     return [
         sketch_abilities,
         sketch_accuracy,
         sketch_stats,
-        ("", ""),
         control_abilities,
         control_stats,
     ]

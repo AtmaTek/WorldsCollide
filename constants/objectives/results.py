@@ -94,6 +94,13 @@ category_types["Auto"].append(ResultType(63, "Auto Overcast", "Auto Overcast", N
 category_types["Auto"].append(ResultType(64, "Auto Dark", "Auto Dark", None))
 category_types["Auto"].append(ResultType(65, "Auto Clear", "Auto Clear", None))
 category_types["Auto"].append(ResultType(66, "Auto Imp", "Auto Imp", None))
+category_types["Item"].append(ResultType(67, "Throwables", "Throwables", None))
+category_types["Item"].append(ResultType(68, "Restoratives", "Restoratives", None))
+category_types["Item"].append(ResultType(69, "High Tier Weapon", "High Tier Weapon", None))
+category_types["Item"].append(ResultType(70, "High Tier Armor", "High Tier Armor", None))
+category_types["Item"].append(ResultType(71, "High Tier Shield", "High Tier Shield", None))
+category_types["Item"].append(ResultType(72, "High Tier Helm", "High Tier Helm", None))
+category_types["Item"].append(ResultType(73, "High Tier Relic", "High Tier Relic", None))
 
 categories = list(category_types.keys())
 

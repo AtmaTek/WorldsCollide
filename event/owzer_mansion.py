@@ -111,11 +111,13 @@ class OwzerMansion(Event):
 
     def character_music_mod(self, character):
         from music.song_utils import get_character_theme
-
-        space = Reserve(0xb4d1f, 0xb4d20, "Play Song Relm")
-        space.write([
+        src = [
             field.StartSong(get_character_theme(character)),
-        ])
+        ]
+        space = Reserve(0xb4d1f, 0xb4d20, "Play Song Relm")
+        space.write(src)
+        space = Reserve(0xb4cc6, 0xb4cc7, "Play Song Relm")
+        space.write(src)
 
     def character_mod(self, character):
         self.character_music_mod(character)

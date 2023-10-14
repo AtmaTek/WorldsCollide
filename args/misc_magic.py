@@ -41,18 +41,18 @@ def options(args):
         mp = f"Random Percent {args.magic_mp_random_percent_min}-{args.magic_mp_random_percent_max}%"
 
     return [
-        ("MP", mp),
+        ("MP", mp, "misc_magic_mp"),
     ]
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         try:
             if key == "MP":
                 value = value.replace("Random Value ", "")
                 value = value.replace("Random Percent ", "")
-            entries[index] = (key, value)
+            entries[index] = (key, value, unique_name)
         except:
             pass
     return (name(), entries)

@@ -282,6 +282,19 @@ id_palette = {
     344 : "Cleon (Player 1)-HoxNorf-PB4",
     345 : "Cleon (Player 2)-HoxNorf-PB4",
     346 : "Koishi-HoxNorf-Touhou",
+    347 : "Yamame-HoxNorf-Touhou",
+    348 : "Suika-HoxNorf-Touhou",
+    349 : "Eirin-HoxNorf-Touhou",
+    350 : "Riku-HoxNorf-KH",
+    351 : "Daryl-IvaarForkbeard_Odbarc-FF6",
+    352 : "Samus-Badass-Metroid",
+    353 : "Ridley-JamesWhite89-Metroid",
+    354 : "Marth-HoxNorf-FE",
+    355 : "Bartz (Knight)-HoxNorf-FF5",
+    356 : "Lenna (Knight)-HoxNorf-FF5",
+    357 : "Lenna (Thief)-HoxNorf-FF5",
+    358 : "Lenna (Summoner)-HoxNorf-FF5",
+    359 : "Lenna (Beastmaster)-HoxNorf-FF5",
 }
 
 def get_path(id_):

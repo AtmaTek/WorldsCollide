@@ -24,8 +24,8 @@ def flags(args):
 
 def options(args):
     return [
-        ("Fast SwdTech", args.fast_swdtech),
-        ("Everyone Learns", args.swdtechs_everyone_learns),
+        ("Fast SwdTech", args.fast_swdtech, "fast_swdtech"),
+        ("Everyone Learns", args.swdtechs_everyone_learns, "swdtechs_everyone_learns"),
     ]
 
 def menu(args):

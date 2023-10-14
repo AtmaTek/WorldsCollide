@@ -39,19 +39,19 @@ def options(args):
     character_stats = f"{args.character_stat_random_percent_min}-{args.character_stat_random_percent_max}%"
 
     return [
-        ("Start Average Level", args.start_average_level),
-        ("Start Level", args.start_level),
-        ("Start Naked", args.start_naked),
-        ("Equipable Umaro", args.equipable_umaro),
-        ("Character Stats", character_stats),
+        ("Start Average Level", args.start_average_level, "start_average_level"),
+        ("Start Level", args.start_level, "start_level"),
+        ("Start Naked", args.start_naked, "start_naked"),
+        ("Equipable Umaro", args.equipable_umaro, "equipable_umaro"),
+        ("Character Stats", character_stats, "character_stats"),
     ]
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         if key == "Character Stats":
-            entries[index] = ("Stats", entry[1])
+            entries[index] = ("Stats", entry[1], unique_name)
     return (name(), entries)
 
 def log(args):

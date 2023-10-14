@@ -34,6 +34,9 @@ class BurningHouse(Event):
         self.flame_eater_mod()
         self.wake_up_mod()
 
+        if not self.args.fixed_encounters_original:
+            self.fixed_battles_mod()
+
         if self.reward.type == RewardType.CHARACTER:
             self.character_mod(self.reward.id)
         elif self.reward.type == RewardType.ESPER:
@@ -130,6 +133,29 @@ class BurningHouse(Event):
         ]
         space = Write(Bank.CB, src, "burning house wake up")
         self.wake_up = space.start_address
+
+    def fixed_battles_mod(self):
+        # BH has 12 fixed encounters that all share the same pack ID
+        # to increase the variety of encounters, we are adding 1 more and swapping 6 of the flames to it
+        # 415 is an otherwise unused encounter
+
+        replaced_encounters = [
+            (415, 0xBE6FF), 
+            (415, 0xBE740),
+            (415, 0xBE70C),
+            (415, 0xBE733),
+            (415, 0xBE726),
+            (415, 0xBE74D),
+        ]
+        for pack_id_address in replaced_encounters:
+            pack_id = pack_id_address[0]
+            # first byte of the command is the pack_id
+            invoke_encounter_pack_address = pack_id_address[1]+1
+            space = Reserve(invoke_encounter_pack_address, invoke_encounter_pack_address, "flame invoke fixed battle (battle byte)")
+            space.write(
+                # subtrack 256 since WC stores fixed encounter IDs starting at 256
+                pack_id - 0x100
+            )
 
     def character_mod(self, character):
         shadow_npc_id = 0x1d

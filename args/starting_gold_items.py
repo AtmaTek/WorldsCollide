@@ -46,18 +46,17 @@ def flags(args):
 
 def options(args):
     opts = [
-        ("Start Gold", args.gold),
-        ("Start Moogle Charms", args.start_moogle_charms),
-        ("Start Sprint Shoes", args.start_sprint_shoes),
-        ("Start Warp Stones", args.start_warp_stones),
-        ("Start Fenix Downs", args.start_fenix_downs),
-        ("Start Tools", args.start_tools),
-        ("Start Junk", args.start_junk),
+        ("Start Gold", args.gold, "gold"),
+        ("Start Moogle Charms", args.start_moogle_charms, "start_moogle_charms"),
+        ("Start Sprint Shoes", args.start_sprint_shoes, "start_sprint_shoes"),
+        ("Start Warp Stones", args.start_warp_stones, "start_warp_stones"),
+        ("Start Fenix Downs", args.start_fenix_downs, "start_fenix_downs"),
+        ("Start Tools", args.start_tools, "start_tools"),
     ]
     
     if args.start_junk != 0:
         opts += [
-            ("Start Junk", args.start_junk)
+            ("Start Junk", args.start_junk, "start_junk")
         ]
 
     return opts

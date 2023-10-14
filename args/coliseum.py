@@ -80,11 +80,11 @@ def options(args):
             rewards_visible = f"{args.coliseum_rewards_visible_random_min}-{args.coliseum_rewards_visible_random_max}"
 
     return [
-        ("Opponents", opponents),
-        ("Rewards", rewards),
-        ("Rewards Visible", rewards_visible),
-        ("No Exp. Eggs", args.coliseum_no_exp_eggs),
-        ("No Illuminas", args.coliseum_no_illuminas),
+        ("Opponents", opponents, "opponents"),
+        ("Rewards", rewards, "rewards"),
+        ("Rewards Visible", rewards_visible, "rewards_visible"),
+        ("No Exp. Eggs", args.coliseum_no_exp_eggs, "coliseum_no_exp_eggs"),
+        ("No Illuminas", args.coliseum_no_illuminas, "coliseum_no_illuminas"),
     ]
 
 def menu(args):

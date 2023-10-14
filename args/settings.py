@@ -35,9 +35,9 @@ def options(args):
         game_mode = "Character Gating"
 
     return [
-        ("Mode", game_mode),
-        ("Seed", args.seed),
-        ("Spoiler Log", args.spoiler_log),
+        ("Mode", game_mode, "game_mode"),
+        ("Seed", args.seed, "seed"),
+        ("Spoiler Log", args.spoiler_log, "spoiler_log"),
     ]
 
 def menu(args):
@@ -45,7 +45,7 @@ def menu(args):
     for index, entry in enumerate(entries):
         if entry[0] == "Seed":
             if len(entry[1]) > 18:
-                entries[index] = (entry[0], entry[1][:15] + "...")
+                entries[index] = (entry[0], entry[1][:15] + "...", "seed")
             break
     return (name(), entries)
 

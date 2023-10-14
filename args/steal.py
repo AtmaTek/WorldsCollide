@@ -41,11 +41,11 @@ def options(args):
     if args.steal_chances_always:
         steal_chances = "Always"
 
-    result.append(("Chances", steal_chances))
+    result.append(("Chances", steal_chances, "steal_chances"))
 
-    result.append(("Shuffle", args.shuffle_steals_drops))
+    result.append(("Shuffle", args.shuffle_steals_drops, "shuffle_steals_drops"))
     if args.shuffle_steals_drops:
-        result.append(("Random Percent", f"{args.shuffle_steals_drops_random_percent}%"))
+        result.append(("Random Percent", f"{args.shuffle_steals_drops_random_percent}%", "shuffle_steals_drops_random_percent"))
 
     return result
 

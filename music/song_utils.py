@@ -3,7 +3,7 @@ from data.event_bit import TEMP_SONG_OVERRIDE
 from instruction import field
 
 character_to_song = {
-    TERRA: 0x05,
+    TERRA: 0x06,
     SHADOW: 0x07,
     STRAGO: 0x08,
     GAU: 0x09,

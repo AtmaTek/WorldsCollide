@@ -53,5 +53,11 @@ def get_separator(label):
 
     return separator
 
-def format_option(option, value):
+def format_option(option, value, unique_name = ''):
+    from constants.standard_flags import standard_flags
+    standard_flag = standard_flags.get(unique_name)
+    if(standard_flag != str(value)):
+        pass # nothing for now -- uncomment once we have new standard
+    #    option = f"!{option}" # prepend a ! to indicate it's non standard
+        
     return f"    {option:<26} {value}"

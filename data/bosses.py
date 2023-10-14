@@ -1,3 +1,8 @@
+# FF6Tools (https://everything8215.github.io/ff6tools/ff6tools.html) reference:
+# Here, "packs" refer to the Battle -> Random Battle Groups + Event Battle Groups. To line up Event Battle Groups with packs IDs, subtrack 256 from the pack ID below.
+# "Formations" refer to the Battle -> Battles listing. Those IDs should line up directly.
+# "Enemies" refer to Monster -> Monsters. Those IDs should line up directly.
+
 final_battle_pack_name = {
     357 : "Final Battle", # (face, short arm, long arm) no pack for other final battles
 }

@@ -14,6 +14,9 @@ from data.map_exit import ShortMapExit, LongMapExit
 import data.world_map_event_modifications as world_map_event_modifications
 from data.world_map import WorldMap
 
+import instruction.asm as asm
+from memory.space import Reserve
+
 class Maps():
     MAP_COUNT = 416
 
@@ -264,6 +267,14 @@ class Maps():
             new_le.event_address = space.start_address - EVENT_CODE_START
             self.add_long_event(map_id, new_le)
 
+    def _disable_saves(self):
+        # Ironmog mode -- disable saves
+        space = Reserve(0x32ead, 0x32eae, asm.NOP())
+        space.add_label("DISABLE SAVE", 0x32ebf)
+        space.write(
+            asm.BRA("DISABLE SAVE") # replace the vanilla BPL $2EBF to always branch)
+        )
+
     def mod(self, characters):
         self.npcs.mod(characters)
         self.chests.mod()
@@ -271,6 +282,8 @@ class Maps():
 
         self._fix_imperial_camp_boxes()
         self._fix_Cid_timer_glitch()
+        if self.args.no_saves:
+            self._disable_saves()
 
     def write(self):
         self.npcs.write()

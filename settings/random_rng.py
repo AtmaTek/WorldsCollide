@@ -4,8 +4,7 @@ import args
 
 class RandomRNG:
     def __init__(self):
-        if args.random_rng:
-            self.mod()
+        self.mod()
 
     def mod(self):
         import random

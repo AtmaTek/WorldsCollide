@@ -1,8 +1,12 @@
 unused_event_battle_groups = {
     9:   "B.Day Suit/Officer",
     10:  "Merchant/B.Day Suit",
+    12:  "Imperial Camp Templar & Doberman",
     13:  "Cyan vs Grunts",
     14:  "Cyan vs Grunts & Cadet",
+    33:  "Unused Trapper & Chaser",
+    36:  "Unused Sky Cap & PlutoArmor",
+    38:  "Narshe Security Checkpoint Dark Side",
     49:  "Empty",
     50:  "Empty",
     51:  "Empty",

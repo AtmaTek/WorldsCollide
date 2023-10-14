@@ -1,6 +1,8 @@
 from event.event import *
 
 class LeteRiver(Event):
+    BATTLE_1_INVOKE_ADDR = 0xb0498 # the event code that initiates fixed battle 1
+    BATTLE_2_INVOKE_ADDR = 0xb04a1 # the event code that initiated fixed battle 2
     def name(self):
         return "Lete River"
 
@@ -27,6 +29,7 @@ class LeteRiver(Event):
         if not self.args.fixed_encounters_original:
             self.fixed_battles_mod()
 
+        self.fixed_battle_location_mod()
         self.before_ultros_mod()
         self.ultros_mod()
         self.after_ultros_mod()
@@ -63,7 +66,7 @@ class LeteRiver(Event):
         battle_background = 13 # raft, right
 
         # NOTE third fixed battle at 0xb09c8 is removed, it was part of terra/edgar/banon scenario
-        fixed_battles = [(pack1_id, 0xb0498), (pack2_id, 0xb04a1)]
+        fixed_battles = [(pack1_id, self.BATTLE_1_INVOKE_ADDR), (pack2_id, self.BATTLE_2_INVOKE_ADDR)]
         for pack_id_address in fixed_battles:
             pack_id = pack_id_address[0]
             start_address = pack_id_address[1]
@@ -75,8 +78,71 @@ class LeteRiver(Event):
                                        battle_background, check_game_over = False),
             )
 
+    def fixed_battle_location_mod(self):
+        # to eliminate randomness across runners of the same seed, this eliminates the 50% chance encounters and turns some of them into 100% encounters
+        # This causes this many encounters based on your first choice if you don't go up at the second choice:
+        # - Left: 4 Fights total
+        # - Straight: 5 Fights total
+        # - Right: 4 Fights total
+        # The Second Choice Up loop adds 2 fights
+
+        # This contrasts with vanilla, in which:
+        #  - Left/Right (with no Up Loop) can give you max 9 fights/min 2 fights
+        #  - Straight (with no Up loop) can give you max 10 fights/min 3 fights
+        #  - The Up loop adds 3 fights possibilities
+
+        # Change to make to each encounter
+        TO_NOOP = 0 # ensure no encounter
+        TO_BATTLE_1 = 1 # force battle 1
+        TO_BATTLE_2 = 2 # force battle 2
+        # this list stores all of the calls to the 50% chance encounter subroutine and the change that we're making
+        chance_encounter_calls = \
+            [ # There is a Forced battle 1 before Straight/Left/Right choice
+              # Straight
+                (0xB0690, TO_NOOP),
+                # Forced battle 1 here
+                (0xB06B4, TO_BATTLE_2),
+                (0xB06D0, TO_NOOP),
+                # Forced battle 1 here
+              # Left 
+                # Forced battle 1 here
+                (0xB071B, TO_NOOP),
+                (0xB0734, TO_BATTLE_2),
+                (0xB0744, TO_NOOP),
+              # Right
+                (0xB076A, TO_NOOP),
+                # Forced battle 1 here
+                (0xB07A0, TO_BATTLE_2),
+                (0xB07B6, TO_NOOP),
+              # After First Cave, before Up/Left choice
+                (0xB07DD, TO_NOOP),
+              # Up
+                (0xB0809, TO_BATTLE_1),
+                (0xB081E, TO_BATTLE_2),
+                (0xB082D, TO_NOOP),
+              # Left
+                (0xB084E, TO_BATTLE_2),
+              # After Second Cave, before Boss
+                (0xB0873, TO_NOOP),
+                (0xB08A8, TO_NOOP),
+             ]
+        
+        for chance_encounter_call in chance_encounter_calls:
+            start_address = chance_encounter_call[0]
+            end_address = start_address+3
+            action = chance_encounter_call[1]
+            space = Reserve(start_address, end_address, "lete river call invoke battle subroutine", field.NOP())
+            if action == TO_BATTLE_1:
+                space.write(
+                    field.Call(self.BATTLE_1_INVOKE_ADDR)
+                )
+            elif action == TO_BATTLE_2:
+                space.write(
+                    field.Call(self.BATTLE_2_INVOKE_ADDR)
+                )
+
     def before_ultros_mod(self):
-        space = Reserve(0xb05a5, 0xb05e3, "lete river heal party, here we go", field.NOP())
+        space = Reserve(0xb05a5, 0xb05e3, "lete river heal party, here we go", field.NOP()) # unused dialog 0166 -- Here we go! This raft'll take us to Narshe!
         if self.args.character_gating:
             space.write(
                 field.ReturnIfEventBitClear(event_bit.character_recruited(self.character_gate())),
@@ -85,7 +151,7 @@ class LeteRiver(Event):
             field.Branch(space.end_address + 1), # skip nops
         )
 
-        space = Reserve(0xb0617, 0xb063c, "lete river tutorial", field.NOP())
+        space = Reserve(0xb0617, 0xb063c, "lete river tutorial", field.NOP()) # unused dialog 0169
 
         # skip setting started raft ride bit to avoid side effects (terra/edgar/banon party in narshe)
         space = Reserve(0xb066f, 0xb0670, "lete river set started raft ride bit", field.NOP())
@@ -97,7 +163,7 @@ class LeteRiver(Event):
             field.BranchIfEventBitSet(event_bit.RODE_RAFT_LETE_RIVER, 0xb092b),
         )
 
-        space = Reserve(0xb08ea, 0xb08ec, "lete river what is it?", field.NOP())
+        space = Reserve(0xb08ea, 0xb08ec, "lete river what is it?", field.NOP()) # unused dialog 0142 What? WHAT IS IT?
 
     def ultros_mod(self):
         boss_pack_id = self.get_boss("Ultros 1")
@@ -121,7 +187,7 @@ class LeteRiver(Event):
         space = Write(Bank.CB, src, "lete river after ultros")
         after_ultros = space.start_address
 
-        space = Reserve(0xb0916, 0xb091a, "lete river call after ultros", field.NOP())
+        space = Reserve(0xb0916, 0xb091a, "lete river call after ultros", field.NOP()) # unused dialog 0171 SABIN!!!
         space.write(
             field.Call(after_ultros),
         )

@@ -58,15 +58,15 @@ def options(args):
         natural_magic2 = args.natural_magic2.capitalize()
 
     return [
-        ("Natural Magic", natural_magic1),
-        ("Randomize Levels", args.random_natural_levels1),
-        ("Randomize Spells", args.random_natural_spells1),
+        ("Natural Magic", natural_magic1, "natural_magic1"),
+        ("Randomize Levels", args.random_natural_levels1, "random_natural_levels1"),
+        ("Randomize Spells", args.random_natural_spells1, "random_natural_spells1"),
 
-        ("Natural Magic", natural_magic2),
-        ("Randomize Levels", args.random_natural_levels2),
-        ("Randomize Spells", args.random_natural_spells2),
+        ("Natural Magic", natural_magic2, "natural_magic2"),
+        ("Randomize Levels", args.random_natural_levels2, "random_natural_levels2"),
+        ("Randomize Spells", args.random_natural_spells2, "random_natural_spells2"),
 
-        ("Menu Indicator", args.natural_magic_menu_indicator),
+        ("Menu Indicator", args.natural_magic_menu_indicator, "natural_magic_menu_indicator"),
     ]
 
 def menu(args):

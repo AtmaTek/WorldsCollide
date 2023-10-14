@@ -63,15 +63,15 @@ def options(args):
     elif args.chest_contents_empty:
         contents_value = "Empty"
 
-    result.append(("Contents", contents_value))
+    result.append(("Contents", contents_value, "contents_value"))
     if args.chest_contents_shuffle_random:
-        result.append(("Random Percent", f"{args.chest_contents_shuffle_random_percent}%"))
+        result.append(("Random Percent", f"{args.chest_contents_shuffle_random_percent}%", "chest_contents_shuffle_random_percent"))
     
     if args.chest_random_monsters:
-        result.append(("MIAB Percent", f"{args.chest_random_monsters_enemy}%"))
-        result.append(("  Boss Percent", f"{args.chest_random_monsters_boss}%"))
+        result.append(("MIAB Percent", f"{args.chest_random_monsters_enemy}%", "chest_random_monsters_enemy"))
+        result.append(("  Boss Percent", f"{args.chest_random_monsters_boss}%", "chest_random_monsters_boss"))
 
-    result.append(("MIAB Shuffled", args.chest_monsters_shuffle))
+    result.append(("MIAB Shuffled", args.chest_monsters_shuffle, "chest_monsters_shuffle"))
 
     return result
 

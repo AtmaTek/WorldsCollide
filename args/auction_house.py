@@ -31,10 +31,10 @@ def flags(args):
 
 def options(args):
     return [
-        ("Randomize Items", args.auction_random_items),
-        ("No Chocobo/Airship", args.auction_no_chocobo_airship),
-        ("Door Esper Hint", args.auction_door_esper_hint),
-        ("Max Espers", args.auction_max_espers),
+        ("Randomize Items", args.auction_random_items, "auction_random_items"),
+        ("No Chocobo/Airship", args.auction_no_chocobo_airship, "auction_no_chocobo_airship"),
+        ("Door Esper Hint", args.auction_door_esper_hint, "auction_door_esper_hint"),
+        ("Max Espers", args.auction_max_espers, "auction_max_espers"),
     ]
 
 def menu(args):

@@ -3,6 +3,7 @@ from settings.movement import Movement
 from settings.random_rng import RandomRNG
 from settings.permadeath import Permadeath
 from settings.y_npc import YNPC
+from settings.less_poison_blur import LessPoisonBlur
 from settings.config import Config
 
 from memory.space import Reserve
@@ -16,6 +17,7 @@ class Settings:
         self.random_rng = RandomRNG()
         self.permadeath = Permadeath()
         self.y_npc = YNPC()
+        self.less_poison_blur = LessPoisonBlur()
         self.config = Config()
 
         # do not auto load save file after game over

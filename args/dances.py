@@ -48,11 +48,11 @@ def options(args):
         start_dances = f"Random {args.start_dances_random_min}-{args.start_dances_random_max}"
 
     return [
-        ("Start Dances", start_dances),
-        ("Shuffle Abilities", args.dances_shuffle),
-        ("Display Abilities", args.dances_display_abilities),
-        ("No Stumble", args.dances_no_stumble),
-        ("Everyone Learns", args.dances_everyone_learns),
+        ("Start Dances", start_dances, "start_dances"),
+        ("Shuffle Abilities", args.dances_shuffle, "dances_shuffle"),
+        ("Display Abilities", args.dances_display_abilities, "dances_display_abilities"),
+        ("No Stumble", args.dances_no_stumble, "dances_no_stumble"),
+        ("Everyone Learns", args.dances_everyone_learns, "dances_everyone_learns"),
     ]
 
 def menu(args):

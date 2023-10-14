@@ -39,18 +39,18 @@ def options(args):
         start_rages = f"Random {args.start_rages_random_min}-{args.start_rages_random_max}"
 
     return [
-        ("Start Rages", start_rages),
-        ("No Leap", args.rages_no_leap),
-        ("No Charm", args.rages_no_charm),
+        ("Start Rages", start_rages, "start_rages"),
+        ("No Leap", args.rages_no_leap, "rages_no_leap"),
+        ("No Charm", args.rages_no_charm, "rages_no_charm"),
     ]
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         if key == "Start Rages":
             value = value.replace("Random ", "")
-            entries[index] = (key, value)
+            entries[index] = (key, value, unique_name)
     return (name(), entries)
 
 def log(args):

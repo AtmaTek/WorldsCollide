@@ -24,8 +24,8 @@ def flags(args):
 
 def options(args):
     return [
-        ("Bum Rush Last", args.bum_rush_last),
-        ("Everyone Learns", args.blitzes_everyone_learns),
+        ("Bum Rush Last", args.bum_rush_last, "bum_rush_last"),
+        ("Everyone Learns", args.blitzes_everyone_learns, "blitzes_everyone_learns"),
     ]
 
 def menu(args):

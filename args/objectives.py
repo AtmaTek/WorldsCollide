@@ -131,7 +131,7 @@ def log(args):
             result_args = "Random"
         else:
             result_args = '-'.join([str(arg) for arg in objective.result.args])
-        entry.append(format_option(result, result_args))
+        entry.append(format_option(result, result_args, f"{objective.result.name}"))
 
         for condition in objective.conditions:
             if condition.min_max:
@@ -143,10 +143,10 @@ def log(args):
                     condition_args = "Random"
                 else:
                     condition_args = condition.string_function(*condition.args)
-            entry.append(format_option("  " + condition.name, condition_args))
+            entry.append(format_option("  " + condition.name, condition_args, f"{objective.result.name}_{condition.name}"))
 
         conditions_required_args = f"{objective.conditions_required_min}-{objective.conditions_required_max}"
-        entry.append(format_option("Conditions Required", conditions_required_args))
+        entry.append(format_option("Conditions Required", conditions_required_args, f"{objective.result.name}_conditions_req"))
 
         if oi % 2:
             rentries.append(entry)

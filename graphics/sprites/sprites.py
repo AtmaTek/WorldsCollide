@@ -297,6 +297,19 @@ id_sprite = {
     342 : "Doom Guy-JamesWhite89-Doom",
     343 : "Cleon-HoxNorf-PB4",
     344 : "Koishi-HoxNorf-Touhou",
+    345 : "Yamame-HoxNorf-Touhou",
+    346 : "Suika-HoxNorf-Touhou",
+    347 : "Eirin-HoxNorf-Touhou",
+    348 : "Riku-HoxNorf-KH",
+    349 : "Daryl-IvaarForkbeard_Odbarc-FF6",
+    350 : "Samus-Badass-Metroid",
+    351 : "Ridley-JamesWhite89-Metroid",
+    352 : "Marth-HoxNorf-FE",
+    353 : "Bartz (Knight)-HoxNorf-FF5",
+    354 : "Lenna (Knight)-HoxNorf-FF5",
+    355 : "Lenna (Thief)-HoxNorf-FF5",
+    356 : "Lenna (Summoner)-HoxNorf-FF5",
+    357 : "Lenna (Beastmaster)-HoxNorf-FF5",
 }
 
 def get_path(id_):

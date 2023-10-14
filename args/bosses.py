@@ -92,25 +92,25 @@ def options(args):
         statue_battles = args.statue_boss_location.capitalize()
 
     return [
-        ("Boss Battles", boss_battles),
-        ("Dragons", dragon_battles),
-        ("Statues", statue_battles),
-        ("Shuffle/Random Phunbaba 3", args.shuffle_random_phunbaba3),
-        ("Normalize & Distort Stats", args.boss_normalize_distort_stats),
-        ("Boss Experience", args.boss_experience),
-        ("No Undead", args.boss_no_undead),
-        ("Marshal Keep Lobos", args.boss_marshal_keep_lobos),
+        ("Boss Battles", boss_battles, "boss_battles"),
+        ("Dragons", dragon_battles, "dragon_battles"),
+        ("Statues", statue_battles, "statue_battles"),
+        ("Shuffle/Random Phunbaba 3", args.shuffle_random_phunbaba3, "shuffle_random_phunbaba3"),
+        ("Normalize & Distort Stats", args.boss_normalize_distort_stats, "boss_normalize_distort_stats"),
+        ("Boss Experience", args.boss_experience, "boss_experience"),
+        ("No Undead", args.boss_no_undead, "boss_no_undead"),
+        ("Marshal Keep Lobos", args.boss_marshal_keep_lobos, "boss_marshal_keep_lobos"),
     ]
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
 
         if key == "Shuffle/Random Phunbaba 3":
-            entries[index] = ("Mix Phunbaba 3", value)
+            entries[index] = ("Mix Phunbaba 3", value, unique_name)
         elif key == "Normalize & Distort Stats":
-            entries[index] = ("Normalize & Distort", value)
+            entries[index] = ("Normalize & Distort", value, unique_name)
     return (name(), entries)
 
 def log(args):

@@ -143,22 +143,22 @@ def options(args):
     elif args.shops_expensive_super_balls:
         super_balls = "Expensive"
 
-    result = [("Inventory", inventory)]
+    result = [("Inventory", inventory, "shops_inventory")]
     if args.shop_inventory_shuffle_random:
-        result.append(("Random Percent", f"{args.shop_inventory_shuffle_random_percent}%"))
+        result.append(("Random Percent", f"{args.shop_inventory_shuffle_random_percent}%", "shops_random_percent"))
 
     result.extend([
-        ("Price", price),
-        ("Sell Fraction", sell_fraction),
-        ("Dried Meat", args.shop_dried_meat),
-        ("No Priceless Items", args.no_priceless_items),
-        ("No Breakable Rods", args.shops_no_breakable_rods),
-        ("Expensive Rods", args.shops_expensive_breakable_rods),
-        ("No Elemental Shields", args.shops_no_elemental_shields),
-        ("No Super Balls", args.shops_no_super_balls),
-        ("Expensive Balls", args.shops_expensive_super_balls),
-        ("No Exp. Eggs", args.shops_no_exp_eggs),
-        ("No Illuminas", args.shops_no_illuminas),
+        ("Price", price, "price"),
+        ("Sell Fraction", sell_fraction, "sell_fraction"),
+        ("Dried Meat", args.shop_dried_meat, "shop_dried_meat"),
+        ("No Priceless Items", args.no_priceless_items, "no_priceless_items"),
+        ("No Breakable Rods", args.shops_no_breakable_rods, "shops_no_breakable_rods"),
+        ("Expensive Rods", args.shops_expensive_breakable_rods, "shops_expensive_breakable_rods"),
+        ("No Elemental Shields", args.shops_no_elemental_shields, "shops_no_elemental_shields"),
+        ("No Super Balls", args.shops_no_super_balls, "shops_no_super_balls"),
+        ("Expensive Balls", args.shops_expensive_super_balls, "shops_expensive_super_balls"),
+        ("No Exp. Eggs", args.shops_no_exp_eggs, "shops_no_exp_eggs"),
+        ("No Illuminas", args.shops_no_illuminas, "shops_no_illuminas"),
     ])
     return result
 

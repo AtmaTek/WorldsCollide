@@ -3,6 +3,25 @@ EMPTY = 0xff
 
 BREAKABLE_RODS = range(53, 59)
 ELEMENTAL_SHIELDS = range(96, 99)
+DIRKS = range(0, 10)
+SWORDS = range(10, 29)
+LANCES = range(29, 37)
+KNIVES = range(37, 43)
+KATANAS = range(43, 51)
+RODS = range(51, 61)
+BRUSHES = range(61, 65)
+STARS = range(65, 68)
+SPECIAL = range(68, 77)
+GAMBLER = range(77, 83)
+CLAWS = range(83, 90)
+WEAPONS = range(0,90)
+SHIELDS = range(90, 105)
+HELMETS = range(105, 132)
+ARMORS = range(132, 163)
+TOOLS = range(163, 171)
+SKEANS = range(171, 176)
+RELICS = range(176, 231)
+
 
 id_name = {
     0   : "Dirk",
@@ -268,6 +287,7 @@ good_items = [
     "ValiantKnife",
     "Illumina",
     "Ragnarok",
+    "Atma Weapon",
     "Pearl Lance",
     "Aura Lance",
     "Magus Rod",
@@ -293,6 +313,45 @@ good_items = [
     "Gem Box",
     "Dragon Horn",
     "Marvel Shoes",
+    "Exp. Egg",
+]
+
+stronger_items = [
+    "ValiantKnife",
+    "Illumina",
+    "Ragnarok",
+    "Atma Weapon",
+    "Aura Lance",
+    "Fixed Dice",
+    "Flame Shld",
+    "Ice Shld",
+    "Thunder Shld",
+    "Paladin Shld",
+    "Force Shld",
+    "Cat Hood",
+    "Force Armor",
+    "Minerva",
+    "BehemothSuit",
+    "Snow Muffler",
+    "Genji Glove",
+    "Offering",
+    "Dragon Horn",
+    "Exp. Egg",
+]
+
+premium_items = [
+    "ValiantKnife",
+    "Illumina",
+    "Ragnarok",
+    "Atma Weapon",
+    "Fixed Dice",
+    "Flame Shld",
+    "Ice Shld",
+    "Thunder Shld",
+    "Paladin Shld",
+    "Minerva",
+    "Genji Glove",
+    "Offering",
     "Exp. Egg",
 ]
 

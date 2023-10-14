@@ -237,9 +237,9 @@ def options(args):
     elif args.level_scaling_time:
         level_scaling = "Time"
 
-    result.append(("Level Scaling", level_scaling))
+    result.append(("Level Scaling", level_scaling, "level_scaling"))
     if args.level_scaling_factor is not None:
-        result.append(("Level Scaling Factor", f"{args.level_scaling_factor:g}"))
+        result.append(("Level Scaling Factor", f"{args.level_scaling_factor:g}", "level_scaling_factor"))
 
     hp_mp_scaling = "None"
     if args.hp_mp_scaling_average:
@@ -257,9 +257,9 @@ def options(args):
     elif args.hp_mp_scaling_time:
         hp_mp_scaling = "Time"
 
-    result.append(("HP/MP Scaling", hp_mp_scaling))
+    result.append(("HP/MP Scaling", hp_mp_scaling, "hp_mp_scaling"))
     if args.hp_mp_scaling_factor is not None:
-        result.append(("HP/MP Scaling Factor", f"{args.hp_mp_scaling_factor:g}"))
+        result.append(("HP/MP Scaling Factor", f"{args.hp_mp_scaling_factor:g}", "hp_mp_scaling_factor"))
 
     xp_gp_scaling = "None"
     if args.xp_gp_scaling_average:
@@ -277,9 +277,9 @@ def options(args):
     elif args.xp_gp_scaling_time:
         xp_gp_scaling = "Time"
 
-    result.append(("Exp/GP Scaling", xp_gp_scaling))
+    result.append(("Exp/GP Scaling", xp_gp_scaling, "xp_gp_scaling"))
     if args.xp_gp_scaling_factor is not None:
-        result.append(("Exp/GP Scaling Factor", f"{args.xp_gp_scaling_factor:g}"))
+        result.append(("Exp/GP Scaling Factor", f"{args.xp_gp_scaling_factor:g}", "xp_gp_scaling_factor"))
 
     ability_scaling = "None"
     if args.ability_scaling_element:
@@ -287,13 +287,13 @@ def options(args):
     elif args.ability_scaling_random:
         ability_scaling = "Random"
 
-    result.append(("Ability Scaling", ability_scaling))
+    result.append(("Ability Scaling", ability_scaling, "ability_scaling"))
     if args.ability_scaling_factor is not None:
-        result.append(("Ability Scaling Factor", f"{args.ability_scaling_factor:g}"))
+        result.append(("Ability Scaling Factor", f"{args.ability_scaling_factor:g}", "ability_scaling_factor"))
 
-    result.append(("Max Scale Level", args.max_scale_level))
-    result.append(("Scale Eight Dragons", args.scale_eight_dragons))
-    result.append(("Scale Final Battles", args.scale_final_battles))
+    result.append(("Max Scale Level", args.max_scale_level, "max_scale_level"))
+    result.append(("Scale Eight Dragons", args.scale_eight_dragons, "scale_eight_dragons"))
+    result.append(("Scale Final Battles", args.scale_final_battles, "scale_final_battles"))
 
     return result
 
@@ -301,7 +301,7 @@ def menu(args):
     entries = options(args)
 
     for index, entry in enumerate(entries):
-        key, value = entry
+        key, value, unique_name = entry
         try:
             key = key.replace(" Scaling", "")
             value = value.replace("Party Average", "PAverage")
@@ -309,7 +309,7 @@ def menu(args):
             value = value.replace("Characters + Espers + Dragons", "C + E + D")
             value = value.replace("Characters + Espers", "C + E")
             value = value.replace("Bosses + Dragons", "B + D")
-            entries[index] = (key, value)
+            entries[index] = (key, value, unique_name)
         except:
             pass
     return (name(), entries)

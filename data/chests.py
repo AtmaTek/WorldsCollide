@@ -202,10 +202,9 @@ class Chests():
         else:
             MIAB_boss = [a for a in range(256) if a in boss_event_battle_groups.keys()]
 
-        # Respect boss modification flags
-        if not self.args.shuffle_random_phunbaba3:
-            # Remove Phunbaba 3 encounter from the MIAB_boss pool
-            MIAB_boss.remove(name_event_battle_group["Phunbaba 3"])
+        # Remove Phunbaba 3 encounter from the MIAB_boss pool -- doing this all the time regardless of flags because, as noted in enemy_packs.randomize_fixed, it can lead to odd behavior.
+        # Rather than testing the behavior across every possible chest, we'll just remove it to avoid the issue.
+        MIAB_boss.remove(name_event_battle_group["Phunbaba 3"])
 
         randomizable_types = [Chest.EMPTY, Chest.ITEM, Chest.GOLD]
         # Remove chests in the Zone Eater crushing ceiling room from the pool.

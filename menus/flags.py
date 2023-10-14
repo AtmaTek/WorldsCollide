@@ -21,7 +21,8 @@ class Flags(scroll_area.ScrollArea):
 
                     self.lines.append(scroll_area.Line(name, f0.set_blue_text_color))
                     for option in options:
-                        key, value = option
+                        key = option[0]
+                        value = option[1]
 
                         key = "  " + key.replace("&", "+")
 

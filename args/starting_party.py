@@ -58,20 +58,20 @@ def flags(args):
 def options(args):
     result = []
     start_chars = [args.start_char1, args.start_char2, args.start_char3, args.start_char4]
-    for start_char in start_chars:
+    for i, start_char in enumerate(start_chars):
         value = "None"
         if start_char == "randomngu":
             value = "Random (No Gogo/Umaro)"
         elif start_char:
             value = start_char.capitalize()
 
-        result.append(("Start Character", value))
+        result.append((f"Start Character {i+1}", value, f"start_char{i+1}"))
     return result
 
 def menu(args):
     entries = options(args)
     for index, entry in enumerate(entries):
-        entries[index] = (entry[1], "")
+        entries[index] = (entry[1], "", entry[2])
     return (name(), entries)
 
 def log(args):

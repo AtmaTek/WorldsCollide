@@ -6,8 +6,8 @@ Complete objectives while searching the worlds for characters, espers, and items
 
 ## Links
 
-###### Start playing: [ff6wc.com](https://www.ff6wc.com)
-###### More Info: [wiki.ff6wc.com](https://wiki.ff6wc.com)
+###### Start playing: [ff6worldscollide.com](https://www.ff6worldscollide.com)
+###### More Info: [wiki.ff6worldscollide.com](https://wiki.ff6worldscollide.com)
 ###### Community: [discord](https://discord.gg/5MPeng5)
 
 ## Usage

@@ -298,6 +298,19 @@ id_portrait = {
     389 : "Cleon-HoxNorf-PB4",
     390 : "Koishi-HoxNorf-Touhou",
     391 : "Reimu3-HoxNorf-Touhou",
+    392 : "Yamame-HoxNorf-Touhou",
+    393 : "Suika-HoxNorf-Touhou",
+    394 : "Eirin-HoxNorf-Touhou",
+    395 : "Riku-HoxNorf-KH",
+    396 : "Umaro (Morph)-CDude-FF6",
+    397 : "Daryl-IvaarForkbeard-FF6",
+    398 : "Samus-Unknown-Metroid",
+    399 : "Ridley-JamesWhite89-Metroid",
+    400 : "Marth-HoxNorf-FE",
+    401 : "Lenna (Knight)-JamesWhite89-FF5",
+    402 : "Lenna (Thief)-JamesWhite89-FF5",
+    403 : "Lenna (Summoner)-JamesWhite89-FF5",
+    404 : "Lenna (Beastmaster)-JamesWhite89-FF5",
 }
 
 def get_bin_path(id_):

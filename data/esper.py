@@ -131,6 +131,27 @@ class Esper(AbilityData):
         for spell_index in range(self.spell_count):
             self.spells[spell_index].rate = random.choice(self.LEARN_RATES)
 
+    def randomize_rates_tiered(self):
+        import random
+        from data.esper_spell_tiers import tiers
+        for spell_index in range(self.spell_count):
+            if self.spells[spell_index].id in tiers[0]:
+                self.spells[spell_index].rate = random.choice([10, 15, 16, 20])
+            elif self.spells[spell_index].id in tiers[1]:
+                self.spells[spell_index].rate = random.choice([5, 6, 7, 8])
+            elif self.spells[spell_index].id in tiers[2]:
+                self.spells[spell_index].rate = random.choice([1, 2, 3, 4])
+            elif self.spells[spell_index].id in tiers[3]:
+                self.spells[spell_index].rate = random.choice([10, 15, 16, 20])
+            elif self.spells[spell_index].id in tiers[4]:
+                self.spells[spell_index].rate = random.choice([6, 7, 8, 10, 15])
+            elif self.spells[spell_index].id in tiers[5]:
+                self.spells[spell_index].rate = random.choice([4, 5, 6, 7, 8])
+            elif self.spells[spell_index].id in tiers[6]:
+                self.spells[spell_index].rate = random.choice([2, 3, 4])
+            elif self.spells[spell_index].id in tiers[7]:
+                self.spells[spell_index].rate = 1
+
     def randomize_bonus(self):
         import random
         # exclude lvl percent bonuses

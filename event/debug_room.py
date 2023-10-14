@@ -1,5 +1,6 @@
 from event.event import *
 from data.npc import NPC
+from music.song_utils import get_character_theme
 
 class DebugRoom(Event):
     # Using the 3 Scenarios room as our debug map
@@ -21,6 +22,7 @@ class DebugRoom(Event):
         src = [
             field.RecruitCharacter(character),
             field.PlaySoundEffect(150),
+            field.StartSong(get_character_theme(character)),
             field.Return(),
         ]
         space = Write(Bank.CC, src, "Recruit NPC")

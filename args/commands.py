@@ -79,22 +79,22 @@ def options(args):
     result = []
     if args.commands is not None:
         for index, command_string in enumerate(args.command_strings):
-            result.append((COMMAND_OPTIONS[index], command_string))
+            result.append((COMMAND_OPTIONS[index], command_string, COMMAND_OPTIONS[index]))
     else:
         for option in COMMAND_OPTIONS:
-            result.append((option, option))
+            result.append((option, option, option))
 
-    result.append(("", ""))
-    result.append(("Shuffle Commands", args.shuffle_commands))
+    result.append(("", "", ""))
+    result.append(("Shuffle Commands", args.shuffle_commands, "shuffle_commands"))
 
-    add_exclude_command = lambda command : result.append(("Random Exclude", "None" if command == NONE_COMMAND else id_name[command]))
+    add_exclude_command = lambda command, i : result.append(("Random Exclude", "None" if command == NONE_COMMAND else id_name[command], f"random_exclude_command{i}"))
 
-    add_exclude_command(args.random_exclude_command1)
-    add_exclude_command(args.random_exclude_command2)
-    add_exclude_command(args.random_exclude_command3)
-    add_exclude_command(args.random_exclude_command4)
-    add_exclude_command(args.random_exclude_command5)
-    add_exclude_command(args.random_exclude_command6)
+    add_exclude_command(args.random_exclude_command1, 1)
+    add_exclude_command(args.random_exclude_command2, 2)
+    add_exclude_command(args.random_exclude_command3, 3)
+    add_exclude_command(args.random_exclude_command4, 4)
+    add_exclude_command(args.random_exclude_command5, 5)
+    add_exclude_command(args.random_exclude_command6, 6)
 
     return result
 
