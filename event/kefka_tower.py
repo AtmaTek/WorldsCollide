@@ -71,6 +71,11 @@ class KefkaTower(Event):
             field.SetEventBit(event_bit.CENTER_DOOR_KEFKA_TOWER),
             field.SetEventBit(event_bit.LEFT_RIGHT_DOORS_KEFKA_TOWER),
 
+            # clear out the Kefka switches due to bug with Phoenix Cave & KT Skip
+            field.ClearEventBit(event_bit.multipurpose_party1_step(2)),
+            field.ClearEventBit(event_bit.multipurpose_party2_step(2)),
+            field.ClearEventBit(event_bit.multipurpose_party3_step(2)),
+
             field.LoadMap(0x163, direction.DOWN, default_music = False,
                           x = 39, y = 9, fade_in = False, entrance_event = True),
 
