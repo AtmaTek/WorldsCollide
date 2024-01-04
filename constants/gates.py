@@ -78,8 +78,8 @@ character_checks = {
     ],
 
     "" : [
-        "Auction1",
-        "Auction2",
+        "Auction 1",
+        "Auction 2",
         "Fanatic's Tower Dragon",
         "Fanatic's Tower Leader",
         "Kefka's Tower Cell Beast",

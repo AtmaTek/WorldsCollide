@@ -18,8 +18,6 @@ class Checks(scroll_area.ScrollArea):
         self.check_bits = {}
         for name_bit in condition_bits.check_bit:
             self.check_bits[name_bit.name] = name_bit.bit
-        self.check_bits["Auction1"] = event_bit.AUCTION_BOUGHT_ESPER1
-        self.check_bits["Auction2"] = event_bit.AUCTION_BOUGHT_ESPER2
 
         if args.character_gating:
             self.character_gating_init()

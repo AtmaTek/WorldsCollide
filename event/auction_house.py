@@ -186,11 +186,12 @@ class AuctionHouse(Event):
         self.hide_chest_mod(0xb52c2, 0xb52c6, "hide chest2 in auction after winning")
         self.hide_chest_mod(0xb5a25, 0xb5a29, "hide chest2 in auction after winning in wor")
 
-    def receive_esper_mod(self, start_addr, end_addr, space_description, esper):
+    def receive_esper_mod(self, start_addr, end_addr, space_description, esper, event_bit_to_set):
         src = [
             field.AddEsper(esper, sound_effect = False),
             field.Dialog(self.espers.get_receive_esper_dialog(esper)),
             field.SetEventBit(event_bit.WON_AN_AUCTION),
+            field.SetEventBit(event_bit_to_set), # while this is also called right after this in the vanilla event code, it's required here to cause the check objective to fire
             field.FinishCheck(),
             field.Return(),
         ]
@@ -202,11 +203,12 @@ class AuctionHouse(Event):
             field.Call(receive_esper),
         )
 
-    def receive_check_item_mod(self, start_addr, end_addr, space_description, item):
+    def receive_check_item_mod(self, start_addr, end_addr, space_description, item, event_bit_to_set):
         src = [
             field.AddItem(item, sound_effect = False),
             field.Dialog(self.items.get_receive_dialog(item)),
             field.SetEventBit(event_bit.WON_AN_AUCTION),
+            field.SetEventBit(event_bit_to_set), # while this is also called right after this in the vanilla event code, it's required here to cause the check objective to fire
             field.FinishCheck(),
             field.Return(),
         ]
@@ -241,8 +243,8 @@ class AuctionHouse(Event):
         self.reward1_announce_dialog_mod(esper_name, False)
 
         # update esper received and dialog
-        self.receive_esper_mod(0xb5452, 0xb5456, "update esper1 received in auction", esper)
-        self.receive_esper_mod(0xb5b77, 0xb5b7b, "update esper1 received in auction in wor", esper)
+        self.receive_esper_mod(0xb5452, 0xb5456, "update esper1 received in auction", esper, event_bit.AUCTION_BOUGHT_ESPER1)
+        self.receive_esper_mod(0xb5b77, 0xb5b7b, "update esper1 received in auction in wor", esper, event_bit.AUCTION_BOUGHT_ESPER1)
 
     def item1_mod(self, item):
         item_name = self.items.get_name(item)
@@ -254,8 +256,8 @@ class AuctionHouse(Event):
         self.reward1_announce_dialog_mod(item_name, True)
 
         # update item received and dialog
-        self.receive_check_item_mod(0xb5452, 0xb5456, "update item1 received in auction", item)
-        self.receive_check_item_mod(0xb5b77, 0xb5b7b, "update item1 received in auction in wor", item)
+        self.receive_check_item_mod(0xb5452, 0xb5456, "update item1 received in auction", item, event_bit.AUCTION_BOUGHT_ESPER1)
+        self.receive_check_item_mod(0xb5b77, 0xb5b7b, "update item1 received in auction in wor", item, event_bit.AUCTION_BOUGHT_ESPER1)
 
     def esper2_mod(self, esper):
         esper_name = self.espers.get_name(esper)
@@ -264,8 +266,8 @@ class AuctionHouse(Event):
         self.reward2_announce_dialog_mod(esper_name, False)
 
         # update esper received and dialog
-        self.receive_esper_mod(0xb52c9, 0xb52cd, "update esper2 received in auction", esper)
-        self.receive_esper_mod(0xb5a2c, 0xb5a30, "update esper2 received in auction in wor", esper)
+        self.receive_esper_mod(0xb52c9, 0xb52cd, "update esper2 received in auction", esper, event_bit.AUCTION_BOUGHT_ESPER2)
+        self.receive_esper_mod(0xb5a2c, 0xb5a30, "update esper2 received in auction in wor", esper, event_bit.AUCTION_BOUGHT_ESPER2)
 
     def item2_mod(self, item):
         item_name = self.items.get_name(item)
@@ -277,8 +279,8 @@ class AuctionHouse(Event):
         self.reward2_announce_dialog_mod(item_name, True)
 
         # update item received and dialog
-        self.receive_check_item_mod(0xb52c9, 0xb52cd, "update item2 received in auction", item)
-        self.receive_check_item_mod(0xb5a2c, 0xb5a30, "update item2 received in auction in wor", item)
+        self.receive_check_item_mod(0xb52c9, 0xb52cd, "update item2 received in auction", item, event_bit.AUCTION_BOUGHT_ESPER2)
+        self.receive_check_item_mod(0xb5a2c, 0xb5a30, "update item2 received in auction in wor", item, event_bit.AUCTION_BOUGHT_ESPER2)
 
     def normal_item_set_announce_dialog(self, new_item_id, start_price, announce_dialog_id):
         item_name = self.items.get_name(new_item_id)

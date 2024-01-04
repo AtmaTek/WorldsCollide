@@ -23,10 +23,13 @@ class Objectives(scroll_area.ScrollArea):
             if len(objective.conditions) == 0:
                 self.lines.append(scroll_area.Line(" " + chr(self.special_characters_start + oi) + " required", f0.set_user_text_color))
             else:
-                conditions_required = " All " + str(objective.conditions_required) + " of"
+                conditions_required = ""
+                if objective.conditions_required != 1: # exclude "All 1 of"
+                    conditions_required = " All " + str(objective.conditions_required) + " of"
                 if objective.conditions_required < len(objective.conditions):
                     conditions_required = " Any " + str(objective.conditions_required) + " of"
-                self.lines.append(scroll_area.Line(conditions_required, f0.set_user_text_color))
+                if conditions_required != "":
+                    self.lines.append(scroll_area.Line(conditions_required, f0.set_user_text_color))
 
                 for condition in objective.conditions:
                     condition_line = "  " + str(condition)
@@ -37,8 +40,9 @@ class Objectives(scroll_area.ScrollArea):
                     ).space.start_address
                     self.lines.append(scroll_area.Line(condition_line, line_color_address))
 
-                completed_line = " -- " + chr(self.special_characters_start + oi) + " completed --"
-                self.lines.append(scroll_area.Line(completed_line, f0.set_user_text_color))
+                if conditions_required != "": #exclude "All 1 of"
+                    completed_line = " -- " + chr(self.special_characters_start + oi) + " completed --"
+                    self.lines.append(scroll_area.Line(completed_line, f0.set_user_text_color))
             self.lines.append(scroll_area.Line("", f0.set_user_text_color))
 
         if len(self.lines) == 0:

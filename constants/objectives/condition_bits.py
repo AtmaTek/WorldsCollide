@@ -66,12 +66,9 @@ check_bit = [
     NameBit("Whelk Gate", event_bit.DEFEATED_WHELK),
     NameBit("Zone Eater", event_bit.RECRUITED_GOGO_WOR),
     NameBit("Zozo Tower", event_bit.GOT_ZOZO_REWARD),
-    NameBit("Kefka's Tower Ambush", event_bit.DEFEATED_INFERNO),         # 59
-    NameBit("Kefka's Tower Guardian", event_bit.DEFEATED_GUARDIAN),      # 60
-    NameBit("KT Left Triad Statue", event_bit.DEFEATED_DOOM),            # 61
-    NameBit("KT Mid Triad Statue", event_bit.DEFEATED_POLTERGEIST),      # 62
-    NameBit("KT Right Triad Statue", event_bit.DEFEATED_GODDESS),        # 63
-    NameBit("Narshe Moogle Defense", event_bit.FINISHED_MOOGLE_DEFENSE), # 64,
+    NameBit("Narshe Moogle Defense", event_bit.FINISHED_MOOGLE_DEFENSE), 
+    NameBit("Auction 1", event_bit.AUCTION_BOUGHT_ESPER1),
+    NameBit("Auction 2", event_bit.AUCTION_BOUGHT_ESPER2),
 ]
 
 
@@ -86,6 +83,11 @@ quest_bit = [
     NameBit("Suplex A Train", event_bit.SUPLEXED_TRAIN),
     NameBit("Win An Auction", event_bit.WON_AN_AUCTION),
     NameBit("Win A Coliseum Match", event_bit.WON_A_COLISEUM_MATCH),
+    NameBit("Defeat KT Ambusher", event_bit.DEFEATED_INFERNO),
+    NameBit("Defeat KT Robot", event_bit.DEFEATED_GUARDIAN),
+    NameBit("Defeat KT Left Statue", event_bit.DEFEATED_DOOM),
+    NameBit("Defeat KT Mid Statue", event_bit.DEFEATED_POLTERGEIST),
+    NameBit("Defeat KT Right Statue", event_bit.DEFEATED_GODDESS),
 ]
 
 from constants.objectives.boss_ids import boss_objective_ids
