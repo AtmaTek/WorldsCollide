@@ -59,6 +59,10 @@ class Arguments:
             # if no output_file given add seed to output name
             name, ext = os.path.splitext(self.input_file)
             self.output_file = f"{name}_wc_{self.seed}{ext}"
+        elif os.path.isdir(self.output_file):
+            name, ext = os.path.splitext(os.path.basename(self.input_file))
+            # If output_file is a directory, construct the full path with above filename
+            self.output_file = os.path.join(self.output_file, f"{name}_wc_{self.seed}{ext}")            
 
         if self.debug:
             self.spoiler_log = True
